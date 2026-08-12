@@ -1,0 +1,1804 @@
+﻿{
+    "openapi":  "3.1.0",
+    "info":  {
+                 "title":  "QuizVerse AI Backend",
+                 "version":  "1.0.0"
+             },
+    "paths":  {
+                  "/api/v1/auth/register":  {
+                                                "post":  {
+                                                             "tags":  [
+                                                                          "Authentication"
+                                                                      ],
+                                                             "summary":  "Register",
+                                                             "description":  "Register a new user, hashing their password and storing details in PostgreSQL.",
+                                                             "operationId":  "register_api_v1_auth_register_post",
+                                                             "requestBody":  {
+                                                                                 "content":  {
+                                                                                                 "application/json":  {
+                                                                                                                          "schema":  {
+                                                                                                                                         "$ref":  "#/components/schemas/UserRegister"
+                                                                                                                                     }
+                                                                                                                      }
+                                                                                             },
+                                                                                 "required":  true
+                                                                             },
+                                                             "responses":  {
+                                                                               "201":  {
+                                                                                           "description":  "Successful Response",
+                                                                                           "content":  {
+                                                                                                           "application/json":  {
+                                                                                                                                    "schema":  {
+                                                                                                                                                   "$ref":  "#/components/schemas/UserResponse"
+                                                                                                                                               }
+                                                                                                                                }
+                                                                                                       }
+                                                                                       },
+                                                                               "422":  {
+                                                                                           "description":  "Validation Error",
+                                                                                           "content":  {
+                                                                                                           "application/json":  {
+                                                                                                                                    "schema":  {
+                                                                                                                                                   "$ref":  "#/components/schemas/HTTPValidationError"
+                                                                                                                                               }
+                                                                                                                                }
+                                                                                                       }
+                                                                                       }
+                                                                           }
+                                                         }
+                                            },
+                  "/api/v1/auth/login":  {
+                                             "post":  {
+                                                          "tags":  [
+                                                                       "Authentication"
+                                                                   ],
+                                                          "summary":  "Login",
+                                                          "description":  "Authenticate user with email/password and return a JWT access token.",
+                                                          "operationId":  "login_api_v1_auth_login_post",
+                                                          "requestBody":  {
+                                                                              "content":  {
+                                                                                              "application/json":  {
+                                                                                                                       "schema":  {
+                                                                                                                                      "$ref":  "#/components/schemas/UserLogin"
+                                                                                                                                  }
+                                                                                                                   },
+                                                                                              "application/x-www-form-urlencoded":  {
+                                                                                                                                        "schema":  {
+                                                                                                                                                       "properties":  {
+                                                                                                                                                                          "username":  {
+                                                                                                                                                                                           "type":  "string",
+                                                                                                                                                                                           "description":  "Email address"
+                                                                                                                                                                                       },
+                                                                                                                                                                          "password":  {
+                                                                                                                                                                                           "type":  "string",
+                                                                                                                                                                                           "format":  "password"
+                                                                                                                                                                                       }
+                                                                                                                                                                      },
+                                                                                                                                                       "type":  "object",
+                                                                                                                                                       "required":  [
+                                                                                                                                                                        "username",
+                                                                                                                                                                        "password"
+                                                                                                                                                                    ]
+                                                                                                                                                   }
+                                                                                                                                    }
+                                                                                          },
+                                                                              "required":  true
+                                                                          },
+                                                          "responses":  {
+                                                                            "200":  {
+                                                                                        "description":  "Successful Response",
+                                                                                        "content":  {
+                                                                                                        "application/json":  {
+                                                                                                                                 "schema":  {
+                                                                                                                                                "$ref":  "#/components/schemas/Token"
+                                                                                                                                            }
+                                                                                                                             }
+                                                                                                    }
+                                                                                    }
+                                                                        }
+                                                      }
+                                         },
+                  "/api/v1/users/me":  {
+                                           "get":  {
+                                                       "tags":  [
+                                                                    "Users"
+                                                                ],
+                                                       "summary":  "Read User Me",
+                                                       "description":  "Retrieve the current logged-in user\u0027s profile details.",
+                                                       "operationId":  "read_user_me_api_v1_users_me_get",
+                                                       "responses":  {
+                                                                         "200":  {
+                                                                                     "description":  "Successful Response",
+                                                                                     "content":  {
+                                                                                                     "application/json":  {
+                                                                                                                              "schema":  {
+                                                                                                                                             "$ref":  "#/components/schemas/UserResponse"
+                                                                                                                                         }
+                                                                                                                          }
+                                                                                                 }
+                                                                                 }
+                                                                     },
+                                                       "security":  [
+                                                                        {
+                                                                            "OAuth2PasswordBearer":  [
+
+                                                                                                     ]
+                                                                        }
+                                                                    ]
+                                                   }
+                                       },
+                  "/api/v1/quizzes":  {
+                                          "post":  {
+                                                       "tags":  [
+                                                                    "Quizzes"
+                                                                ],
+                                                       "summary":  "Create Quiz",
+                                                       "description":  "Create a new quiz, including its questions and options. Protected for teachers and admins.",
+                                                       "operationId":  "create_quiz_api_v1_quizzes_post",
+                                                       "security":  [
+                                                                        {
+                                                                            "OAuth2PasswordBearer":  [
+
+                                                                                                     ]
+                                                                        }
+                                                                    ],
+                                                       "requestBody":  {
+                                                                           "required":  true,
+                                                                           "content":  {
+                                                                                           "application/json":  {
+                                                                                                                    "schema":  {
+                                                                                                                                   "$ref":  "#/components/schemas/QuizCreate"
+                                                                                                                               }
+                                                                                                                }
+                                                                                       }
+                                                                       },
+                                                       "responses":  {
+                                                                         "201":  {
+                                                                                     "description":  "Successful Response",
+                                                                                     "content":  {
+                                                                                                     "application/json":  {
+                                                                                                                              "schema":  {
+                                                                                                                                             "$ref":  "#/components/schemas/QuizResponse"
+                                                                                                                                         }
+                                                                                                                          }
+                                                                                                 }
+                                                                                 },
+                                                                         "422":  {
+                                                                                     "description":  "Validation Error",
+                                                                                     "content":  {
+                                                                                                     "application/json":  {
+                                                                                                                              "schema":  {
+                                                                                                                                             "$ref":  "#/components/schemas/HTTPValidationError"
+                                                                                                                                         }
+                                                                                                                          }
+                                                                                                 }
+                                                                                 }
+                                                                     }
+                                                   },
+                                          "get":  {
+                                                      "tags":  [
+                                                                   "Quizzes"
+                                                               ],
+                                                      "summary":  "Read Quizzes",
+                                                      "description":  "Retrieve quizzes. Accessible to all logged-in students, teachers, and admins.",
+                                                      "operationId":  "read_quizzes_api_v1_quizzes_get",
+                                                      "security":  [
+                                                                       {
+                                                                           "OAuth2PasswordBearer":  [
+
+                                                                                                    ]
+                                                                       }
+                                                                   ],
+                                                      "parameters":  [
+                                                                         {
+                                                                             "name":  "skip",
+                                                                             "in":  "query",
+                                                                             "required":  false,
+                                                                             "schema":  {
+                                                                                            "type":  "integer",
+                                                                                            "default":  0,
+                                                                                            "title":  "Skip"
+                                                                                        }
+                                                                         },
+                                                                         {
+                                                                             "name":  "limit",
+                                                                             "in":  "query",
+                                                                             "required":  false,
+                                                                             "schema":  {
+                                                                                            "type":  "integer",
+                                                                                            "default":  100,
+                                                                                            "title":  "Limit"
+                                                                                        }
+                                                                         }
+                                                                     ],
+                                                      "responses":  {
+                                                                        "200":  {
+                                                                                    "description":  "Successful Response",
+                                                                                    "content":  {
+                                                                                                    "application/json":  {
+                                                                                                                             "schema":  {
+                                                                                                                                            "type":  "array",
+                                                                                                                                            "items":  {
+                                                                                                                                                          "$ref":  "#/components/schemas/QuizResponse"
+                                                                                                                                                      },
+                                                                                                                                            "title":  "Response Read Quizzes Api V1 Quizzes Get"
+                                                                                                                                        }
+                                                                                                                         }
+                                                                                                }
+                                                                                },
+                                                                        "422":  {
+                                                                                    "description":  "Validation Error",
+                                                                                    "content":  {
+                                                                                                    "application/json":  {
+                                                                                                                             "schema":  {
+                                                                                                                                            "$ref":  "#/components/schemas/HTTPValidationError"
+                                                                                                                                        }
+                                                                                                                         }
+                                                                                                }
+                                                                                }
+                                                                    }
+                                                  }
+                                      },
+                  "/api/v1/quizzes/{id}":  {
+                                               "get":  {
+                                                           "tags":  [
+                                                                        "Quizzes"
+                                                                    ],
+                                                           "summary":  "Read Quiz",
+                                                           "description":  "Get a specific quiz by ID. Accessible to all logged-in students, teachers, and admins.",
+                                                           "operationId":  "read_quiz_api_v1_quizzes__id__get",
+                                                           "security":  [
+                                                                            {
+                                                                                "OAuth2PasswordBearer":  [
+
+                                                                                                         ]
+                                                                            }
+                                                                        ],
+                                                           "parameters":  [
+                                                                              {
+                                                                                  "name":  "id",
+                                                                                  "in":  "path",
+                                                                                  "required":  true,
+                                                                                  "schema":  {
+                                                                                                 "type":  "string",
+                                                                                                 "format":  "uuid",
+                                                                                                 "title":  "Id"
+                                                                                             }
+                                                                              }
+                                                                          ],
+                                                           "responses":  {
+                                                                             "200":  {
+                                                                                         "description":  "Successful Response",
+                                                                                         "content":  {
+                                                                                                         "application/json":  {
+                                                                                                                                  "schema":  {
+                                                                                                                                                 "$ref":  "#/components/schemas/QuizResponse"
+                                                                                                                                             }
+                                                                                                                              }
+                                                                                                     }
+                                                                                     },
+                                                                             "422":  {
+                                                                                         "description":  "Validation Error",
+                                                                                         "content":  {
+                                                                                                         "application/json":  {
+                                                                                                                                  "schema":  {
+                                                                                                                                                 "$ref":  "#/components/schemas/HTTPValidationError"
+                                                                                                                                             }
+                                                                                                                              }
+                                                                                                     }
+                                                                                     }
+                                                                         }
+                                                       },
+                                               "put":  {
+                                                           "tags":  [
+                                                                        "Quizzes"
+                                                                    ],
+                                                           "summary":  "Update Quiz",
+                                                           "description":  "Update a quiz, including nested questions and options.\nProtected for teachers and admins.",
+                                                           "operationId":  "update_quiz_api_v1_quizzes__id__put",
+                                                           "security":  [
+                                                                            {
+                                                                                "OAuth2PasswordBearer":  [
+
+                                                                                                         ]
+                                                                            }
+                                                                        ],
+                                                           "parameters":  [
+                                                                              {
+                                                                                  "name":  "id",
+                                                                                  "in":  "path",
+                                                                                  "required":  true,
+                                                                                  "schema":  {
+                                                                                                 "type":  "string",
+                                                                                                 "format":  "uuid",
+                                                                                                 "title":  "Id"
+                                                                                             }
+                                                                              }
+                                                                          ],
+                                                           "requestBody":  {
+                                                                               "required":  true,
+                                                                               "content":  {
+                                                                                               "application/json":  {
+                                                                                                                        "schema":  {
+                                                                                                                                       "$ref":  "#/components/schemas/QuizUpdate"
+                                                                                                                                   }
+                                                                                                                    }
+                                                                                           }
+                                                                           },
+                                                           "responses":  {
+                                                                             "200":  {
+                                                                                         "description":  "Successful Response",
+                                                                                         "content":  {
+                                                                                                         "application/json":  {
+                                                                                                                                  "schema":  {
+                                                                                                                                                 "$ref":  "#/components/schemas/QuizResponse"
+                                                                                                                                             }
+                                                                                                                              }
+                                                                                                     }
+                                                                                     },
+                                                                             "422":  {
+                                                                                         "description":  "Validation Error",
+                                                                                         "content":  {
+                                                                                                         "application/json":  {
+                                                                                                                                  "schema":  {
+                                                                                                                                                 "$ref":  "#/components/schemas/HTTPValidationError"
+                                                                                                                                             }
+                                                                                                                              }
+                                                                                                     }
+                                                                                     }
+                                                                         }
+                                                       },
+                                               "delete":  {
+                                                              "tags":  [
+                                                                           "Quizzes"
+                                                                       ],
+                                                              "summary":  "Delete Quiz",
+                                                              "description":  "Delete a quiz. Cascades to questions and options. Protected for teachers and admins.",
+                                                              "operationId":  "delete_quiz_api_v1_quizzes__id__delete",
+                                                              "security":  [
+                                                                               {
+                                                                                   "OAuth2PasswordBearer":  [
+
+                                                                                                            ]
+                                                                               }
+                                                                           ],
+                                                              "parameters":  [
+                                                                                 {
+                                                                                     "name":  "id",
+                                                                                     "in":  "path",
+                                                                                     "required":  true,
+                                                                                     "schema":  {
+                                                                                                    "type":  "string",
+                                                                                                    "format":  "uuid",
+                                                                                                    "title":  "Id"
+                                                                                                }
+                                                                                 }
+                                                                             ],
+                                                              "responses":  {
+                                                                                "204":  {
+                                                                                            "description":  "Successful Response"
+                                                                                        },
+                                                                                "422":  {
+                                                                                            "description":  "Validation Error",
+                                                                                            "content":  {
+                                                                                                            "application/json":  {
+                                                                                                                                     "schema":  {
+                                                                                                                                                    "$ref":  "#/components/schemas/HTTPValidationError"
+                                                                                                                                                }
+                                                                                                                                 }
+                                                                                                        }
+                                                                                        }
+                                                                            }
+                                                          }
+                                           },
+                  "/health":  {
+                                  "get":  {
+                                              "tags":  [
+                                                           "Health"
+                                                       ],
+                                              "summary":  "Health Check",
+                                              "description":  "Service Health Check Endpoint",
+                                              "operationId":  "health_check_health_get",
+                                              "responses":  {
+                                                                "200":  {
+                                                                            "description":  "Successful Response",
+                                                                            "content":  {
+                                                                                            "application/json":  {
+                                                                                                                     "schema":  {
+
+                                                                                                                                }
+                                                                                                                 }
+                                                                                        }
+                                                                        }
+                                                            }
+                                          }
+                              },
+                  "/health/db":  {
+                                     "get":  {
+                                                 "tags":  [
+                                                              "Health"
+                                                          ],
+                                                 "summary":  "Db Health Check",
+                                                 "description":  "Database Health Check Endpoint verifying active AsyncSession connectivity.",
+                                                 "operationId":  "db_health_check_health_db_get",
+                                                 "responses":  {
+                                                                   "200":  {
+                                                                               "description":  "Successful Response",
+                                                                               "content":  {
+                                                                                               "application/json":  {
+                                                                                                                        "schema":  {
+
+                                                                                                                                   }
+                                                                                                                    }
+                                                                                           }
+                                                                           }
+                                                               }
+                                             }
+                                 },
+                  "/":  {
+                            "get":  {
+                                        "tags":  [
+                                                     "Root"
+                                                 ],
+                                        "summary":  "Root",
+                                        "operationId":  "root__get",
+                                        "responses":  {
+                                                          "200":  {
+                                                                      "description":  "Successful Response",
+                                                                      "content":  {
+                                                                                      "application/json":  {
+                                                                                                               "schema":  {
+
+                                                                                                                          }
+                                                                                                           }
+                                                                                  }
+                                                                  }
+                                                      }
+                                    }
+                        }
+              },
+    "components":  {
+                       "schemas":  {
+                                       "HTTPValidationError":  {
+                                                                   "properties":  {
+                                                                                      "detail":  {
+                                                                                                     "items":  {
+                                                                                                                   "$ref":  "#/components/schemas/ValidationError"
+                                                                                                               },
+                                                                                                     "type":  "array",
+                                                                                                     "title":  "Detail"
+                                                                                                 }
+                                                                                  },
+                                                                   "type":  "object",
+                                                                   "title":  "HTTPValidationError"
+                                                               },
+                                       "QuestionCreate":  {
+                                                              "properties":  {
+                                                                                 "text":  {
+                                                                                              "type":  "string",
+                                                                                              "title":  "Text"
+                                                                                          },
+                                                                                 "difficulty":  {
+                                                                                                    "type":  "string",
+                                                                                                    "title":  "Difficulty"
+                                                                                                },
+                                                                                 "topic":  {
+                                                                                               "type":  "string",
+                                                                                               "title":  "Topic"
+                                                                                           },
+                                                                                 "marks":  {
+                                                                                               "type":  "integer",
+                                                                                               "title":  "Marks"
+                                                                                           },
+                                                                                 "explanation":  {
+                                                                                                     "anyOf":  [
+                                                                                                                   {
+                                                                                                                       "type":  "string"
+                                                                                                                   },
+                                                                                                                   {
+                                                                                                                       "type":  "null"
+                                                                                                                   }
+                                                                                                               ],
+                                                                                                     "title":  "Explanation"
+                                                                                                 },
+                                                                                 "question_type":  {
+                                                                                                       "type":  "string",
+                                                                                                       "title":  "Question Type",
+                                                                                                       "default":  "mcq"
+                                                                                                   },
+                                                                                 "bloom_level":  {
+                                                                                                     "anyOf":  [
+                                                                                                                   {
+                                                                                                                       "type":  "string"
+                                                                                                                   },
+                                                                                                                   {
+                                                                                                                       "type":  "null"
+                                                                                                                   }
+                                                                                                               ],
+                                                                                                     "title":  "Bloom Level"
+                                                                                                 },
+                                                                                 "subtopic":  {
+                                                                                                  "anyOf":  [
+                                                                                                                {
+                                                                                                                    "type":  "string"
+                                                                                                                },
+                                                                                                                {
+                                                                                                                    "type":  "null"
+                                                                                                                }
+                                                                                                            ],
+                                                                                                  "title":  "Subtopic"
+                                                                                              },
+                                                                                 "estimated_time":  {
+                                                                                                        "anyOf":  [
+                                                                                                                      {
+                                                                                                                          "type":  "integer"
+                                                                                                                      },
+                                                                                                                      {
+                                                                                                                          "type":  "null"
+                                                                                                                      }
+                                                                                                                  ],
+                                                                                                        "title":  "Estimated Time"
+                                                                                                    },
+                                                                                 "negative_marks":  {
+                                                                                                        "type":  "number",
+                                                                                                        "title":  "Negative Marks",
+                                                                                                        "default":  0.0
+                                                                                                    },
+                                                                                 "hint":  {
+                                                                                              "anyOf":  [
+                                                                                                            {
+                                                                                                                "type":  "string"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "type":  "null"
+                                                                                                            }
+                                                                                                        ],
+                                                                                              "title":  "Hint"
+                                                                                          },
+                                                                                 "ai_generated":  {
+                                                                                                      "type":  "boolean",
+                                                                                                      "title":  "Ai Generated",
+                                                                                                      "default":  false
+                                                                                                  },
+                                                                                 "version":  {
+                                                                                                 "type":  "integer",
+                                                                                                 "title":  "Version",
+                                                                                                 "default":  1
+                                                                                             },
+                                                                                 "options":  {
+                                                                                                 "items":  {
+                                                                                                               "$ref":  "#/components/schemas/QuestionOptionCreate"
+                                                                                                           },
+                                                                                                 "type":  "array",
+                                                                                                 "title":  "Options"
+                                                                                             }
+                                                                             },
+                                                              "type":  "object",
+                                                              "required":  [
+                                                                               "text",
+                                                                               "difficulty",
+                                                                               "topic",
+                                                                               "marks"
+                                                                           ],
+                                                              "title":  "QuestionCreate"
+                                                          },
+                                       "QuestionOptionCreate":  {
+                                                                    "properties":  {
+                                                                                       "text":  {
+                                                                                                    "type":  "string",
+                                                                                                    "title":  "Text"
+                                                                                                },
+                                                                                       "is_correct":  {
+                                                                                                          "type":  "boolean",
+                                                                                                          "title":  "Is Correct",
+                                                                                                          "default":  false
+                                                                                                      },
+                                                                                       "display_order":  {
+                                                                                                             "type":  "integer",
+                                                                                                             "title":  "Display Order",
+                                                                                                             "default":  0
+                                                                                                         }
+                                                                                   },
+                                                                    "type":  "object",
+                                                                    "required":  [
+                                                                                     "text"
+                                                                                 ],
+                                                                    "title":  "QuestionOptionCreate"
+                                                                },
+                                       "QuestionOptionResponse":  {
+                                                                      "properties":  {
+                                                                                         "text":  {
+                                                                                                      "type":  "string",
+                                                                                                      "title":  "Text"
+                                                                                                  },
+                                                                                         "is_correct":  {
+                                                                                                            "type":  "boolean",
+                                                                                                            "title":  "Is Correct",
+                                                                                                            "default":  false
+                                                                                                        },
+                                                                                         "display_order":  {
+                                                                                                               "type":  "integer",
+                                                                                                               "title":  "Display Order",
+                                                                                                               "default":  0
+                                                                                                           },
+                                                                                         "id":  {
+                                                                                                    "type":  "string",
+                                                                                                    "format":  "uuid",
+                                                                                                    "title":  "Id"
+                                                                                                },
+                                                                                         "question_id":  {
+                                                                                                             "type":  "string",
+                                                                                                             "format":  "uuid",
+                                                                                                             "title":  "Question Id"
+                                                                                                         }
+                                                                                     },
+                                                                      "type":  "object",
+                                                                      "required":  [
+                                                                                       "text",
+                                                                                       "id",
+                                                                                       "question_id"
+                                                                                   ],
+                                                                      "title":  "QuestionOptionResponse"
+                                                                  },
+                                       "QuestionOptionUpdate":  {
+                                                                    "properties":  {
+                                                                                       "id":  {
+                                                                                                  "anyOf":  [
+                                                                                                                {
+                                                                                                                    "type":  "string",
+                                                                                                                    "format":  "uuid"
+                                                                                                                },
+                                                                                                                {
+                                                                                                                    "type":  "null"
+                                                                                                                }
+                                                                                                            ],
+                                                                                                  "title":  "Id"
+                                                                                              },
+                                                                                       "text":  {
+                                                                                                    "type":  "string",
+                                                                                                    "title":  "Text"
+                                                                                                },
+                                                                                       "is_correct":  {
+                                                                                                          "type":  "boolean",
+                                                                                                          "title":  "Is Correct"
+                                                                                                      },
+                                                                                       "display_order":  {
+                                                                                                             "type":  "integer",
+                                                                                                             "title":  "Display Order",
+                                                                                                             "default":  0
+                                                                                                         }
+                                                                                   },
+                                                                    "type":  "object",
+                                                                    "required":  [
+                                                                                     "text",
+                                                                                     "is_correct"
+                                                                                 ],
+                                                                    "title":  "QuestionOptionUpdate"
+                                                                },
+                                       "QuestionResponse":  {
+                                                                "properties":  {
+                                                                                   "text":  {
+                                                                                                "type":  "string",
+                                                                                                "title":  "Text"
+                                                                                            },
+                                                                                   "difficulty":  {
+                                                                                                      "type":  "string",
+                                                                                                      "title":  "Difficulty"
+                                                                                                  },
+                                                                                   "topic":  {
+                                                                                                 "type":  "string",
+                                                                                                 "title":  "Topic"
+                                                                                             },
+                                                                                   "marks":  {
+                                                                                                 "type":  "integer",
+                                                                                                 "title":  "Marks"
+                                                                                             },
+                                                                                   "explanation":  {
+                                                                                                       "anyOf":  [
+                                                                                                                     {
+                                                                                                                         "type":  "string"
+                                                                                                                     },
+                                                                                                                     {
+                                                                                                                         "type":  "null"
+                                                                                                                     }
+                                                                                                                 ],
+                                                                                                       "title":  "Explanation"
+                                                                                                   },
+                                                                                   "question_type":  {
+                                                                                                         "type":  "string",
+                                                                                                         "title":  "Question Type",
+                                                                                                         "default":  "mcq"
+                                                                                                     },
+                                                                                   "bloom_level":  {
+                                                                                                       "anyOf":  [
+                                                                                                                     {
+                                                                                                                         "type":  "string"
+                                                                                                                     },
+                                                                                                                     {
+                                                                                                                         "type":  "null"
+                                                                                                                     }
+                                                                                                                 ],
+                                                                                                       "title":  "Bloom Level"
+                                                                                                   },
+                                                                                   "subtopic":  {
+                                                                                                    "anyOf":  [
+                                                                                                                  {
+                                                                                                                      "type":  "string"
+                                                                                                                  },
+                                                                                                                  {
+                                                                                                                      "type":  "null"
+                                                                                                                  }
+                                                                                                              ],
+                                                                                                    "title":  "Subtopic"
+                                                                                                },
+                                                                                   "estimated_time":  {
+                                                                                                          "anyOf":  [
+                                                                                                                        {
+                                                                                                                            "type":  "integer"
+                                                                                                                        },
+                                                                                                                        {
+                                                                                                                            "type":  "null"
+                                                                                                                        }
+                                                                                                                    ],
+                                                                                                          "title":  "Estimated Time"
+                                                                                                      },
+                                                                                   "negative_marks":  {
+                                                                                                          "type":  "number",
+                                                                                                          "title":  "Negative Marks",
+                                                                                                          "default":  0.0
+                                                                                                      },
+                                                                                   "hint":  {
+                                                                                                "anyOf":  [
+                                                                                                              {
+                                                                                                                  "type":  "string"
+                                                                                                              },
+                                                                                                              {
+                                                                                                                  "type":  "null"
+                                                                                                              }
+                                                                                                          ],
+                                                                                                "title":  "Hint"
+                                                                                            },
+                                                                                   "ai_generated":  {
+                                                                                                        "type":  "boolean",
+                                                                                                        "title":  "Ai Generated",
+                                                                                                        "default":  false
+                                                                                                    },
+                                                                                   "version":  {
+                                                                                                   "type":  "integer",
+                                                                                                   "title":  "Version",
+                                                                                                   "default":  1
+                                                                                               },
+                                                                                   "id":  {
+                                                                                              "type":  "string",
+                                                                                              "format":  "uuid",
+                                                                                              "title":  "Id"
+                                                                                          },
+                                                                                   "quiz_id":  {
+                                                                                                   "type":  "string",
+                                                                                                   "format":  "uuid",
+                                                                                                   "title":  "Quiz Id"
+                                                                                               },
+                                                                                   "options":  {
+                                                                                                   "items":  {
+                                                                                                                 "$ref":  "#/components/schemas/QuestionOptionResponse"
+                                                                                                             },
+                                                                                                   "type":  "array",
+                                                                                                   "title":  "Options"
+                                                                                               }
+                                                                               },
+                                                                "type":  "object",
+                                                                "required":  [
+                                                                                 "text",
+                                                                                 "difficulty",
+                                                                                 "topic",
+                                                                                 "marks",
+                                                                                 "id",
+                                                                                 "quiz_id"
+                                                                             ],
+                                                                "title":  "QuestionResponse"
+                                                            },
+                                       "QuestionUpdate":  {
+                                                              "properties":  {
+                                                                                 "id":  {
+                                                                                            "anyOf":  [
+                                                                                                          {
+                                                                                                              "type":  "string",
+                                                                                                              "format":  "uuid"
+                                                                                                          },
+                                                                                                          {
+                                                                                                              "type":  "null"
+                                                                                                          }
+                                                                                                      ],
+                                                                                            "title":  "Id"
+                                                                                        },
+                                                                                 "text":  {
+                                                                                              "anyOf":  [
+                                                                                                            {
+                                                                                                                "type":  "string"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "type":  "null"
+                                                                                                            }
+                                                                                                        ],
+                                                                                              "title":  "Text"
+                                                                                          },
+                                                                                 "difficulty":  {
+                                                                                                    "anyOf":  [
+                                                                                                                  {
+                                                                                                                      "type":  "string"
+                                                                                                                  },
+                                                                                                                  {
+                                                                                                                      "type":  "null"
+                                                                                                                  }
+                                                                                                              ],
+                                                                                                    "title":  "Difficulty"
+                                                                                                },
+                                                                                 "topic":  {
+                                                                                               "anyOf":  [
+                                                                                                             {
+                                                                                                                 "type":  "string"
+                                                                                                             },
+                                                                                                             {
+                                                                                                                 "type":  "null"
+                                                                                                             }
+                                                                                                         ],
+                                                                                               "title":  "Topic"
+                                                                                           },
+                                                                                 "marks":  {
+                                                                                               "anyOf":  [
+                                                                                                             {
+                                                                                                                 "type":  "integer"
+                                                                                                             },
+                                                                                                             {
+                                                                                                                 "type":  "null"
+                                                                                                             }
+                                                                                                         ],
+                                                                                               "title":  "Marks"
+                                                                                           },
+                                                                                 "explanation":  {
+                                                                                                     "anyOf":  [
+                                                                                                                   {
+                                                                                                                       "type":  "string"
+                                                                                                                   },
+                                                                                                                   {
+                                                                                                                       "type":  "null"
+                                                                                                                   }
+                                                                                                               ],
+                                                                                                     "title":  "Explanation"
+                                                                                                 },
+                                                                                 "question_type":  {
+                                                                                                       "anyOf":  [
+                                                                                                                     {
+                                                                                                                         "type":  "string"
+                                                                                                                     },
+                                                                                                                     {
+                                                                                                                         "type":  "null"
+                                                                                                                     }
+                                                                                                                 ],
+                                                                                                       "title":  "Question Type"
+                                                                                                   },
+                                                                                 "bloom_level":  {
+                                                                                                     "anyOf":  [
+                                                                                                                   {
+                                                                                                                       "type":  "string"
+                                                                                                                   },
+                                                                                                                   {
+                                                                                                                       "type":  "null"
+                                                                                                                   }
+                                                                                                               ],
+                                                                                                     "title":  "Bloom Level"
+                                                                                                 },
+                                                                                 "subtopic":  {
+                                                                                                  "anyOf":  [
+                                                                                                                {
+                                                                                                                    "type":  "string"
+                                                                                                                },
+                                                                                                                {
+                                                                                                                    "type":  "null"
+                                                                                                                }
+                                                                                                            ],
+                                                                                                  "title":  "Subtopic"
+                                                                                              },
+                                                                                 "estimated_time":  {
+                                                                                                        "anyOf":  [
+                                                                                                                      {
+                                                                                                                          "type":  "integer"
+                                                                                                                      },
+                                                                                                                      {
+                                                                                                                          "type":  "null"
+                                                                                                                      }
+                                                                                                                  ],
+                                                                                                        "title":  "Estimated Time"
+                                                                                                    },
+                                                                                 "negative_marks":  {
+                                                                                                        "anyOf":  [
+                                                                                                                      {
+                                                                                                                          "type":  "number"
+                                                                                                                      },
+                                                                                                                      {
+                                                                                                                          "type":  "null"
+                                                                                                                      }
+                                                                                                                  ],
+                                                                                                        "title":  "Negative Marks"
+                                                                                                    },
+                                                                                 "hint":  {
+                                                                                              "anyOf":  [
+                                                                                                            {
+                                                                                                                "type":  "string"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "type":  "null"
+                                                                                                            }
+                                                                                                        ],
+                                                                                              "title":  "Hint"
+                                                                                          },
+                                                                                 "ai_generated":  {
+                                                                                                      "anyOf":  [
+                                                                                                                    {
+                                                                                                                        "type":  "boolean"
+                                                                                                                    },
+                                                                                                                    {
+                                                                                                                        "type":  "null"
+                                                                                                                    }
+                                                                                                                ],
+                                                                                                      "title":  "Ai Generated"
+                                                                                                  },
+                                                                                 "version":  {
+                                                                                                 "anyOf":  [
+                                                                                                               {
+                                                                                                                   "type":  "integer"
+                                                                                                               },
+                                                                                                               {
+                                                                                                                   "type":  "null"
+                                                                                                               }
+                                                                                                           ],
+                                                                                                 "title":  "Version"
+                                                                                             },
+                                                                                 "options":  {
+                                                                                                 "anyOf":  [
+                                                                                                               {
+                                                                                                                   "items":  {
+                                                                                                                                 "$ref":  "#/components/schemas/QuestionOptionUpdate"
+                                                                                                                             },
+                                                                                                                   "type":  "array"
+                                                                                                               },
+                                                                                                               {
+                                                                                                                   "type":  "null"
+                                                                                                               }
+                                                                                                           ],
+                                                                                                 "title":  "Options"
+                                                                                             }
+                                                                             },
+                                                              "type":  "object",
+                                                              "title":  "QuestionUpdate"
+                                                          },
+                                       "QuizCreate":  {
+                                                          "properties":  {
+                                                                             "title":  {
+                                                                                           "type":  "string",
+                                                                                           "title":  "Title"
+                                                                                       },
+                                                                             "description":  {
+                                                                                                 "anyOf":  [
+                                                                                                               {
+                                                                                                                   "type":  "string"
+                                                                                                               },
+                                                                                                               {
+                                                                                                                   "type":  "null"
+                                                                                                               }
+                                                                                                           ],
+                                                                                                 "title":  "Description"
+                                                                                             },
+                                                                             "subject":  {
+                                                                                             "type":  "string",
+                                                                                             "title":  "Subject"
+                                                                                         },
+                                                                             "duration":  {
+                                                                                              "type":  "integer",
+                                                                                              "title":  "Duration"
+                                                                                          },
+                                                                             "randomize_questions":  {
+                                                                                                         "type":  "boolean",
+                                                                                                         "title":  "Randomize Questions",
+                                                                                                         "default":  false
+                                                                                                     },
+                                                                             "randomize_options":  {
+                                                                                                       "type":  "boolean",
+                                                                                                       "title":  "Randomize Options",
+                                                                                                       "default":  false
+                                                                                                   },
+                                                                             "anti_cheating_enabled":  {
+                                                                                                           "type":  "boolean",
+                                                                                                           "title":  "Anti Cheating Enabled",
+                                                                                                           "default":  false
+                                                                                                       },
+                                                                             "ai_feedback_enabled":  {
+                                                                                                         "type":  "boolean",
+                                                                                                         "title":  "Ai Feedback Enabled",
+                                                                                                         "default":  false
+                                                                                                     },
+                                                                             "department":  {
+                                                                                                "anyOf":  [
+                                                                                                              {
+                                                                                                                  "type":  "string"
+                                                                                                              },
+                                                                                                              {
+                                                                                                                  "type":  "null"
+                                                                                                              }
+                                                                                                          ],
+                                                                                                "title":  "Department"
+                                                                                            },
+                                                                             "semester":  {
+                                                                                              "anyOf":  [
+                                                                                                            {
+                                                                                                                "type":  "string"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "type":  "null"
+                                                                                                            }
+                                                                                                        ],
+                                                                                              "title":  "Semester"
+                                                                                          },
+                                                                             "total_marks":  {
+                                                                                                 "type":  "integer",
+                                                                                                 "title":  "Total Marks",
+                                                                                                 "default":  0
+                                                                                             },
+                                                                             "pass_percentage":  {
+                                                                                                     "type":  "number",
+                                                                                                     "title":  "Pass Percentage",
+                                                                                                     "default":  40.0
+                                                                                                 },
+                                                                             "visibility":  {
+                                                                                                "type":  "string",
+                                                                                                "title":  "Visibility",
+                                                                                                "default":  "public"
+                                                                                            },
+                                                                             "status":  {
+                                                                                            "type":  "string",
+                                                                                            "title":  "Status",
+                                                                                            "default":  "draft"
+                                                                                        },
+                                                                             "language":  {
+                                                                                              "type":  "string",
+                                                                                              "title":  "Language",
+                                                                                              "default":  "en"
+                                                                                          },
+                                                                             "fullscreen_required":  {
+                                                                                                         "type":  "boolean",
+                                                                                                         "title":  "Fullscreen Required",
+                                                                                                         "default":  false
+                                                                                                     },
+                                                                             "adaptive_mode":  {
+                                                                                                   "type":  "boolean",
+                                                                                                   "title":  "Adaptive Mode",
+                                                                                                   "default":  false
+                                                                                               },
+                                                                             "allow_review":  {
+                                                                                                  "type":  "boolean",
+                                                                                                  "title":  "Allow Review",
+                                                                                                  "default":  true
+                                                                                              },
+                                                                             "start_time":  {
+                                                                                                "anyOf":  [
+                                                                                                              {
+                                                                                                                  "type":  "string",
+                                                                                                                  "format":  "date-time"
+                                                                                                              },
+                                                                                                              {
+                                                                                                                  "type":  "null"
+                                                                                                              }
+                                                                                                          ],
+                                                                                                "title":  "Start Time"
+                                                                                            },
+                                                                             "end_time":  {
+                                                                                              "anyOf":  [
+                                                                                                            {
+                                                                                                                "type":  "string",
+                                                                                                                "format":  "date-time"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "type":  "null"
+                                                                                                            }
+                                                                                                        ],
+                                                                                              "title":  "End Time"
+                                                                                          },
+                                                                             "quiz_code":  {
+                                                                                               "type":  "string",
+                                                                                               "title":  "Quiz Code"
+                                                                                           },
+                                                                             "published_at":  {
+                                                                                                  "anyOf":  [
+                                                                                                                {
+                                                                                                                    "type":  "string",
+                                                                                                                    "format":  "date-time"
+                                                                                                                },
+                                                                                                                {
+                                                                                                                    "type":  "null"
+                                                                                                                }
+                                                                                                            ],
+                                                                                                  "title":  "Published At"
+                                                                                              },
+                                                                             "max_attempts":  {
+                                                                                                  "type":  "integer",
+                                                                                                  "title":  "Max Attempts",
+                                                                                                  "default":  1
+                                                                                              },
+                                                                             "questions":  {
+                                                                                               "items":  {
+                                                                                                             "$ref":  "#/components/schemas/QuestionCreate"
+                                                                                                         },
+                                                                                               "type":  "array",
+                                                                                               "title":  "Questions"
+                                                                                           }
+                                                                         },
+                                                          "type":  "object",
+                                                          "required":  [
+                                                                           "title",
+                                                                           "subject",
+                                                                           "duration",
+                                                                           "quiz_code"
+                                                                       ],
+                                                          "title":  "QuizCreate"
+                                                      },
+                                       "QuizResponse":  {
+                                                            "properties":  {
+                                                                               "title":  {
+                                                                                             "type":  "string",
+                                                                                             "title":  "Title"
+                                                                                         },
+                                                                               "description":  {
+                                                                                                   "anyOf":  [
+                                                                                                                 {
+                                                                                                                     "type":  "string"
+                                                                                                                 },
+                                                                                                                 {
+                                                                                                                     "type":  "null"
+                                                                                                                 }
+                                                                                                             ],
+                                                                                                   "title":  "Description"
+                                                                                               },
+                                                                               "subject":  {
+                                                                                               "type":  "string",
+                                                                                               "title":  "Subject"
+                                                                                           },
+                                                                               "duration":  {
+                                                                                                "type":  "integer",
+                                                                                                "title":  "Duration"
+                                                                                            },
+                                                                               "randomize_questions":  {
+                                                                                                           "type":  "boolean",
+                                                                                                           "title":  "Randomize Questions",
+                                                                                                           "default":  false
+                                                                                                       },
+                                                                               "randomize_options":  {
+                                                                                                         "type":  "boolean",
+                                                                                                         "title":  "Randomize Options",
+                                                                                                         "default":  false
+                                                                                                     },
+                                                                               "anti_cheating_enabled":  {
+                                                                                                             "type":  "boolean",
+                                                                                                             "title":  "Anti Cheating Enabled",
+                                                                                                             "default":  false
+                                                                                                         },
+                                                                               "ai_feedback_enabled":  {
+                                                                                                           "type":  "boolean",
+                                                                                                           "title":  "Ai Feedback Enabled",
+                                                                                                           "default":  false
+                                                                                                       },
+                                                                               "department":  {
+                                                                                                  "anyOf":  [
+                                                                                                                {
+                                                                                                                    "type":  "string"
+                                                                                                                },
+                                                                                                                {
+                                                                                                                    "type":  "null"
+                                                                                                                }
+                                                                                                            ],
+                                                                                                  "title":  "Department"
+                                                                                              },
+                                                                               "semester":  {
+                                                                                                "anyOf":  [
+                                                                                                              {
+                                                                                                                  "type":  "string"
+                                                                                                              },
+                                                                                                              {
+                                                                                                                  "type":  "null"
+                                                                                                              }
+                                                                                                          ],
+                                                                                                "title":  "Semester"
+                                                                                            },
+                                                                               "total_marks":  {
+                                                                                                   "type":  "integer",
+                                                                                                   "title":  "Total Marks",
+                                                                                                   "default":  0
+                                                                                               },
+                                                                               "pass_percentage":  {
+                                                                                                       "type":  "number",
+                                                                                                       "title":  "Pass Percentage",
+                                                                                                       "default":  40.0
+                                                                                                   },
+                                                                               "visibility":  {
+                                                                                                  "type":  "string",
+                                                                                                  "title":  "Visibility",
+                                                                                                  "default":  "public"
+                                                                                              },
+                                                                               "status":  {
+                                                                                              "type":  "string",
+                                                                                              "title":  "Status",
+                                                                                              "default":  "draft"
+                                                                                          },
+                                                                               "language":  {
+                                                                                                "type":  "string",
+                                                                                                "title":  "Language",
+                                                                                                "default":  "en"
+                                                                                            },
+                                                                               "fullscreen_required":  {
+                                                                                                           "type":  "boolean",
+                                                                                                           "title":  "Fullscreen Required",
+                                                                                                           "default":  false
+                                                                                                       },
+                                                                               "adaptive_mode":  {
+                                                                                                     "type":  "boolean",
+                                                                                                     "title":  "Adaptive Mode",
+                                                                                                     "default":  false
+                                                                                                 },
+                                                                               "allow_review":  {
+                                                                                                    "type":  "boolean",
+                                                                                                    "title":  "Allow Review",
+                                                                                                    "default":  true
+                                                                                                },
+                                                                               "start_time":  {
+                                                                                                  "anyOf":  [
+                                                                                                                {
+                                                                                                                    "type":  "string",
+                                                                                                                    "format":  "date-time"
+                                                                                                                },
+                                                                                                                {
+                                                                                                                    "type":  "null"
+                                                                                                                }
+                                                                                                            ],
+                                                                                                  "title":  "Start Time"
+                                                                                              },
+                                                                               "end_time":  {
+                                                                                                "anyOf":  [
+                                                                                                              {
+                                                                                                                  "type":  "string",
+                                                                                                                  "format":  "date-time"
+                                                                                                              },
+                                                                                                              {
+                                                                                                                  "type":  "null"
+                                                                                                              }
+                                                                                                          ],
+                                                                                                "title":  "End Time"
+                                                                                            },
+                                                                               "quiz_code":  {
+                                                                                                 "type":  "string",
+                                                                                                 "title":  "Quiz Code"
+                                                                                             },
+                                                                               "published_at":  {
+                                                                                                    "anyOf":  [
+                                                                                                                  {
+                                                                                                                      "type":  "string",
+                                                                                                                      "format":  "date-time"
+                                                                                                                  },
+                                                                                                                  {
+                                                                                                                      "type":  "null"
+                                                                                                                  }
+                                                                                                              ],
+                                                                                                    "title":  "Published At"
+                                                                                                },
+                                                                               "max_attempts":  {
+                                                                                                    "type":  "integer",
+                                                                                                    "title":  "Max Attempts",
+                                                                                                    "default":  1
+                                                                                                },
+                                                                               "id":  {
+                                                                                          "type":  "string",
+                                                                                          "format":  "uuid",
+                                                                                          "title":  "Id"
+                                                                                      },
+                                                                               "created_by_id":  {
+                                                                                                     "type":  "string",
+                                                                                                     "format":  "uuid",
+                                                                                                     "title":  "Created By Id"
+                                                                                                 },
+                                                                               "created_at":  {
+                                                                                                  "type":  "string",
+                                                                                                  "format":  "date-time",
+                                                                                                  "title":  "Created At"
+                                                                                              },
+                                                                               "updated_at":  {
+                                                                                                  "type":  "string",
+                                                                                                  "format":  "date-time",
+                                                                                                  "title":  "Updated At"
+                                                                                              },
+                                                                               "questions":  {
+                                                                                                 "items":  {
+                                                                                                               "$ref":  "#/components/schemas/QuestionResponse"
+                                                                                                           },
+                                                                                                 "type":  "array",
+                                                                                                 "title":  "Questions"
+                                                                                             }
+                                                                           },
+                                                            "type":  "object",
+                                                            "required":  [
+                                                                             "title",
+                                                                             "subject",
+                                                                             "duration",
+                                                                             "quiz_code",
+                                                                             "id",
+                                                                             "created_by_id",
+                                                                             "created_at",
+                                                                             "updated_at"
+                                                                         ],
+                                                            "title":  "QuizResponse"
+                                                        },
+                                       "QuizUpdate":  {
+                                                          "properties":  {
+                                                                             "title":  {
+                                                                                           "anyOf":  [
+                                                                                                         {
+                                                                                                             "type":  "string"
+                                                                                                         },
+                                                                                                         {
+                                                                                                             "type":  "null"
+                                                                                                         }
+                                                                                                     ],
+                                                                                           "title":  "Title"
+                                                                                       },
+                                                                             "description":  {
+                                                                                                 "anyOf":  [
+                                                                                                               {
+                                                                                                                   "type":  "string"
+                                                                                                               },
+                                                                                                               {
+                                                                                                                   "type":  "null"
+                                                                                                               }
+                                                                                                           ],
+                                                                                                 "title":  "Description"
+                                                                                             },
+                                                                             "subject":  {
+                                                                                             "anyOf":  [
+                                                                                                           {
+                                                                                                               "type":  "string"
+                                                                                                           },
+                                                                                                           {
+                                                                                                               "type":  "null"
+                                                                                                           }
+                                                                                                       ],
+                                                                                             "title":  "Subject"
+                                                                                         },
+                                                                             "duration":  {
+                                                                                              "anyOf":  [
+                                                                                                            {
+                                                                                                                "type":  "integer"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "type":  "null"
+                                                                                                            }
+                                                                                                        ],
+                                                                                              "title":  "Duration"
+                                                                                          },
+                                                                             "randomize_questions":  {
+                                                                                                         "anyOf":  [
+                                                                                                                       {
+                                                                                                                           "type":  "boolean"
+                                                                                                                       },
+                                                                                                                       {
+                                                                                                                           "type":  "null"
+                                                                                                                       }
+                                                                                                                   ],
+                                                                                                         "title":  "Randomize Questions"
+                                                                                                     },
+                                                                             "randomize_options":  {
+                                                                                                       "anyOf":  [
+                                                                                                                     {
+                                                                                                                         "type":  "boolean"
+                                                                                                                     },
+                                                                                                                     {
+                                                                                                                         "type":  "null"
+                                                                                                                     }
+                                                                                                                 ],
+                                                                                                       "title":  "Randomize Options"
+                                                                                                   },
+                                                                             "anti_cheating_enabled":  {
+                                                                                                           "anyOf":  [
+                                                                                                                         {
+                                                                                                                             "type":  "boolean"
+                                                                                                                         },
+                                                                                                                         {
+                                                                                                                             "type":  "null"
+                                                                                                                         }
+                                                                                                                     ],
+                                                                                                           "title":  "Anti Cheating Enabled"
+                                                                                                       },
+                                                                             "ai_feedback_enabled":  {
+                                                                                                         "anyOf":  [
+                                                                                                                       {
+                                                                                                                           "type":  "boolean"
+                                                                                                                       },
+                                                                                                                       {
+                                                                                                                           "type":  "null"
+                                                                                                                       }
+                                                                                                                   ],
+                                                                                                         "title":  "Ai Feedback Enabled"
+                                                                                                     },
+                                                                             "department":  {
+                                                                                                "anyOf":  [
+                                                                                                              {
+                                                                                                                  "type":  "string"
+                                                                                                              },
+                                                                                                              {
+                                                                                                                  "type":  "null"
+                                                                                                              }
+                                                                                                          ],
+                                                                                                "title":  "Department"
+                                                                                            },
+                                                                             "semester":  {
+                                                                                              "anyOf":  [
+                                                                                                            {
+                                                                                                                "type":  "string"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "type":  "null"
+                                                                                                            }
+                                                                                                        ],
+                                                                                              "title":  "Semester"
+                                                                                          },
+                                                                             "total_marks":  {
+                                                                                                 "anyOf":  [
+                                                                                                               {
+                                                                                                                   "type":  "integer"
+                                                                                                               },
+                                                                                                               {
+                                                                                                                   "type":  "null"
+                                                                                                               }
+                                                                                                           ],
+                                                                                                 "title":  "Total Marks"
+                                                                                             },
+                                                                             "pass_percentage":  {
+                                                                                                     "anyOf":  [
+                                                                                                                   {
+                                                                                                                       "type":  "number"
+                                                                                                                   },
+                                                                                                                   {
+                                                                                                                       "type":  "null"
+                                                                                                                   }
+                                                                                                               ],
+                                                                                                     "title":  "Pass Percentage"
+                                                                                                 },
+                                                                             "visibility":  {
+                                                                                                "anyOf":  [
+                                                                                                              {
+                                                                                                                  "type":  "string"
+                                                                                                              },
+                                                                                                              {
+                                                                                                                  "type":  "null"
+                                                                                                              }
+                                                                                                          ],
+                                                                                                "title":  "Visibility"
+                                                                                            },
+                                                                             "status":  {
+                                                                                            "anyOf":  [
+                                                                                                          {
+                                                                                                              "type":  "string"
+                                                                                                          },
+                                                                                                          {
+                                                                                                              "type":  "null"
+                                                                                                          }
+                                                                                                      ],
+                                                                                            "title":  "Status"
+                                                                                        },
+                                                                             "language":  {
+                                                                                              "anyOf":  [
+                                                                                                            {
+                                                                                                                "type":  "string"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "type":  "null"
+                                                                                                            }
+                                                                                                        ],
+                                                                                              "title":  "Language"
+                                                                                          },
+                                                                             "fullscreen_required":  {
+                                                                                                         "anyOf":  [
+                                                                                                                       {
+                                                                                                                           "type":  "boolean"
+                                                                                                                       },
+                                                                                                                       {
+                                                                                                                           "type":  "null"
+                                                                                                                       }
+                                                                                                                   ],
+                                                                                                         "title":  "Fullscreen Required"
+                                                                                                     },
+                                                                             "adaptive_mode":  {
+                                                                                                   "anyOf":  [
+                                                                                                                 {
+                                                                                                                     "type":  "boolean"
+                                                                                                                 },
+                                                                                                                 {
+                                                                                                                     "type":  "null"
+                                                                                                                 }
+                                                                                                             ],
+                                                                                                   "title":  "Adaptive Mode"
+                                                                                               },
+                                                                             "allow_review":  {
+                                                                                                  "anyOf":  [
+                                                                                                                {
+                                                                                                                    "type":  "boolean"
+                                                                                                                },
+                                                                                                                {
+                                                                                                                    "type":  "null"
+                                                                                                                }
+                                                                                                            ],
+                                                                                                  "title":  "Allow Review"
+                                                                                              },
+                                                                             "start_time":  {
+                                                                                                "anyOf":  [
+                                                                                                              {
+                                                                                                                  "type":  "string",
+                                                                                                                  "format":  "date-time"
+                                                                                                              },
+                                                                                                              {
+                                                                                                                  "type":  "null"
+                                                                                                              }
+                                                                                                          ],
+                                                                                                "title":  "Start Time"
+                                                                                            },
+                                                                             "end_time":  {
+                                                                                              "anyOf":  [
+                                                                                                            {
+                                                                                                                "type":  "string",
+                                                                                                                "format":  "date-time"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "type":  "null"
+                                                                                                            }
+                                                                                                        ],
+                                                                                              "title":  "End Time"
+                                                                                          },
+                                                                             "quiz_code":  {
+                                                                                               "anyOf":  [
+                                                                                                             {
+                                                                                                                 "type":  "string"
+                                                                                                             },
+                                                                                                             {
+                                                                                                                 "type":  "null"
+                                                                                                             }
+                                                                                                         ],
+                                                                                               "title":  "Quiz Code"
+                                                                                           },
+                                                                             "published_at":  {
+                                                                                                  "anyOf":  [
+                                                                                                                {
+                                                                                                                    "type":  "string",
+                                                                                                                    "format":  "date-time"
+                                                                                                                },
+                                                                                                                {
+                                                                                                                    "type":  "null"
+                                                                                                                }
+                                                                                                            ],
+                                                                                                  "title":  "Published At"
+                                                                                              },
+                                                                             "max_attempts":  {
+                                                                                                  "anyOf":  [
+                                                                                                                {
+                                                                                                                    "type":  "integer"
+                                                                                                                },
+                                                                                                                {
+                                                                                                                    "type":  "null"
+                                                                                                                }
+                                                                                                            ],
+                                                                                                  "title":  "Max Attempts"
+                                                                                              },
+                                                                             "questions":  {
+                                                                                               "anyOf":  [
+                                                                                                             {
+                                                                                                                 "items":  {
+                                                                                                                               "$ref":  "#/components/schemas/QuestionUpdate"
+                                                                                                                           },
+                                                                                                                 "type":  "array"
+                                                                                                             },
+                                                                                                             {
+                                                                                                                 "type":  "null"
+                                                                                                             }
+                                                                                                         ],
+                                                                                               "title":  "Questions"
+                                                                                           }
+                                                                         },
+                                                          "type":  "object",
+                                                          "title":  "QuizUpdate"
+                                                      },
+                                       "Token":  {
+                                                     "properties":  {
+                                                                        "access_token":  {
+                                                                                             "type":  "string",
+                                                                                             "title":  "Access Token"
+                                                                                         },
+                                                                        "token_type":  {
+                                                                                           "type":  "string",
+                                                                                           "title":  "Token Type",
+                                                                                           "default":  "bearer"
+                                                                                       }
+                                                                    },
+                                                     "type":  "object",
+                                                     "required":  [
+                                                                      "access_token"
+                                                                  ],
+                                                     "title":  "Token"
+                                                 },
+                                       "UserRegister":  {
+                                                            "properties":  {
+                                                                               "email":  {
+                                                                                             "type":  "string",
+                                                                                             "format":  "email",
+                                                                                             "title":  "Email"
+                                                                                         },
+                                                                               "full_name":  {
+                                                                                                 "anyOf":  [
+                                                                                                               {
+                                                                                                                   "type":  "string",
+                                                                                                                   "maxLength":  255
+                                                                                                               },
+                                                                                                               {
+                                                                                                                   "type":  "null"
+                                                                                                               }
+                                                                                                           ],
+                                                                                                 "title":  "Full Name"
+                                                                                             },
+                                                                               "password":  {
+                                                                                                "type":  "string",
+                                                                                                "maxLength":  128,
+                                                                                                "minLength":  6,
+                                                                                                "title":  "Password"
+                                                                                            },
+                                                                               "role":  {
+                                                                                            "$ref":  "#/components/schemas/UserRole",
+                                                                                            "default":  "student"
+                                                                                        }
+                                                                           },
+                                                            "type":  "object",
+                                                            "required":  [
+                                                                             "email",
+                                                                             "password"
+                                                                         ],
+                                                            "title":  "UserRegister"
+                                                        },
+                                       "UserResponse":  {
+                                                            "properties":  {
+                                                                               "email":  {
+                                                                                             "type":  "string",
+                                                                                             "format":  "email",
+                                                                                             "title":  "Email"
+                                                                                         },
+                                                                               "full_name":  {
+                                                                                                 "anyOf":  [
+                                                                                                               {
+                                                                                                                   "type":  "string",
+                                                                                                                   "maxLength":  255
+                                                                                                               },
+                                                                                                               {
+                                                                                                                   "type":  "null"
+                                                                                                               }
+                                                                                                           ],
+                                                                                                 "title":  "Full Name"
+                                                                                             },
+                                                                               "id":  {
+                                                                                          "type":  "string",
+                                                                                          "format":  "uuid",
+                                                                                          "title":  "Id"
+                                                                                      },
+                                                                               "role":  {
+                                                                                            "$ref":  "#/components/schemas/UserRole"
+                                                                                        },
+                                                                               "is_active":  {
+                                                                                                 "type":  "boolean",
+                                                                                                 "title":  "Is Active"
+                                                                                             },
+                                                                               "created_at":  {
+                                                                                                  "type":  "string",
+                                                                                                  "format":  "date-time",
+                                                                                                  "title":  "Created At"
+                                                                                              },
+                                                                               "updated_at":  {
+                                                                                                  "type":  "string",
+                                                                                                  "format":  "date-time",
+                                                                                                  "title":  "Updated At"
+                                                                                              }
+                                                                           },
+                                                            "type":  "object",
+                                                            "required":  [
+                                                                             "email",
+                                                                             "id",
+                                                                             "role",
+                                                                             "is_active",
+                                                                             "created_at",
+                                                                             "updated_at"
+                                                                         ],
+                                                            "title":  "UserResponse"
+                                                        },
+                                       "UserRole":  {
+                                                        "type":  "string",
+                                                        "enum":  [
+                                                                     "student",
+                                                                     "teacher",
+                                                                     "admin"
+                                                                 ],
+                                                        "title":  "UserRole"
+                                                    },
+                                       "ValidationError":  {
+                                                               "properties":  {
+                                                                                  "loc":  {
+                                                                                              "items":  {
+                                                                                                            "anyOf":  [
+                                                                                                                          {
+                                                                                                                              "type":  "string"
+                                                                                                                          },
+                                                                                                                          {
+                                                                                                                              "type":  "integer"
+                                                                                                                          }
+                                                                                                                      ]
+                                                                                                        },
+                                                                                              "type":  "array",
+                                                                                              "title":  "Location"
+                                                                                          },
+                                                                                  "msg":  {
+                                                                                              "type":  "string",
+                                                                                              "title":  "Message"
+                                                                                          },
+                                                                                  "type":  {
+                                                                                               "type":  "string",
+                                                                                               "title":  "Error Type"
+                                                                                           },
+                                                                                  "input":  {
+                                                                                                "title":  "Input"
+                                                                                            },
+                                                                                  "ctx":  {
+                                                                                              "type":  "object",
+                                                                                              "title":  "Context"
+                                                                                          }
+                                                                              },
+                                                               "type":  "object",
+                                                               "required":  [
+                                                                                "loc",
+                                                                                "msg",
+                                                                                "type"
+                                                                            ],
+                                                               "title":  "ValidationError"
+                                                           },
+                                       "UserLogin":  {
+                                                         "properties":  {
+                                                                            "email":  {
+                                                                                          "format":  "email",
+                                                                                          "title":  "Email",
+                                                                                          "type":  "string"
+                                                                                      },
+                                                                            "password":  {
+                                                                                             "title":  "Password",
+                                                                                             "type":  "string"
+                                                                                         }
+                                                                        },
+                                                         "required":  [
+                                                                          "email",
+                                                                          "password"
+                                                                      ],
+                                                         "title":  "UserLogin",
+                                                         "type":  "object"
+                                                     }
+                                   },
+                       "securitySchemes":  {
+                                               "OAuth2PasswordBearer":  {
+                                                                            "type":  "oauth2",
+                                                                            "flows":  {
+                                                                                          "password":  {
+                                                                                                           "scopes":  {
+
+                                                                                                                      },
+                                                                                                           "tokenUrl":  "/api/v1/auth/login"
+                                                                                                       }
+                                                                                      }
+                                                                        }
+                                           }
+                   }
+}

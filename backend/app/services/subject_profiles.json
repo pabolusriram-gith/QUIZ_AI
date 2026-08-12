@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Computer Science & Software Engineering",
+    "keywords": ["coding", "programming", "python", "javascript", "c++", "java", "html", "css", "database", "sql", "git", "api", "algorithm", "complexity", "operating systems", "dsa", "dbms"],
+    "guidelines": "Include realistic code snippets, debug traces, execution outputs, database schemas, or system architecture trade-offs. Focus questions on runtime/space complexity, correct state tracking, debugging logic, edge cases, and design patterns."
+  },
+  {
+    "name": "Quantitative & Applied Sciences",
+    "keywords": ["math", "physics", "chemistry", "algebra", "calculus", "statistics", "equations", "mechanics", "thermodynamics"],
+    "guidelines": "Formulate questions requiring multi-step mathematical solving, quantitative analysis, derivation steps, or physics calculations. Distractors should represent common computational errors or algebraic sign mistakes."
+  },
+  {
+    "name": "Medical & Life Sciences",
+    "keywords": ["biology", "medicine", "anatomy", "physiology", "pathology", "pharmacology", "cells", "genetics"],
+    "guidelines": "Present clinical vignettes, patient scenarios, physiological pathways, or diagnostic logic. Test understanding of anatomical structures, cell mechanisms, and biochemical reactions rather than simple flashcard lists."
+  },
+  {
+    "name": "Humanities, Law & Social Sciences",
+    "keywords": ["history", "law", "sociology", "literature", "philosophy", "political", "civics", "geography"],
+    "guidelines": "Provide contextual source analysis, legal case scenarios, historical arguments, or philosophical dilemmas. Ask candidates to compare theories, evaluate historical impacts, or analyze conceptual passages."
+  }
+]

@@ -1,0 +1,937 @@
+{
+  "mixed": [
+    {
+      "text": "Scenario: A team is implementing a system based on Python. They need to select the approach that guarantees optimal performance and stability. Which of the following is the best strategy?",
+      "difficulty": "easy",
+      "topic": "Python",
+      "marks": 1,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Core principles and definitions of Python (Aspect 1).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Understand",
+      "learning_objective": "Core principles and definitions of Python (Aspect 1)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 0,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "Which architectural pattern provides the highest concurrency level when using Python for high-throughput messaging?",
+      "difficulty": "easy",
+      "topic": "Python",
+      "marks": 1,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Conceptual mechanisms and properties of Python (Aspect 2).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Understand",
+      "learning_objective": "Conceptual mechanisms and properties of Python (Aspect 2)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 1,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "An engineer is debugging a latency issue in a Python service. Which configuration adjustment is most likely to resolve it?",
+      "difficulty": "medium",
+      "topic": "Python",
+      "marks": 2,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Practical implementation and application scenarios of Python (Aspect 3).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Analyze",
+      "learning_objective": "Practical implementation and application scenarios of Python (Aspect 3)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 2,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "Compare the performance overhead of synchronous calls versus asynchronous event handling in a Python application.",
+      "difficulty": "medium",
+      "topic": "Python",
+      "marks": 2,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Trade-offs, performance constraints, or analytical comparison of Python (Aspect 4).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Understand",
+      "learning_objective": "Trade-offs, performance constraints, or analytical comparison of Python (Aspect 4)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 3,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "Identify the primary advantage of deploying a Python solution in decentralized cloud networks.",
+      "difficulty": "medium",
+      "topic": "Python",
+      "marks": 2,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Advanced debugging, error evaluation, or structural optimization of Python (Aspect 5).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Apply",
+      "learning_objective": "Advanced debugging, error evaluation, or structural optimization of Python (Aspect 5)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 4,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    }
+  ],
+  "exam": [
+    {
+      "text": "Scenario: A team is implementing a system based on Python. They need to select the approach that guarantees optimal performance and stability. Which of the following is the best strategy?",
+      "difficulty": "easy",
+      "topic": "Python",
+      "marks": 1,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Core principles and definitions of Python (Aspect 1).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Understand",
+      "learning_objective": "Core principles and definitions of Python (Aspect 1)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 0,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "Which architectural pattern provides the highest concurrency level when using Python for high-throughput messaging?",
+      "difficulty": "easy",
+      "topic": "Python",
+      "marks": 1,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Conceptual mechanisms and properties of Python (Aspect 2).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Understand",
+      "learning_objective": "Conceptual mechanisms and properties of Python (Aspect 2)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 1,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "An engineer is debugging a latency issue in a Python service. Which configuration adjustment is most likely to resolve it?",
+      "difficulty": "medium",
+      "topic": "Python",
+      "marks": 2,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Practical implementation and application scenarios of Python (Aspect 3).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Analyze",
+      "learning_objective": "Practical implementation and application scenarios of Python (Aspect 3)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 2,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "Compare the performance overhead of synchronous calls versus asynchronous event handling in a Python application.",
+      "difficulty": "medium",
+      "topic": "Python",
+      "marks": 2,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Trade-offs, performance constraints, or analytical comparison of Python (Aspect 4).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Understand",
+      "learning_objective": "Trade-offs, performance constraints, or analytical comparison of Python (Aspect 4)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 3,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "Identify the primary advantage of deploying a Python solution in decentralized cloud networks.",
+      "difficulty": "medium",
+      "topic": "Python",
+      "marks": 2,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Advanced debugging, error evaluation, or structural optimization of Python (Aspect 5).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Apply",
+      "learning_objective": "Advanced debugging, error evaluation, or structural optimization of Python (Aspect 5)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 4,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    }
+  ],
+  "interview": [
+    {
+      "text": "Scenario: A team is implementing a system based on Python. They need to select the approach that guarantees optimal performance and stability. Which of the following is the best strategy?",
+      "difficulty": "easy",
+      "topic": "Python",
+      "marks": 1,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Core principles and definitions of Python (Aspect 1).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Understand",
+      "learning_objective": "Core principles and definitions of Python (Aspect 1)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 0,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "Which architectural pattern provides the highest concurrency level when using Python for high-throughput messaging?",
+      "difficulty": "easy",
+      "topic": "Python",
+      "marks": 1,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Conceptual mechanisms and properties of Python (Aspect 2).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Understand",
+      "learning_objective": "Conceptual mechanisms and properties of Python (Aspect 2)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 1,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "An engineer is debugging a latency issue in a Python service. Which configuration adjustment is most likely to resolve it?",
+      "difficulty": "medium",
+      "topic": "Python",
+      "marks": 2,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Practical implementation and application scenarios of Python (Aspect 3).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Analyze",
+      "learning_objective": "Practical implementation and application scenarios of Python (Aspect 3)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 2,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "Compare the performance overhead of synchronous calls versus asynchronous event handling in a Python application.",
+      "difficulty": "medium",
+      "topic": "Python",
+      "marks": 2,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Trade-offs, performance constraints, or analytical comparison of Python (Aspect 4).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Understand",
+      "learning_objective": "Trade-offs, performance constraints, or analytical comparison of Python (Aspect 4)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 3,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "Identify the primary advantage of deploying a Python solution in decentralized cloud networks.",
+      "difficulty": "medium",
+      "topic": "Python",
+      "marks": 2,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Advanced debugging, error evaluation, or structural optimization of Python (Aspect 5).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Apply",
+      "learning_objective": "Advanced debugging, error evaluation, or structural optimization of Python (Aspect 5)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 4,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    }
+  ],
+  "case_study": [
+    {
+      "text": "Scenario: A team is implementing a system based on Python. They need to select the approach that guarantees optimal performance and stability. Which of the following is the best strategy?",
+      "difficulty": "easy",
+      "topic": "Python",
+      "marks": 1,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Core principles and definitions of Python (Aspect 1).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Understand",
+      "learning_objective": "Core principles and definitions of Python (Aspect 1)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 0,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "Which architectural pattern provides the highest concurrency level when using Python for high-throughput messaging?",
+      "difficulty": "easy",
+      "topic": "Python",
+      "marks": 1,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Conceptual mechanisms and properties of Python (Aspect 2).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Understand",
+      "learning_objective": "Conceptual mechanisms and properties of Python (Aspect 2)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 1,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "An engineer is debugging a latency issue in a Python service. Which configuration adjustment is most likely to resolve it?",
+      "difficulty": "medium",
+      "topic": "Python",
+      "marks": 2,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Practical implementation and application scenarios of Python (Aspect 3).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Analyze",
+      "learning_objective": "Practical implementation and application scenarios of Python (Aspect 3)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 2,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "Compare the performance overhead of synchronous calls versus asynchronous event handling in a Python application.",
+      "difficulty": "medium",
+      "topic": "Python",
+      "marks": 2,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Trade-offs, performance constraints, or analytical comparison of Python (Aspect 4).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Understand",
+      "learning_objective": "Trade-offs, performance constraints, or analytical comparison of Python (Aspect 4)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 3,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "Identify the primary advantage of deploying a Python solution in decentralized cloud networks.",
+      "difficulty": "medium",
+      "topic": "Python",
+      "marks": 2,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Advanced debugging, error evaluation, or structural optimization of Python (Aspect 5).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Apply",
+      "learning_objective": "Advanced debugging, error evaluation, or structural optimization of Python (Aspect 5)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 4,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    }
+  ],
+  "scenario_based": [
+    {
+      "text": "Scenario: A team is implementing a system based on Python. They need to select the approach that guarantees optimal performance and stability. Which of the following is the best strategy?",
+      "difficulty": "easy",
+      "topic": "Python",
+      "marks": 1,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Core principles and definitions of Python (Aspect 1).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Understand",
+      "learning_objective": "Core principles and definitions of Python (Aspect 1)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 0,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "Which architectural pattern provides the highest concurrency level when using Python for high-throughput messaging?",
+      "difficulty": "easy",
+      "topic": "Python",
+      "marks": 1,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Conceptual mechanisms and properties of Python (Aspect 2).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Understand",
+      "learning_objective": "Conceptual mechanisms and properties of Python (Aspect 2)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 1,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "An engineer is debugging a latency issue in a Python service. Which configuration adjustment is most likely to resolve it?",
+      "difficulty": "medium",
+      "topic": "Python",
+      "marks": 2,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Practical implementation and application scenarios of Python (Aspect 3).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Analyze",
+      "learning_objective": "Practical implementation and application scenarios of Python (Aspect 3)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 2,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "Compare the performance overhead of synchronous calls versus asynchronous event handling in a Python application.",
+      "difficulty": "medium",
+      "topic": "Python",
+      "marks": 2,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Trade-offs, performance constraints, or analytical comparison of Python (Aspect 4).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Understand",
+      "learning_objective": "Trade-offs, performance constraints, or analytical comparison of Python (Aspect 4)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 3,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    },
+    {
+      "text": "Identify the primary advantage of deploying a Python solution in decentralized cloud networks.",
+      "difficulty": "medium",
+      "topic": "Python",
+      "marks": 2,
+      "explanation": "**Core Concept**: This question tests the essential properties of Python related to Advanced debugging, error evaluation, or structural optimization of Python (Aspect 5).\n**Incorrect Option Analysis**:\n- Option 1: Incorrect because sequential single-threaded execution bypasses Python concurrency.\n- Option 2: Incorrect because unmonitored container configurations do not contain failure domains.\n- Option 3: Incorrect because raw pointer tracking violates memory safety abstractions.\n**Learner Takeaway**: Always design systems around robust, automated scaling boundaries using Python.",
+      "question_type": "multiple_choice",
+      "bloom_level": "Apply",
+      "learning_objective": "Advanced debugging, error evaluation, or structural optimization of Python (Aspect 5)",
+      "options": [
+        {
+          "text": "Implement a structured layer with optimized caching for Python.",
+          "is_correct": true,
+          "display_order": 0
+        },
+        {
+          "text": "Bypass all caching and run operations sequentially on the main thread.",
+          "is_correct": false,
+          "display_order": 1
+        },
+        {
+          "text": "Deploy a secondary unmonitored container with manual scaling.",
+          "is_correct": false,
+          "display_order": 2
+        },
+        {
+          "text": "Deprecate the entire abstraction and manage raw memory using pointers.",
+          "is_correct": false,
+          "display_order": 3
+        }
+      ],
+      "order_index": 4,
+      "critic_score": 4.5200000000000005,
+      "ai_provider": "mock",
+      "ai_model": "default",
+      "generated_by_ai": true
+    }
+  ]
+}

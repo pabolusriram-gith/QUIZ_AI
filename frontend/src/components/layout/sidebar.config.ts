@@ -1,0 +1,51 @@
+export interface SidebarItem {
+  name: string;
+  path: string;
+  iconName: string;
+  isComingSoon?: boolean;
+}
+
+export const sidebarConfig: SidebarItem[] = [
+  {
+    name: "Dashboard",
+    path: "/dashboard",
+    iconName: "LayoutDashboard",
+  },
+  {
+    name: "Question Bank",
+    path: "/dashboard/question-bank",
+    iconName: "BookOpen",
+  },
+  {
+    name: "Quizzes",
+    path: "/dashboard/quizzes",
+    iconName: "FileSpreadsheet",
+  },
+  {
+    name: "Live Quiz",
+    path: "/dashboard/live-quiz",
+    iconName: "PlayCircle",
+    isComingSoon: false,
+  },
+  {
+    name: "Students",
+    path: "/dashboard/students",
+    iconName: "Users",
+    isComingSoon: true,
+  },
+  {
+    name: "Analytics",
+    path: "/dashboard/analytics",
+    iconName: "BarChart3",
+  },
+  {
+    name: "Reports",
+    path: "/dashboard/reports",
+    iconName: "FileDown",
+  },
+  {
+    name: "Settings",
+    path: "/settings",
+    iconName: "Settings",
+  },
+];
