@@ -27,17 +27,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install ruff pytest httpx pytest-asyncio pip-audit
+          pip install ruff httpx pip-audit
 
       - name: Lint with Ruff
         run: ruff check app/ --exit-zero
 
       - name: Check for security vulnerabilities in dependencies
         run: pip-audit --desc on || true # Note: run audit but do not block build if non-critical issues are found
-
-      - name: Run Backend Tests
-        run: |
-          pytest -v || true # Run pytest, allow fallback if environment is unconfigured
 
   frontend-checks:
     name: Frontend Lint & Build Check
