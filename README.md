@@ -64,3 +64,4 @@ QuizVersaAI/
 - [Software Architecture Specification](file:///C:/Users/pabol/.gemini/antigravity-ide/brain/16ef86fc-16b9-4533-a41d-c4e1c1c8f5cd/quizverse_ai_architecture.md)
 - [Row Level Security (RLS) Database Specification](file:///c:/Users/pabol/OneDrive/Desktop/QuizVersaAI/SUPABASE_RLS.md)
 # QuizVersaAI
+# QUIZ_AI
