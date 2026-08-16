@@ -6,22 +6,13 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import { 
   Sparkles, 
-  Check,
-  Trophy,
-  Users,
-  LineChart,
-  Monitor,
-  FileText,
-  Shield,
-  Zap,
-  ArrowRight,
-  ChevronDown,
-  BrainCircuit,
-  Activity,
-  Layers,
-  GraduationCap,
-  Sun,
-  Moon
+  LineChart, 
+  Shield, 
+  ArrowRight, 
+  ChevronDown, 
+  BrainCircuit, 
+  Sun, 
+  Moon 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
