@@ -225,14 +225,14 @@ export default function StudentDashboard() {
                             <span>{quiz.duration} mins</span>
                           </span>
                           <Link href={`/assessment/${quiz.id}`}>
-                            <Button className={`h-9 px-4 text-xs font-bold rounded-xl cursor-pointer flex items-center gap-1.5 shadow-sm ${
+                            <button className={`h-9 px-4 text-xs font-bold rounded-xl cursor-pointer flex items-center gap-1.5 shadow-sm transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/40 focus-visible:outline-none ${
                               quiz.has_active_attempt 
-                                ? "bg-emerald-600 hover:bg-emerald-500 text-white animate-pulse" 
-                                : "bg-indigo-600 hover:bg-indigo-500 text-white"
+                                ? "bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white animate-pulse" 
+                                : "bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white"
                             }`}>
                               <span>{quiz.has_active_attempt ? "Resume Quiz" : "Start Quiz"}</span>
                               <ArrowRight className="h-3.5 w-3.5" />
-                            </Button>
+                            </button>
                           </Link>
                         </div>
                       </div>

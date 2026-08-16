@@ -28,12 +28,6 @@ export const sidebarConfig: SidebarItem[] = [
     isComingSoon: false,
   },
   {
-    name: "Students",
-    path: "/dashboard/students",
-    iconName: "Users",
-    isComingSoon: true,
-  },
-  {
     name: "Analytics",
     path: "/dashboard/analytics",
     iconName: "BarChart3",

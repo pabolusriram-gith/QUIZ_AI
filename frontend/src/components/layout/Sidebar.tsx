@@ -54,7 +54,7 @@ export default function Sidebar({
 
   const renderNavItems = () => {
     const filteredConfig = sidebarConfig.filter((item: SidebarItem) => {
-      if (currentUser?.role === "student") {
+      if (currentUser?.role?.toLowerCase() === "student") {
         return item.name === "Dashboard" || item.name === "Settings";
       }
       return true;

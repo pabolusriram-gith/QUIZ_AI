@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import PageHeader from "@/components/layout/PageHeader";
-import { Button, buttonVariants } from "@/components/ui/button";
 import { StatCard } from "@/components/ui/StatCard";
 import dynamic from "next/dynamic";
 
@@ -89,9 +88,7 @@ export default function TeacherDashboard() {
         actions={
           <Link
             href="/create-quiz"
-            className={buttonVariants({
-              className: "bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl px-5 h-11 flex items-center gap-2 shadow-sm shadow-indigo-600/20 border-none cursor-pointer"
-            })}
+            className="bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold rounded-2xl px-5 h-11 flex items-center gap-2 shadow-sm shadow-indigo-600/20 border-none cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
           >
             <Plus className="h-4.5 w-4.5" />
             <span>Create Quiz</span>
@@ -104,7 +101,7 @@ export default function TeacherDashboard() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
-        className="relative overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md p-6 md:p-8 shadow-sm"
+        className="relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-slate-800/80 bg-slate-100/50 dark:bg-slate-900/60 backdrop-blur-md p-6 md:p-8 shadow-sm"
       >
         <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-indigo-500/10 blur-[80px] pointer-events-none" />
         <div className="absolute -left-24 -bottom-24 h-64 w-64 rounded-full bg-cyan-500/10 blur-[80px] pointer-events-none" />
@@ -126,15 +123,12 @@ export default function TeacherDashboard() {
           <div className="pt-2 flex flex-wrap items-center gap-3">
             <Link
               href="/create-quiz"
-              className={buttonVariants({
-                variant: "outline",
-                className: "rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold px-4 cursor-pointer h-10 shadow-xs"
-              })}
+              className="rounded-2xl border border-slate-200 dark:border-slate-700/80 bg-slate-100/90 dark:bg-slate-800/80 text-slate-800 dark:text-slate-100 hover:bg-slate-200/90 dark:hover:bg-slate-700 active:bg-slate-300/80 dark:active:bg-slate-600 font-bold px-4 h-10 flex items-center cursor-pointer shadow-xs transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/40 focus-visible:outline-none"
             >
               <PenTool className="h-4 w-4 mr-1.5 text-indigo-500" />
               <span>Create Assessment</span>
             </Link>
-            <div className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 rounded-2xl">
+            <div className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-200/60 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 rounded-2xl">
               <GraduationCap className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
               <span>Role: {currentUser?.role?.toUpperCase() || "TEACHER"}</span>
             </div>
@@ -172,11 +166,12 @@ export default function TeacherDashboard() {
               Your educator workspace is ready! Generate highly customized questions using our AI generator or draft assessments manually to get started.
             </p>
           </div>
-          <Link href="/create-quiz">
-            <Button className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 h-11 rounded-2xl shadow-md shadow-indigo-600/20 cursor-pointer border-none flex items-center gap-2">
-              <Plus className="h-4.5 w-4.5" />
-              <span>Create First Quiz</span>
-            </Button>
+          <Link
+            href="/create-quiz"
+            className="bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold px-6 h-11 rounded-2xl shadow-md shadow-indigo-600/20 cursor-pointer flex items-center gap-2 transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
+          >
+            <Plus className="h-4.5 w-4.5" />
+            <span>Create First Quiz</span>
           </Link>
         </motion.div>
       ) : (
@@ -227,68 +222,76 @@ export default function TeacherDashboard() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
               {/* Primary CTA */}
-              <Link href="/create-quiz" className="sm:col-span-2 lg:col-span-1">
-                <button className="w-full h-[56px] px-5 rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold text-sm flex items-center justify-between cursor-pointer transition-all shadow-md shadow-indigo-600/15 hover:shadow-indigo-600/25 hover:-translate-y-px group">
-                  <span className="flex items-center gap-2.5">
-                    <PenTool className="h-4 w-4 shrink-0" />
-                    <span>Create Quiz Manually</span>
-                  </span>
-                  <ArrowRight className="h-4 w-4 shrink-0 opacity-80 group-hover:translate-x-0.5 transition-transform" />
-                </button>
-              </Link>
-
-              <Link href="/create-quiz" className="w-full">
-                <button className="w-full h-[56px] px-5 rounded-2xl border border-slate-200 dark:border-slate-700/80 bg-white/80 dark:bg-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-cyan-500/40 text-slate-800 dark:text-slate-100 font-bold text-sm flex items-center justify-between cursor-pointer transition-all group shadow-xs">
-                  <span className="flex items-center gap-2.5">
-                    <Sparkles className="h-4 w-4 text-cyan-600 dark:text-cyan-400 shrink-0" />
-                    <span>AI Question Generator</span>
-                  </span>
-                  <ArrowRight className="h-4 w-4 shrink-0 opacity-60 group-hover:translate-x-0.5 transition-transform" />
-                </button>
-              </Link>
-
-              <Link href="/create-quiz?source=file" className="w-full">
-                <button className="w-full h-[56px] px-5 rounded-2xl border border-slate-200 dark:border-slate-700/80 bg-white/80 dark:bg-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-indigo-500/40 text-slate-800 dark:text-slate-100 font-bold text-sm flex items-center justify-between cursor-pointer transition-all group shadow-xs">
-                  <span className="flex items-center gap-2.5">
-                    <FileText className="h-4 w-4 text-indigo-500 dark:text-indigo-400 shrink-0" />
-                    <span>Generate from Document (PDF)</span>
-                  </span>
-                  <ArrowRight className="h-4 w-4 shrink-0 opacity-60 group-hover:translate-x-0.5 transition-transform" />
-                </button>
-              </Link>
-
-              <Link href="/create-quiz?source=file" className="w-full">
-                <button className="w-full h-[56px] px-5 rounded-2xl border border-slate-200 dark:border-slate-700/80 bg-white/80 dark:bg-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-cyan-500/40 text-slate-800 dark:text-slate-100 font-bold text-sm flex items-center justify-between cursor-pointer transition-all group shadow-xs">
-                  <span className="flex items-center gap-2.5">
-                    <Layers className="h-4 w-4 text-cyan-600 dark:text-cyan-400 shrink-0" />
-                    <span>Generate from Slides (PPT)</span>
-                  </span>
-                  <ArrowRight className="h-4 w-4 shrink-0 opacity-60 group-hover:translate-x-0.5 transition-transform" />
-                </button>
-              </Link>
-
-              <Link href="/dashboard/question-bank" className="w-full">
-                <button className="w-full h-[56px] px-5 rounded-2xl border border-slate-200 dark:border-slate-700/80 bg-white/80 dark:bg-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-emerald-500/40 text-slate-800 dark:text-slate-100 font-bold text-sm flex items-center justify-between cursor-pointer transition-all group shadow-xs">
-                  <span className="flex items-center gap-2.5">
-                    <ListTodo className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                    <span>Manage Question Bank</span>
-                  </span>
-                  <ArrowRight className="h-4 w-4 shrink-0 opacity-60 group-hover:translate-x-0.5 transition-transform" />
-                </button>
-              </Link>
-
-              {/* Import Action */}
-              <button
-                disabled
-                className="w-full h-[56px] px-5 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-transparent text-slate-400 font-medium text-sm flex items-center justify-between cursor-not-allowed select-none opacity-60"
-                title="Import Question Bank — Coming in upcoming release"
+              <Link 
+                href="/create-quiz" 
+                className="sm:col-span-2 lg:col-span-1 w-full h-[56px] px-5 rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 active:from-indigo-700 active:to-cyan-700 text-white font-bold text-sm flex items-center justify-between cursor-pointer transition-all shadow-md shadow-indigo-600/15 hover:shadow-indigo-600/25 hover:-translate-y-px group focus-visible:ring-2 focus-visible:ring-indigo-500/40 focus-visible:outline-none"
               >
                 <span className="flex items-center gap-2.5">
-                  <FileDown className="h-4 w-4 shrink-0" />
+                  <PenTool className="h-4 w-4 shrink-0" />
+                  <span>Create Quiz Manually</span>
+                </span>
+                <ArrowRight className="h-4 w-4 shrink-0 opacity-80 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+
+              {/* AI Question Generator */}
+              <Link 
+                href="/create-quiz" 
+                className="w-full h-[56px] px-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100/70 hover:bg-slate-200/70 active:bg-slate-200 dark:bg-slate-900/60 dark:hover:bg-slate-800/80 dark:active:bg-slate-800 hover:border-cyan-500/40 dark:hover:border-cyan-500/40 text-slate-800 dark:text-slate-100 font-bold text-sm flex items-center justify-between cursor-pointer transition-all group shadow-xs focus-visible:ring-2 focus-visible:ring-cyan-500/40 focus-visible:outline-none"
+              >
+                <span className="flex items-center gap-2.5">
+                  <Sparkles className="h-4 w-4 text-cyan-600 dark:text-cyan-400 shrink-0" />
+                  <span>AI Question Generator</span>
+                </span>
+                <ArrowRight className="h-4 w-4 shrink-0 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+
+              {/* Generate from Document (PDF) */}
+              <Link 
+                href="/create-quiz?source=file" 
+                className="w-full h-[56px] px-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100/70 hover:bg-slate-200/70 active:bg-slate-200 dark:bg-slate-900/60 dark:hover:bg-slate-800/80 dark:active:bg-slate-800 hover:border-indigo-500/40 dark:hover:border-indigo-500/40 text-slate-800 dark:text-slate-100 font-bold text-sm flex items-center justify-between cursor-pointer transition-all group shadow-xs focus-visible:ring-2 focus-visible:ring-indigo-500/40 focus-visible:outline-none"
+              >
+                <span className="flex items-center gap-2.5">
+                  <FileText className="h-4 w-4 text-indigo-500 dark:text-indigo-400 shrink-0" />
+                  <span>Generate from Document (PDF)</span>
+                </span>
+                <ArrowRight className="h-4 w-4 shrink-0 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+
+              {/* Generate from Slides (PPT) */}
+              <Link 
+                href="/create-quiz?source=file" 
+                className="w-full h-[56px] px-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100/70 hover:bg-slate-200/70 active:bg-slate-200 dark:bg-slate-900/60 dark:hover:bg-slate-800/80 dark:active:bg-slate-800 hover:border-cyan-500/40 dark:hover:border-cyan-500/40 text-slate-800 dark:text-slate-100 font-bold text-sm flex items-center justify-between cursor-pointer transition-all group shadow-xs focus-visible:ring-2 focus-visible:ring-cyan-500/40 focus-visible:outline-none"
+              >
+                <span className="flex items-center gap-2.5">
+                  <Layers className="h-4 w-4 text-cyan-600 dark:text-cyan-400 shrink-0" />
+                  <span>Generate from Slides (PPT)</span>
+                </span>
+                <ArrowRight className="h-4 w-4 shrink-0 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+
+              {/* Manage Question Bank */}
+              <Link 
+                href="/dashboard/question-bank" 
+                className="w-full h-[56px] px-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100/70 hover:bg-slate-200/70 active:bg-slate-200 dark:bg-slate-900/60 dark:hover:bg-slate-800/80 dark:active:bg-slate-800 hover:border-emerald-500/40 dark:hover:border-emerald-500/40 text-slate-800 dark:text-slate-100 font-bold text-sm flex items-center justify-between cursor-pointer transition-all group shadow-xs focus-visible:ring-2 focus-visible:ring-emerald-500/40 focus-visible:outline-none"
+              >
+                <span className="flex items-center gap-2.5">
+                  <ListTodo className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <span>Manage Question Bank</span>
+                </span>
+                <ArrowRight className="h-4 w-4 shrink-0 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+
+              {/* Import Action (Clean & Unobtrusive Disabled Presentation) */}
+              <div
+                className="w-full h-[56px] px-5 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30 text-slate-400 dark:text-slate-500 font-medium text-sm flex items-center justify-between select-none opacity-60 cursor-not-allowed"
+                title="Import Question Bank (Planned Feature)"
+              >
+                <span className="flex items-center gap-2.5">
+                  <FileDown className="h-4 w-4 shrink-0 opacity-60" />
                   <span>Import Question Bank</span>
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">Coming Soon</span>
-              </button>
+                <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-600">Planned</span>
+              </div>
             </div>
           </div>
 
@@ -326,7 +329,7 @@ export default function TeacherDashboard() {
                 <div className="space-y-2.5 my-4">
                   <Link
                     href="/create-quiz"
-                    className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 transition-all cursor-pointer group"
+                    className="flex items-start gap-3 p-3 rounded-2xl bg-slate-100/70 dark:bg-slate-800/50 hover:bg-slate-200/70 dark:hover:bg-slate-800 active:bg-slate-200 dark:active:bg-slate-700/70 border border-slate-200/70 dark:border-slate-700/60 transition-all cursor-pointer group focus-visible:ring-2 focus-visible:ring-indigo-500/40 focus-visible:outline-none"
                   >
                     <div className="h-8 w-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5">
                       <PenTool className="h-3.5 w-3.5" />
@@ -343,7 +346,7 @@ export default function TeacherDashboard() {
 
                   <Link
                     href="/create-quiz"
-                    className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 transition-all cursor-pointer group"
+                    className="flex items-start gap-3 p-3 rounded-2xl bg-slate-100/70 dark:bg-slate-800/50 hover:bg-slate-200/70 dark:hover:bg-slate-800 active:bg-slate-200 dark:active:bg-slate-700/70 border border-slate-200/70 dark:border-slate-700/60 transition-all cursor-pointer group focus-visible:ring-2 focus-visible:ring-cyan-500/40 focus-visible:outline-none"
                   >
                     <div className="h-8 w-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-600 dark:text-cyan-400 shrink-0 mt-0.5">
                       <Sparkles className="h-3.5 w-3.5" />
@@ -360,11 +363,12 @@ export default function TeacherDashboard() {
                 </div>
               </div>
 
-              <Link href="/create-quiz" className="w-full mt-2">
-                <Button className="w-full h-10 border border-slate-200 dark:border-slate-700 hover:border-indigo-500 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-100 text-xs font-bold rounded-2xl flex items-center justify-center gap-2 cursor-pointer transition-all shadow-xs">
-                  <span>Open Quiz Creator</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Button>
+              <Link 
+                href="/create-quiz" 
+                className="w-full mt-2 h-10 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/60 dark:hover:border-indigo-500/60 bg-slate-100/90 dark:bg-slate-800/80 hover:bg-slate-200/90 dark:hover:bg-slate-700 active:bg-slate-300/80 dark:active:bg-slate-600 text-slate-800 dark:text-slate-100 text-xs font-bold rounded-2xl flex items-center justify-center gap-2 cursor-pointer transition-all shadow-xs focus-visible:ring-2 focus-visible:ring-indigo-500/40 focus-visible:outline-none"
+              >
+                <span>Open Quiz Creator</span>
+                <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </motion.div>
           </div>
