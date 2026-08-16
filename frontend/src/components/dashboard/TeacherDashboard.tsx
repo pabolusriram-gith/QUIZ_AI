@@ -6,7 +6,7 @@ import PageHeader from "@/components/layout/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
 import dynamic from "next/dynamic";
 
-const ChartCard = dynamic(() => import("@/components/ui/ChartCard").then((mod) => mod.ChartCard), {
+const ChartCard = dynamic(() => import("@/components/ui/ChartCard"), {
   ssr: false,
   loading: () => (
     <div className="h-72 w-full rounded-3xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 animate-pulse flex items-center justify-center text-xs text-slate-400 font-bold">

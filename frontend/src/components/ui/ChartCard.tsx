@@ -110,3 +110,6 @@ export function ChartCard({
     </motion.div>
   )
 }
+
+export default ChartCard;
+
