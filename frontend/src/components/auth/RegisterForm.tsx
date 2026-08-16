@@ -138,14 +138,14 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-[#030712] text-slate-100 flex flex-col justify-between items-center py-10 px-4">
-
+    <div className="relative min-h-screen w-full overflow-hidden bg-background text-foreground flex flex-col justify-between items-center py-10 px-4">
+ 
       {/* Background Design */}
       <div
-        className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-85 pointer-events-none"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-85 pointer-events-none"
         aria-hidden="true"
       />
-
+ 
       {/* Glowing backdrop elements */}
       <div className="absolute inset-0 -z-20 overflow-hidden pointer-events-none" aria-hidden="true">
         <motion.div
@@ -159,7 +159,7 @@ export default function RegisterForm() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute -top-12 -left-12 h-[450px] w-[450px] rounded-full bg-indigo-950/20 blur-[110px]"
+          className="absolute -top-12 -left-12 h-[450px] w-[450px] rounded-full bg-indigo-500/5 dark:bg-indigo-950/20 blur-[110px]"
         />
         <motion.div
           animate={{
@@ -172,10 +172,10 @@ export default function RegisterForm() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute -bottom-16 -right-16 h-[450px] w-[450px] rounded-full bg-cyan-950/20 blur-[110px]"
+          className="absolute -bottom-16 -right-16 h-[450px] w-[450px] rounded-full bg-cyan-500/5 dark:bg-cyan-950/20 blur-[110px]"
         />
       </div>
-
+ 
       <div className="flex-1 flex items-center justify-center w-full z-10">
 
         <motion.div
@@ -184,9 +184,9 @@ export default function RegisterForm() {
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="w-full max-w-[440px]"
         >
-          <Card className="glass-panel border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-2xl overflow-hidden p-1">
+          <Card className="glass-panel border-border shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-2xl overflow-hidden p-1">
             <CardContent className="pt-8 pb-7 px-8 space-y-6">
-
+ 
               {/* Header */}
               <div className="flex flex-col items-center text-center space-y-4">
                 <motion.div
@@ -198,12 +198,12 @@ export default function RegisterForm() {
                   <BrainCircuit className="h-6 w-6 text-white animate-pulse" />
                   <span className="absolute -inset-0.5 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 opacity-30 blur-sm -z-10" />
                 </motion.div>
-
+ 
                 <div className="space-y-1">
-                  <h1 className="text-2xl font-extrabold tracking-tight text-white font-display">
+                  <h1 className="text-2xl font-extrabold tracking-tight text-foreground font-display">
                     Create Account
                   </h1>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-cyan-400">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-cyan-600 dark:text-cyan-400">
                     QuizVerse AI Assessments
                   </p>
                 </div>
@@ -241,18 +241,18 @@ export default function RegisterForm() {
 
                 {/* Full Name */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="fullName" className="text-slate-300 font-medium text-xs">
+                  <Label htmlFor="fullName" className="text-muted-foreground font-medium text-xs">
                     Full Name
                   </Label>
                   <div className="relative group">
-                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-500 group-focus-within:text-cyan-400 transition-colors duration-200" />
+                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-cyan-400 transition-colors duration-200" />
                     <Input
                       id="fullName"
                       type="text"
                       disabled={isSubmitting || !!apiSuccess}
                       placeholder="John Doe"
                       {...register("fullName")}
-                      className={`pl-11 pr-4 h-11 w-full bg-white/4 border-white/10 rounded-xl hover:border-white/20 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-[#070b16] text-white transition-all duration-200 ${errors.fullName ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
+                      className={`pl-11 pr-4 h-11 w-full bg-slate-50 dark:bg-white/4 border-border rounded-xl hover:border-slate-300 dark:hover:border-white/20 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-background focus:ring-primary/10 text-foreground transition-all duration-200 ${errors.fullName ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
                     />
                   </div>
                   {errors.fullName && (
@@ -261,21 +261,21 @@ export default function RegisterForm() {
                     </p>
                   )}
                 </div>
-
+ 
                 {/* Email */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="email" className="text-slate-300 font-medium text-xs">
+                  <Label htmlFor="email" className="text-muted-foreground font-medium text-xs">
                     Email address
                   </Label>
                   <div className="relative group">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-500 group-focus-within:text-cyan-400 transition-colors duration-200" />
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-cyan-400 transition-colors duration-200" />
                     <Input
                       id="email"
                       type="email"
                       disabled={isSubmitting || !!apiSuccess}
                       placeholder="name@example.com"
                       {...register("email")}
-                      className={`pl-11 pr-4 h-11 w-full bg-white/4 border-white/10 rounded-xl hover:border-white/20 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-[#070b16] text-white transition-all duration-200 ${errors.email ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
+                      className={`pl-11 pr-4 h-11 w-full bg-slate-50 dark:bg-white/4 border-border rounded-xl hover:border-slate-300 dark:hover:border-white/20 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-background focus:ring-primary/10 text-foreground transition-all duration-200 ${errors.email ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
                     />
                   </div>
                   {errors.email && (
@@ -284,21 +284,21 @@ export default function RegisterForm() {
                     </p>
                   )}
                 </div>
-
+ 
                 {/* Role Selection */}
                 <div className="space-y-1.5">
-                  <Label className="text-slate-300 font-medium text-xs">
+                  <Label className="text-muted-foreground font-medium text-xs">
                     Choose Your Role
                   </Label>
-                  <div className="grid grid-cols-2 gap-3 p-1 rounded-xl bg-white/3 border border-white/5">
+                  <div className="grid grid-cols-2 gap-3 p-1 rounded-xl bg-black/5 dark:bg-white/3 border border-border">
                     <button
                       type="button"
                       disabled={isSubmitting || !!apiSuccess}
                       onClick={() => setValue("role", "student", { shouldValidate: true })}
                       className={`py-2 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 ${
                         roleVal === "student"
-                          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-indigo-500/15"
-                          : "text-slate-400 hover:text-slate-200"
+                           ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-indigo-500/15"
+                           : "text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       <span>Student</span>
@@ -309,8 +309,8 @@ export default function RegisterForm() {
                       onClick={() => setValue("role", "teacher", { shouldValidate: true })}
                       className={`py-2 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 ${
                         roleVal === "teacher"
-                          ? "bg-gradient-to-r from-indigo-600 to-cyan-600 text-white shadow-md shadow-indigo-500/15"
-                          : "text-slate-400 hover:text-slate-200"
+                           ? "bg-gradient-to-r from-indigo-600 to-cyan-600 text-white shadow-md shadow-indigo-500/15"
+                           : "text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       <span>Teacher</span>
@@ -322,21 +322,21 @@ export default function RegisterForm() {
                     </p>
                   )}
                 </div>
-
+ 
                 {/* Password */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="password" className="text-slate-300 font-medium text-xs">
+                  <Label htmlFor="password" className="text-muted-foreground font-medium text-xs">
                     Password
                   </Label>
                   <div className="relative group">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-500 group-focus-within:text-cyan-400 transition-colors duration-200" />
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-cyan-400 transition-colors duration-200" />
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
                       disabled={isSubmitting || !!apiSuccess}
                       placeholder="••••••••"
                       {...register("password")}
-                      className={`pl-11 pr-11 h-11 w-full bg-white/4 border-white/10 rounded-xl hover:border-white/20 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-[#070b16] text-white transition-all duration-200 ${errors.password ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
+                      className={`pl-11 pr-11 h-11 w-full bg-slate-50 dark:bg-white/4 border-border rounded-xl hover:border-slate-300 dark:hover:border-white/20 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-background focus:ring-primary/10 text-foreground transition-all duration-200 ${errors.password ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
                     />
                     <button
                       type="button"
@@ -346,41 +346,41 @@ export default function RegisterForm() {
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
-
+ 
                   {/* Strength Meter */}
                   {passwordVal && (
                     <div className="space-y-1 pt-1">
-                      <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                      <div className="h-1.5 w-full bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                         <div className={`h-full transition-all duration-300 ${strength.color}`} />
                       </div>
-                      <div className="flex justify-between items-center text-[10px] font-semibold text-slate-400">
+                      <div className="flex justify-between items-center text-[10px] font-semibold text-muted-foreground">
                         <span>Password Strength:</span>
                         <span>{strength.label}</span>
                       </div>
                     </div>
                   )}
-
+ 
                   {errors.password && (
                     <p className="text-xs text-rose-400 font-medium pl-1 leading-normal">
                       {errors.password.message}
                     </p>
                   )}
                 </div>
-
+ 
                 {/* Confirm Password */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="confirmPassword" className="text-slate-300 font-medium text-xs">
+                  <Label htmlFor="confirmPassword" className="text-muted-foreground font-medium text-xs">
                     Confirm Password
                   </Label>
                   <div className="relative group">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-500 group-focus-within:text-cyan-400 transition-colors duration-200" />
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-cyan-400 transition-colors duration-200" />
                     <Input
                       id="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
                       disabled={isSubmitting || !!apiSuccess}
                       placeholder="••••••••"
                       {...register("confirmPassword")}
-                      className={`pl-11 pr-11 h-11 w-full bg-white/4 border-white/10 rounded-xl hover:border-white/20 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-[#070b16] text-white transition-all duration-200 ${errors.confirmPassword ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
+                      className={`pl-11 pr-11 h-11 w-full bg-slate-50 dark:bg-white/4 border-border rounded-xl hover:border-slate-300 dark:hover:border-white/20 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-background focus:ring-primary/10 text-foreground transition-all duration-200 ${errors.confirmPassword ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
                     />
                     <button
                       type="button"
@@ -396,7 +396,7 @@ export default function RegisterForm() {
                     </p>
                   )}
                 </div>
-
+ 
                 {/* Submit */}
                 <motion.div
                   whileHover={!(isSubmitting || !!apiSuccess) ? { scale: 1.01 } : {}}
@@ -422,25 +422,25 @@ export default function RegisterForm() {
                   </Button>
                 </motion.div>
               </form>
-
+ 
               {/* Redirect to Login */}
-              <div className="pt-2 text-center text-sm text-slate-400">
+              <div className="pt-2 text-center text-sm text-muted-foreground">
                 Already have an account?{" "}
                 <button
                   type="button"
                   onClick={() => router.push("/login")}
-                  className="font-semibold text-cyan-400 hover:text-cyan-300 hover:underline focus:outline-none cursor-pointer"
+                  className="font-semibold text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 hover:underline focus:outline-none cursor-pointer"
                 >
                   Sign In
                 </button>
               </div>
-
+ 
             </CardContent>
           </Card>
         </motion.div>
       </div>
-
-      <footer className="text-center text-xs text-slate-500 pt-6">
+ 
+      <footer className="text-center text-xs text-muted-foreground pt-6">
         &copy; 2026 QuizVerse AI. All rights reserved.
       </footer>
     </div>

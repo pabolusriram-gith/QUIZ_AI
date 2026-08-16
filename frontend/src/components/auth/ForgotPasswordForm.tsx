@@ -91,14 +91,14 @@ export default function ForgotPasswordForm() {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-[#030712] text-slate-100 flex flex-col justify-between items-center py-10 px-4">
+    <div className="relative min-h-screen w-full overflow-hidden bg-background text-foreground flex flex-col justify-between items-center py-10 px-4">
       
       {/* Background Design */}
       <div 
-        className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-85 pointer-events-none" 
+        className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-85 pointer-events-none" 
         aria-hidden="true"
       />
-
+ 
       <div className="absolute inset-0 -z-20 overflow-hidden pointer-events-none" aria-hidden="true">
         <motion.div
           animate={{
@@ -111,7 +111,7 @@ export default function ForgotPasswordForm() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute -top-12 -left-12 h-[450px] w-[450px] rounded-full bg-indigo-950/20 blur-[110px]"
+          className="absolute -top-12 -left-12 h-[450px] w-[450px] rounded-full bg-indigo-500/5 dark:bg-indigo-950/20 blur-[110px]"
         />
         <motion.div
           animate={{
@@ -124,10 +124,10 @@ export default function ForgotPasswordForm() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute -bottom-16 -right-16 h-[450px] w-[450px] rounded-full bg-cyan-950/20 blur-[110px]"
+          className="absolute -bottom-16 -right-16 h-[450px] w-[450px] rounded-full bg-cyan-500/5 dark:bg-cyan-950/20 blur-[110px]"
         />
       </div>
-
+ 
       <div className="flex-1 flex items-center justify-center w-full z-10">
         
         <motion.div
@@ -136,7 +136,7 @@ export default function ForgotPasswordForm() {
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="w-full max-w-[440px]"
         >
-          <Card className="glass-panel border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-2xl overflow-hidden p-1">
+          <Card className="glass-panel border-border shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-2xl overflow-hidden p-1">
             <CardContent className="pt-8 pb-7 px-8 space-y-6">
               
               {/* Header */}
@@ -150,12 +150,12 @@ export default function ForgotPasswordForm() {
                   <BrainCircuit className="h-6 w-6 text-white animate-pulse" />
                   <span className="absolute -inset-0.5 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 opacity-30 blur-sm -z-10" />
                 </motion.div>
-
+ 
                 <div className="space-y-1">
-                  <h1 className="text-2xl font-extrabold tracking-tight text-white font-display">
+                  <h1 className="text-2xl font-extrabold tracking-tight text-foreground font-display">
                     Forgot Password
                   </h1>
-                  <p className="text-xs text-slate-400 max-w-[320px]">
+                  <p className="text-xs text-muted-foreground max-w-[320px]">
                     Enter your email address and we will generate a secure reset link.
                   </p>
                 </div>
@@ -190,41 +190,41 @@ export default function ForgotPasswordForm() {
                   
                   {/* Development Mode Helper Link */}
                   {devResetUrl && (
-                    <div className="mt-3 p-3 bg-white/3 border border-emerald-500/20 rounded-lg text-left w-full space-y-1">
-                      <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-wide">
+                    <div className="mt-3 p-3 bg-black/5 dark:bg-white/3 border border-emerald-500/20 rounded-lg text-left w-full space-y-1">
+                      <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
                         Development Reset Link:
                       </p>
                       <a 
                         href={devResetUrl}
-                        className="text-xs text-cyan-400 font-semibold underline hover:text-cyan-300 break-all"
+                        className="text-xs text-cyan-600 dark:text-cyan-400 font-semibold underline hover:text-cyan-500 dark:hover:text-cyan-300 break-all"
                       >
                         {devResetUrl}
                       </a>
-                      <p className="text-[9px] text-slate-500 font-normal">
+                      <p className="text-[9px] text-muted-foreground font-normal">
                         Click this link to perform a local password reset bypass test.
                       </p>
                     </div>
                   )}
                 </motion.div>
               )}
-
+ 
               {/* Form */}
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 
                 {/* Email */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="email" className="text-slate-300 font-medium text-xs">
+                  <Label htmlFor="email" className="text-muted-foreground font-medium text-xs">
                     Email address
                   </Label>
                   <div className="relative group">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-500 group-focus-within:text-cyan-400 transition-colors duration-200" />
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-cyan-400 transition-colors duration-200" />
                     <Input
                       id="email"
                       type="email"
                       disabled={isSubmitting || !!apiSuccess}
                       placeholder="name@example.com"
                       {...register("email")}
-                      className={`pl-11 pr-4 h-11 w-full bg-white/4 border-white/10 rounded-xl hover:border-white/20 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-[#070b16] text-white transition-all duration-200 ${errors.email ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
+                      className={`pl-11 pr-4 h-11 w-full bg-slate-50 dark:bg-white/4 border-border rounded-xl hover:border-slate-300 dark:hover:border-white/20 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-background focus:ring-primary/10 text-foreground transition-all duration-200 ${errors.email ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
                     />
                   </div>
                   {errors.email && (
@@ -233,7 +233,7 @@ export default function ForgotPasswordForm() {
                     </p>
                   )}
                 </div>
-
+ 
                 {/* Submit */}
                 <motion.div
                   whileHover={!(isSubmitting || !!apiSuccess) ? { scale: 1.01 } : {}}
@@ -259,25 +259,25 @@ export default function ForgotPasswordForm() {
                   </Button>
                 </motion.div>
               </form>
-
+ 
               {/* Back to Login */}
               <div className="pt-2 text-center">
                 <button
                   type="button"
                   onClick={() => router.push("/login")}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-400 hover:text-cyan-300 hover:underline focus:outline-none cursor-pointer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 hover:underline focus:outline-none cursor-pointer"
                 >
                   <ArrowLeft className="h-3 w-3" />
                   Back to Sign In
                 </button>
               </div>
-
+ 
             </CardContent>
           </Card>
         </motion.div>
       </div>
-
-      <footer className="text-center text-xs text-slate-500 pt-6">
+ 
+      <footer className="text-center text-xs text-muted-foreground pt-6">
         &copy; 2026 QuizVerse AI. All rights reserved.
       </footer>
     </div>

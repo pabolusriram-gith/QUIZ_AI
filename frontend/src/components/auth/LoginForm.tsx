@@ -154,16 +154,16 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-[#030712] text-slate-100 flex flex-col justify-between items-center py-10 px-4">
+    <div className="relative min-h-screen w-full overflow-hidden bg-background text-foreground flex flex-col justify-between items-center py-10 px-4">
       
       {/* ----------------- Background Design ----------------- */}
       
       {/* Premium subtle grid overlay */}
       <div 
-        className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-85 pointer-events-none" 
+        className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-85 pointer-events-none" 
         aria-hidden="true"
       />
-
+ 
       {/* Animated soft gradient blobs for premium AI look */}
       <div className="absolute inset-0 -z-20 overflow-hidden pointer-events-none" aria-hidden="true">
         <motion.div
@@ -177,7 +177,7 @@ export default function LoginForm() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute -top-12 -left-12 h-[450px] w-[450px] rounded-full bg-indigo-950/20 blur-[110px]"
+          className="absolute -top-12 -left-12 h-[450px] w-[450px] rounded-full bg-indigo-500/5 dark:bg-indigo-950/20 blur-[110px]"
         />
         <motion.div
           animate={{
@@ -190,10 +190,10 @@ export default function LoginForm() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute -bottom-16 -right-16 h-[450px] w-[450px] rounded-full bg-cyan-950/20 blur-[110px]"
+          className="absolute -bottom-16 -right-16 h-[450px] w-[450px] rounded-full bg-cyan-500/5 dark:bg-cyan-950/20 blur-[110px]"
         />
       </div>
-
+ 
       <div className="flex-1 flex items-center justify-center w-full z-10">
         
         {/* ----------------- Animated Login Card ----------------- */}
@@ -204,7 +204,7 @@ export default function LoginForm() {
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="w-full max-w-[440px]"
         >
-          <Card className="glass-panel border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-2xl overflow-hidden p-1">
+          <Card className="glass-panel border-border shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-2xl overflow-hidden p-1">
             <CardContent className="pt-8 pb-7 px-8 space-y-6">
               
               {/* --- Header Section (Branding & Welcome) --- */}
@@ -220,23 +220,23 @@ export default function LoginForm() {
                   <BrainCircuit className="h-6 w-6 text-white animate-pulse" />
                   <span className="absolute -inset-0.5 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 opacity-30 blur-sm -z-10" />
                 </motion.div>
-
+ 
                 {/* Title & Subtitle */}
                 <div className="space-y-1">
-                  <h1 className="text-2xl font-extrabold tracking-tight text-white font-display">
+                  <h1 className="text-2xl font-extrabold tracking-tight text-foreground font-display">
                     QuizVerse AI
                   </h1>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-cyan-400">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-cyan-600 dark:text-cyan-400">
                     AI-Powered Assessment Workspace
                   </p>
                 </div>
-
+ 
                 {/* Greeting */}
                 <div className="space-y-1 pt-1">
-                  <h2 className="text-lg font-bold text-white font-display">
+                  <h2 className="text-lg font-bold text-foreground font-display">
                     Welcome Back 👋
                   </h2>
-                  <p className="text-xs text-slate-400 max-w-[320px]">
+                  <p className="text-xs text-muted-foreground max-w-[320px]">
                     Sign in to continue creating and managing AI-powered quizzes.
                   </p>
                 </div>
@@ -261,18 +261,18 @@ export default function LoginForm() {
                 
                 {/* Email Input */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="email" className="text-slate-300 font-medium text-xs">
+                  <Label htmlFor="email" className="text-muted-foreground font-medium text-xs">
                     Email address
                   </Label>
                   <div className="relative group">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-500 group-focus-within:text-cyan-400 transition-colors duration-200" />
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-cyan-400 transition-colors duration-200" />
                     <Input
                       id="email"
                       type="email"
                       disabled={isSubmitting || oauthLoading !== null}
                       placeholder="name@example.com"
                       {...register("email")}
-                      className={`pl-11 pr-4 h-11 w-full bg-white/4 border-white/10 rounded-xl hover:border-white/20 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-[#070b16] text-white transition-all duration-200 ${errors.email ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
+                      className={`pl-11 pr-4 h-11 w-full bg-slate-50 dark:bg-white/4 border-border rounded-xl hover:border-slate-300 dark:hover:border-white/20 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-background focus:ring-primary/10 text-foreground transition-all duration-200 ${errors.email ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
                     />
                   </div>
                   {errors.email && (
@@ -281,31 +281,31 @@ export default function LoginForm() {
                     </p>
                   )}
                 </div>
-
+ 
                 {/* Password Input */}
                 <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
-                    <Label htmlFor="password" className="text-slate-300 font-medium text-xs">
+                    <Label htmlFor="password" className="text-muted-foreground font-medium text-xs">
                       Password
                     </Label>
                     <button
                       type="button"
                       onClick={() => router.push("/forgot-password")}
                       tabIndex={-1}
-                      className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 hover:underline focus:outline-none cursor-pointer"
+                      className="text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 hover:underline focus:outline-none cursor-pointer"
                     >
                       Forgot password?
                     </button>
                   </div>
                   <div className="relative group">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-500 group-focus-within:text-cyan-400 transition-colors duration-200" />
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-cyan-400 transition-colors duration-200" />
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
                       disabled={isSubmitting || oauthLoading !== null}
                       placeholder="••••••••"
                       {...register("password")}
-                      className={`pl-11 pr-11 h-11 w-full bg-white/4 border-white/10 rounded-xl hover:border-white/20 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-[#070b16] text-white transition-all duration-200 ${errors.password ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
+                      className={`pl-11 pr-11 h-11 w-full bg-slate-50 dark:bg-white/4 border-border rounded-xl hover:border-slate-300 dark:hover:border-white/20 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-background focus:ring-primary/10 text-foreground transition-all duration-200 ${errors.password ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
                     />
                     <button
                       type="button"
@@ -322,11 +322,11 @@ export default function LoginForm() {
                     </p>
                   )}
                 </div>
-
+ 
                 {/* Remember Me */}
                 <div className="flex items-center pt-0.5">
-                  <label className="group flex items-center gap-2.5 cursor-pointer text-xs text-slate-400 select-none">
-                    <div className="relative flex items-center justify-center h-4.5 w-4.5 rounded-md border border-white/10 bg-white/5 transition-all group-hover:border-indigo-500 group-hover:shadow-[0_0_0_3px_rgba(99,102,241,0.1)] has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-600">
+                  <label className="group flex items-center gap-2.5 cursor-pointer text-xs text-muted-foreground select-none">
+                    <div className="relative flex items-center justify-center h-4.5 w-4.5 rounded-md border border-border bg-slate-50 dark:bg-white/5 transition-all group-hover:border-indigo-500 group-hover:shadow-[0_0_0_3px_rgba(99,102,241,0.1)] has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-600">
                       <input 
                         type="checkbox" 
                         disabled={isSubmitting || oauthLoading !== null}
@@ -337,10 +337,10 @@ export default function LoginForm() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                       </svg>
                     </div>
-                    <span className="group-hover:text-slate-200 transition-colors font-medium">Remember for 30 days</span>
+                    <span className="group-hover:text-foreground transition-colors font-medium">Remember for 30 days</span>
                   </label>
                 </div>
-
+ 
                 {/* Submit Button */}
                 <motion.div
                   whileHover={!(isSubmitting || oauthLoading !== null) ? { scale: 1.01 } : {}}
@@ -366,16 +366,16 @@ export default function LoginForm() {
                   </Button>
                 </motion.div>
               </form>
-
+ 
               {/* --- Divider --- */}
               <div className="relative flex items-center py-1">
-                <div className="flex-grow border-t border-white/5"></div>
-                <span className="flex-shrink mx-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-transparent">
+                <div className="flex-grow border-t border-border"></div>
+                <span className="flex-shrink mx-4 text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-transparent">
                   or
                 </span>
-                <div className="flex-grow border-t border-white/5"></div>
+                <div className="flex-grow border-t border-border"></div>
               </div>
-
+ 
               {/* --- Social Buttons --- */}
               <motion.div
                 whileHover={!(isSubmitting || oauthLoading !== null) ? { scale: 1.01 } : {}}
@@ -390,7 +390,7 @@ export default function LoginForm() {
                     window.location.href = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1") + "/auth/google/login";
                   }}
                   disabled={isSubmitting || oauthLoading !== null}
-                  className="w-full h-11 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:text-white font-semibold text-xs gap-3 flex items-center justify-center cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full h-11 rounded-xl border border-border bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-foreground transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {oauthLoading === "google" ? (
                     <svg className="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -405,29 +405,29 @@ export default function LoginForm() {
                   <span>{oauthLoading === "google" ? "Connecting to Google..." : "Continue with Google"}</span>
                 </Button>
               </motion.div>
-
+ 
               {/* --- Sign Up Redirect --- */}
-              <div className="pt-2 text-center text-sm text-slate-400">
+              <div className="pt-2 text-center text-sm text-muted-foreground">
                 Don&apos;t have an account?{" "}
                 <button
                   type="button"
                   onClick={() => router.push("/register")}
-                  className="font-semibold text-cyan-400 hover:text-cyan-300 hover:underline focus:outline-none cursor-pointer"
+                  className="font-semibold text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 hover:underline focus:outline-none cursor-pointer"
                 >
                   Create one free
                 </button>
               </div>
-
+ 
             </CardContent>
           </Card>
         </motion.div>
       </div>
-
+ 
       {/* --- Footer Section --- */}
-      <footer className="text-center text-xs text-slate-500 pt-6">
+      <footer className="text-center text-xs text-muted-foreground pt-6">
         &copy; 2026 QuizVerse AI. All rights reserved.
       </footer>
-
+ 
       {/* Toast Notification */}
       <AnimatePresence>
         {toast && (
@@ -436,7 +436,7 @@ export default function LoginForm() {
             animate={{ opacity: 1, y: 0, scale: 1, x: "-50%" }}
             exit={{ opacity: 0, y: -20, scale: 0.95, x: "-50%" }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="fixed top-6 left-1/2 z-50 px-4 py-3 rounded-xl border border-rose-500/20 bg-[#090f1e]/85 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex items-center gap-2.5 text-xs font-semibold text-rose-400 max-w-sm w-full mx-4"
+            className="fixed top-6 left-1/2 z-50 px-4 py-3 rounded-xl border border-rose-500/20 bg-popover/85 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex items-center gap-2.5 text-xs font-semibold text-rose-600 dark:text-rose-400 max-w-sm w-full mx-4"
           >
             <svg className="h-4.5 w-4.5 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />

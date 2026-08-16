@@ -32,6 +32,26 @@ from app.services.question_processor import QuestionProcessor
 # Question Bank Endpoints
 # ---------------------------------------------------------------------------
 
+@router.delete("/questions", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_all_my_questions(
+    current_user: User = Depends(check_role(["teacher", "admin"])),
+    db: AsyncSession = Depends(get_db)
+) -> None:
+    """Delete all questions belonging to the current teacher (admin deletes all)."""
+    from sqlalchemy import delete
+    if current_user.role == "admin":
+        await db.execute(delete(Question))
+    else:
+        # Teacher deletes only their own questions
+        subq = select(Quiz.id).where(Quiz.created_by_id == current_user.id)
+        q_result = await db.execute(select(Question.id).where(Question.quiz_id.in_(subq)))
+        question_ids = [r[0] for r in q_result.all()]
+        if question_ids:
+            await db.execute(delete(Question).where(Question.id.in_(question_ids)))
+    await db.commit()
+    return None
+
+
 @router.get("/questions", response_model=dict)
 async def list_all_questions(
     skip: int = Query(0, ge=0),
@@ -56,6 +76,9 @@ async def list_all_questions(
 
     # Apply filters
     filters = []
+    if current_user.role != "admin":
+        filters.append(Quiz.created_by_id == current_user.id)
+
     if search:
         like_pat = f"%{search}%"
         filters.append(or_(Question.text.ilike(like_pat), Question.topic.ilike(like_pat)))

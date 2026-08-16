@@ -242,7 +242,7 @@ export default function ReportsPage() {
           description="Compile and export quiz summaries, student performance matrices, and cheat violations."
           actions={
             <div className="flex gap-2">
-              <button onClick={handlePrintPDF} className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition cursor-pointer">
+              <button onClick={handlePrintPDF} className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-foreground bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl border border-border transition cursor-pointer">
                 <Printer className="h-4 w-4" />Print PDF
               </button>
               <button onClick={handleExportCSV} className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition cursor-pointer">
@@ -263,73 +263,73 @@ export default function ReportsPage() {
       <div className="glass-panel rounded-2xl p-4 space-y-3 print:hidden">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <button onClick={() => setShowFilters(!showFilters)} className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${showFilters || hasActiveFilters ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-400" : "bg-white/4 border-white/8 text-slate-400 hover:text-white"}`}>
+            <button onClick={() => setShowFilters(!showFilters)} className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${showFilters || hasActiveFilters ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-600 dark:text-indigo-400" : "bg-slate-50 dark:bg-white/4 border-border text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-white/8"}`}>
               <Filter className="h-3.5 w-3.5" />
               Filter Reports
               <ChevronDown className={`h-3 w-3 transition-transform ${showFilters ? "rotate-180" : ""}`} />
             </button>
             {hasActiveFilters && (
-              <button onClick={handleResetFilters} className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-semibold bg-white/4 border border-white/8 text-slate-400 hover:text-white transition-colors cursor-pointer">
+              <button onClick={handleResetFilters} className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-white/4 border border-border text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-white/8 transition-colors cursor-pointer">
                 <RotateCcw className="h-3.5 w-3.5" />Reset
               </button>
             )}
           </div>
         </div>
-
+ 
         <AnimatePresence>
           {showFilters && (
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
-              <div className="pt-3 border-t border-white/5 grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+              <div className="pt-3 border-t border-border grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
                 {/* Subject Selector */}
                 <div className="space-y-1">
-                  <label className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Subject</label>
-                  <Input value={filterSubject} onChange={(e) => setFilterSubject(e.target.value)} placeholder="e.g. Science" className="bg-white/4 border-white/8 text-white h-9 text-xs focus:border-indigo-500/50" />
+                  <label className="font-bold text-muted-foreground uppercase tracking-wider text-[10px]">Subject</label>
+                  <Input value={filterSubject} onChange={(e) => setFilterSubject(e.target.value)} placeholder="e.g. Science" className="bg-slate-50 dark:bg-white/4 border-border text-foreground h-9 text-xs focus:border-indigo-500/50" />
                 </div>
-
+ 
                 {/* Quiz Selector */}
                 <div className="space-y-1">
-                  <label className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Quiz</label>
-                  <select value={filterQuizId} onChange={(e) => setFilterQuizId(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/4 border border-white/8 text-white focus:outline-none focus:border-indigo-500/50 transition cursor-pointer">
-                    <option value="" className="bg-[#060d1c]">All Quizzes</option>
+                  <label className="font-bold text-muted-foreground uppercase tracking-wider text-[10px]">Quiz</label>
+                  <select value={filterQuizId} onChange={(e) => setFilterQuizId(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-white/4 border border-border text-foreground focus:outline-none focus:border-indigo-500/50 transition cursor-pointer">
+                    <option value="" className="bg-popover text-popover-foreground">All Quizzes</option>
                     {quizzesList.map((q) => (
-                      <option key={q.id} value={q.id} className="bg-[#060d1c]">{q.title}</option>
+                      <option key={q.id} value={q.id} className="bg-popover text-popover-foreground">{q.title}</option>
                     ))}
                   </select>
                 </div>
-
+ 
                 {/* Student Selector */}
                 <div className="space-y-1">
-                  <label className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Student</label>
-                  <select value={filterStudentId} onChange={(e) => setFilterStudentId(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/4 border border-white/8 text-white focus:outline-none focus:border-indigo-500/50 transition cursor-pointer">
-                    <option value="" className="bg-[#060d1c]">All Students</option>
+                  <label className="font-bold text-muted-foreground uppercase tracking-wider text-[10px]">Student</label>
+                  <select value={filterStudentId} onChange={(e) => setFilterStudentId(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-white/4 border border-border text-foreground focus:outline-none focus:border-indigo-500/50 transition cursor-pointer">
+                    <option value="" className="bg-popover text-popover-foreground">All Students</option>
                     {studentsList.map((s) => (
-                      <option key={s.id} value={s.id} className="bg-[#060d1c]">{s.name}</option>
+                      <option key={s.id} value={s.id} className="bg-popover text-popover-foreground">{s.name}</option>
                     ))}
                   </select>
                 </div>
-
+ 
                 {/* Department */}
                 <div className="space-y-1">
-                  <label className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Department</label>
-                  <Input value={filterDept} onChange={(e) => setFilterDept(e.target.value)} placeholder="e.g. CS" className="bg-white/4 border-white/8 text-white h-9 text-xs focus:border-indigo-500/50" />
+                  <label className="font-bold text-muted-foreground uppercase tracking-wider text-[10px]">Department</label>
+                  <Input value={filterDept} onChange={(e) => setFilterDept(e.target.value)} placeholder="e.g. CS" className="bg-slate-50 dark:bg-white/4 border-border text-foreground h-9 text-xs focus:border-indigo-500/50" />
                 </div>
-
+ 
                 {/* Semester */}
                 <div className="space-y-1">
-                  <label className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Semester</label>
-                  <Input value={filterSem} onChange={(e) => setFilterSem(e.target.value)} placeholder="e.g. Autumn" className="bg-white/4 border-white/8 text-white h-9 text-xs focus:border-indigo-500/50" />
+                  <label className="font-bold text-muted-foreground uppercase tracking-wider text-[10px]">Semester</label>
+                  <Input value={filterSem} onChange={(e) => setFilterSem(e.target.value)} placeholder="e.g. Autumn" className="bg-slate-50 dark:bg-white/4 border-border text-foreground h-9 text-xs focus:border-indigo-500/50" />
                 </div>
-
+ 
                 {/* Start Date */}
                 <div className="space-y-1">
-                  <label className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">From Date</label>
-                  <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="bg-white/4 border-white/8 text-white h-9 text-xs focus:border-indigo-500/50" />
+                  <label className="font-bold text-muted-foreground uppercase tracking-wider text-[10px]">From Date</label>
+                  <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="bg-slate-50 dark:bg-white/4 border-border text-foreground h-9 text-xs focus:border-indigo-500/50" />
                 </div>
-
+ 
                 {/* End Date */}
                 <div className="space-y-1">
-                  <label className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">To Date</label>
-                  <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="bg-white/4 border-white/8 text-white h-9 text-xs focus:border-indigo-500/50" />
+                  <label className="font-bold text-muted-foreground uppercase tracking-wider text-[10px]">To Date</label>
+                  <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="bg-slate-50 dark:bg-white/4 border-border text-foreground h-9 text-xs focus:border-indigo-500/50" />
                 </div>
               </div>
             </motion.div>
@@ -338,7 +338,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Tabs list (hidden on print) */}
-      <div className="flex border-b border-white/5 gap-4 print:hidden">
+      <div className="flex border-b border-border gap-4 print:hidden">
         {[
           { key: "attempts", label: "Quiz Attempts" },
           { key: "quizzes", label: "Quiz Performances" },
@@ -347,7 +347,7 @@ export default function ReportsPage() {
           <button
             key={t.key}
             onClick={() => setActiveTab(t.key as any)}
-            className={`pb-3 font-semibold text-xs tracking-wider uppercase border-b-2 transition-all cursor-pointer ${activeTab === t.key ? "border-indigo-500 text-white" : "border-transparent text-slate-500 hover:text-slate-300"}`}
+            className={`pb-3 font-semibold text-xs tracking-wider uppercase border-b-2 transition-all cursor-pointer ${activeTab === t.key ? "border-indigo-500 text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
           >
             {t.label}
           </button>
@@ -359,29 +359,29 @@ export default function ReportsPage() {
         <div className="space-y-6">
           <div className="grid grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-24 w-full bg-white/5 border border-white/5" variant="glass" />
+              <Skeleton key={i} className="h-24 w-full bg-black/5 dark:bg-white/5 border border-border" variant="glass" />
             ))}
           </div>
-          <Skeleton className="h-96 w-full bg-white/5 border border-white/5" variant="glass" />
+          <Skeleton className="h-96 w-full bg-black/5 dark:bg-white/5 border border-border" variant="glass" />
         </div>
       ) : !data ? (
-        <div className="glass-panel rounded-2xl py-16 text-center text-slate-500">Failed to compile reports.</div>
+        <div className="glass-panel rounded-2xl py-16 text-center text-muted-foreground">Failed to compile reports.</div>
       ) : (
         <div className="space-y-6">
           
           {/* Quick stats totals */}
           <div className="grid grid-cols-3 gap-4 print:hidden">
-            <StatCard title="Total Attempts" value={data.attempts.length} icon={<FileText className="h-5 w-5 text-indigo-400" />} glowColor="indigo" />
-            <StatCard title="Total Quizzes" value={data.quizzes.length} icon={<BookOpen className="h-5 w-5 text-cyan-400" />} glowColor="cyan" />
-            <StatCard title="Total Students" value={data.students.length} icon={<CheckCircle2 className="h-5 w-5 text-emerald-400" />} glowColor="emerald" />
+            <StatCard title="Total Attempts" value={data.attempts.length} icon={<FileText className="h-5 w-5 text-indigo-500 dark:text-indigo-400" />} glowColor="indigo" />
+            <StatCard title="Total Quizzes" value={data.quizzes.length} icon={<BookOpen className="h-5 w-5 text-cyan-500 dark:text-cyan-400" />} glowColor="cyan" />
+            <StatCard title="Total Students" value={data.students.length} icon={<CheckCircle2 className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />} glowColor="emerald" />
           </div>
-
+ 
           {/* TABLE DISPLAY */}
-          <div className="glass-panel rounded-2xl overflow-hidden border-white/5 print:bg-white print:border-none print:shadow-none">
+          <div className="glass-panel rounded-2xl overflow-hidden border-border print:bg-white print:border-none print:shadow-none">
             
             {/* View Title */}
-            <div className="px-5 py-4 border-b border-white/5 print:border-black/10">
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider print:text-black print:text-sm">
+            <div className="px-5 py-4 border-b border-border print:border-black/10">
+              <h3 className="text-xs font-bold text-foreground uppercase tracking-wider print:text-black print:text-sm">
                 {activeTab === "attempts" && "Detailed Attempts Summary"}
                 {activeTab === "quizzes" && "Detailed Quiz Performance Summary"}
                 {activeTab === "students" && "Detailed Student Performance Summary"}
@@ -395,7 +395,7 @@ export default function ReportsPage() {
               {activeTab === "attempts" && (
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="text-slate-500 print:text-black text-[10px] font-bold uppercase border-b border-white/5 print:border-black/20">
+                    <tr className="text-muted-foreground print:text-black text-[10px] font-bold uppercase border-b border-border print:border-black/20">
                       <th className="px-5 py-3">Student</th>
                       <th className="py-3">Quiz</th>
                       <th className="py-3">Subject</th>
@@ -406,25 +406,25 @@ export default function ReportsPage() {
                       <th className="px-5 py-3">Completed At</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/4 print:divide-black/10">
+                  <tbody className="divide-y divide-border print:divide-black/10">
                     {data.attempts.length === 0 ? (
-                      <tr><td colSpan={8} className="py-12 text-center text-slate-500">No raw quiz attempts match the filters.</td></tr>
+                      <tr><td colSpan={8} className="py-12 text-center text-muted-foreground">No raw quiz attempts match the filters.</td></tr>
                     ) : (
                       data.attempts.map((a) => (
-                        <tr key={a.id} className="text-slate-300 hover:text-white print:text-slate-700">
+                        <tr key={a.id} className="text-foreground/85 hover:text-foreground print:text-slate-700">
                           <td className="px-5 py-3.5">
-                            <div className="font-semibold text-white print:text-black">{a.student_name}</div>
-                            <div className="text-[10px] text-slate-500 font-normal">{a.student_email}</div>
+                            <div className="font-semibold text-foreground print:text-black">{a.student_name}</div>
+                            <div className="text-[10px] text-muted-foreground font-normal">{a.student_email}</div>
                           </td>
                           <td className="py-3.5 font-medium">{a.quiz_title}</td>
-                          <td className="py-3.5 text-slate-400">{a.subject}</td>
-                          <td className="py-3.5 text-center font-bold text-cyan-400">{a.percentage}%</td>
+                          <td className="py-3.5 text-muted-foreground">{a.subject}</td>
+                          <td className="py-3.5 text-center font-bold text-cyan-600 dark:text-cyan-400">{a.percentage}%</td>
                           <td className="py-3.5 text-center font-semibold">
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${a.passed ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-rose-500/10 text-rose-400 border border-rose-500/20"}`}>{a.passed ? "Pass" : "Fail"}</span>
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${a.passed ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20" : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20"}`}>{a.passed ? "Pass" : "Fail"}</span>
                           </td>
-                          <td className="py-3.5 text-center text-slate-400">{formatTime(a.time_spent_seconds)}</td>
-                          <td className="py-3.5 text-center font-bold text-amber-400">{a.violations}</td>
-                          <td className="px-5 py-3.5 text-slate-400">{a.completed_at ? new Date(a.completed_at).toLocaleString() : "Unknown"}</td>
+                          <td className="py-3.5 text-center text-muted-foreground">{formatTime(a.time_spent_seconds)}</td>
+                          <td className="py-3.5 text-center font-bold text-amber-500 dark:text-amber-400">{a.violations}</td>
+                          <td className="px-5 py-3.5 text-muted-foreground">{a.completed_at ? new Date(a.completed_at).toLocaleString() : "Unknown"}</td>
                         </tr>
                       ))
                     )}
@@ -436,7 +436,7 @@ export default function ReportsPage() {
               {activeTab === "quizzes" && (
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="text-slate-500 print:text-black text-[10px] font-bold uppercase border-b border-white/5 print:border-black/20">
+                    <tr className="text-muted-foreground print:text-black text-[10px] font-bold uppercase border-b border-border print:border-black/20">
                       <th className="px-5 py-3">Quiz Details</th>
                       <th className="py-3">Subject</th>
                       <th className="py-3 text-center">Quiz Code</th>
@@ -447,23 +447,23 @@ export default function ReportsPage() {
                       <th className="px-5 py-3">Created Date</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/4 print:divide-black/10">
+                  <tbody className="divide-y divide-border print:divide-black/10">
                     {data.quizzes.length === 0 ? (
-                      <tr><td colSpan={8} className="py-12 text-center text-slate-500">No quizzes matched.</td></tr>
+                      <tr><td colSpan={8} className="py-12 text-center text-muted-foreground">No quizzes matched.</td></tr>
                     ) : (
                       data.quizzes.map((q) => (
-                        <tr key={q.id} className="text-slate-300 hover:text-white print:text-slate-700">
+                        <tr key={q.id} className="text-foreground/85 hover:text-foreground print:text-slate-700">
                           <td className="px-5 py-3.5">
-                            <div className="font-semibold text-white print:text-black">{q.title}</div>
-                            <div className="text-[10px] text-slate-500 font-normal">{q.department || "General"} | {q.semester || "General"}</div>
+                            <div className="font-semibold text-foreground print:text-black">{q.title}</div>
+                            <div className="text-[10px] text-muted-foreground font-normal">{q.department || "General"} | {q.semester || "General"}</div>
                           </td>
-                          <td className="py-3.5 text-slate-400">{q.subject}</td>
-                          <td className="py-3.5 text-center text-indigo-400 font-bold">{q.quiz_code}</td>
-                          <td className="py-3.5 text-center text-slate-400">{q.duration} mins</td>
-                          <td className="py-3.5 text-center text-slate-400 font-bold">{q.attempts_count}</td>
-                          <td className="py-3.5 text-center text-cyan-400 font-black">{q.avg_score}%</td>
-                          <td className="py-3.5 text-center text-emerald-400 font-black">{q.pass_rate}%</td>
-                          <td className="px-5 py-3.5 text-slate-400">{q.created_at ? new Date(q.created_at).toLocaleDateString() : ""}</td>
+                          <td className="py-3.5 text-muted-foreground">{q.subject}</td>
+                          <td className="py-3.5 text-center text-indigo-600 dark:text-indigo-400 font-bold">{q.quiz_code}</td>
+                          <td className="py-3.5 text-center text-muted-foreground">{q.duration} mins</td>
+                          <td className="py-3.5 text-center text-muted-foreground font-bold">{q.attempts_count}</td>
+                          <td className="py-3.5 text-center text-cyan-600 dark:text-cyan-400 font-black">{q.avg_score}%</td>
+                          <td className="py-3.5 text-center text-emerald-600 dark:text-emerald-400 font-black">{q.pass_rate}%</td>
+                          <td className="px-5 py-3.5 text-muted-foreground">{q.created_at ? new Date(q.created_at).toLocaleDateString() : ""}</td>
                         </tr>
                       ))
                     )}
@@ -475,7 +475,7 @@ export default function ReportsPage() {
               {activeTab === "students" && (
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="text-slate-500 print:text-black text-[10px] font-bold uppercase border-b border-white/5 print:border-black/20">
+                    <tr className="text-muted-foreground print:text-black text-[10px] font-bold uppercase border-b border-border print:border-black/20">
                       <th className="px-5 py-3">Student Name</th>
                       <th className="py-3">Email</th>
                       <th className="py-3">Dept / Sem</th>
@@ -485,19 +485,19 @@ export default function ReportsPage() {
                       <th className="px-5 py-3 text-center">Total Violations</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/4 print:divide-black/10">
+                  <tbody className="divide-y divide-border print:divide-black/10">
                     {data.students.length === 0 ? (
-                      <tr><td colSpan={7} className="py-12 text-center text-slate-500">No students recorded matching filters.</td></tr>
+                      <tr><td colSpan={7} className="py-12 text-center text-muted-foreground">No students recorded matching filters.</td></tr>
                     ) : (
                       data.students.map((s) => (
-                        <tr key={s.id} className="text-slate-300 hover:text-white print:text-slate-700">
-                          <td className="px-5 py-3.5 font-semibold text-white print:text-black">{s.name}</td>
-                          <td className="py-3.5 text-slate-400">{s.email}</td>
-                          <td className="py-3.5 text-slate-400">{s.department} | {s.semester}</td>
-                          <td className="py-3.5 text-center text-slate-400 font-bold">{s.attempts_count}</td>
-                          <td className="py-3.5 text-center text-cyan-400 font-black">{s.avg_score}%</td>
-                          <td className="py-3.5 text-center text-emerald-400 font-black">{s.pass_rate}%</td>
-                          <td className="px-5 py-3.5 text-center text-rose-400 font-bold">{s.total_violations}</td>
+                        <tr key={s.id} className="text-foreground/85 hover:text-foreground print:text-slate-700">
+                          <td className="px-5 py-3.5 font-semibold text-foreground print:text-black">{s.name}</td>
+                          <td className="py-3.5 text-muted-foreground">{s.email}</td>
+                          <td className="py-3.5 text-muted-foreground">{s.department} | {s.semester}</td>
+                          <td className="py-3.5 text-center text-muted-foreground font-bold">{s.attempts_count}</td>
+                          <td className="py-3.5 text-center text-cyan-600 dark:text-cyan-400 font-black">{s.avg_score}%</td>
+                          <td className="py-3.5 text-center text-emerald-600 dark:text-emerald-400 font-black">{s.pass_rate}%</td>
+                          <td className="px-5 py-3.5 text-center text-rose-600 dark:text-rose-400 font-bold">{s.total_violations}</td>
                         </tr>
                       ))
                     )}

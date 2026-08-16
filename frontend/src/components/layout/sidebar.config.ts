@@ -39,6 +39,11 @@ export const sidebarConfig: SidebarItem[] = [
     iconName: "BarChart3",
   },
   {
+    name: "AI Analytics",
+    path: "/dashboard/analytics/ai",
+    iconName: "BrainCircuit",
+  },
+  {
     name: "Reports",
     path: "/dashboard/reports",
     iconName: "FileDown",

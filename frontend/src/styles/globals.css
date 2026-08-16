@@ -57,33 +57,68 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.08);
   border-radius: 9999px;
   transition: all 0.2s ease;
 }
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+}
 ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+.dark ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.15);
 }
 
 /* Glassmorphism primitives */
 .glass-panel {
-  background: rgba(13, 22, 43, 0.45);
+  background: rgba(255, 255, 255, 0.70);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.dark .glass-panel {
+  background: rgba(10, 20, 48, 0.50);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glass-panel-glow {
-  background: rgba(13, 22, 43, 0.55);
+  background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(20px);
+  border: 1px solid rgba(79, 70, 229, 0.18);
+  box-shadow: 0 10px 40px -10px rgba(79, 70, 229, 0.10);
+}
+
+.dark .glass-panel-glow {
+  background: rgba(10, 20, 48, 0.60);
   border: 1px solid rgba(99, 102, 241, 0.15);
   box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.08);
 }
 
+/* Solid card utility for pages that need hard white/navy surfaces */
+.page-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+}
+
+.dark .page-card {
+  background: rgba(10, 18, 38, 0.80);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
 .brand-text-gradient {
-  background: linear-gradient(135deg, #f8fafc 0%, #a5b4fc 50%, #06b6d4 100%);
+  background-image: linear-gradient(135deg, #0f172a 0%, #4f46e5 50%, #0891b2 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.dark .brand-text-gradient {
+  background-image: linear-gradient(135deg, #f8fafc 0%, #a5b4fc 50%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
 .brand-button-glow {
@@ -98,22 +133,63 @@ body {
 
 @layer base {
   :root {
-    --background: #030712; /* Default theme is dark slate/navy */
-    --foreground: #f8fafc;
+    --background: #f1f5f9; /* slate-100 — soft off-white, not pure white */
+    --foreground: #0f172a; /* slate-900 */
     
-    --card: rgba(9, 15, 30, 0.65);
-    --card-foreground: #f8fafc;
+    --card: #ffffff;
+    --card-foreground: #0f172a;
     
-    --popover: #060b16;
-    --popover-foreground: #f8fafc;
+    --popover: #ffffff;
+    --popover-foreground: #0f172a;
     
-    --primary: #6366f1;
+    --primary: #4f46e5; /* Indigo 600 */
     --primary-foreground: #ffffff;
     
-    --secondary: #0f172a;
-    --secondary-foreground: #e2e8f0;
+    --secondary: #e2e8f0; /* Slate 200 */
+    --secondary-foreground: #0f172a;
     
-    --muted: #0b0f19;
+    --muted: #f8fafc; /* Slate 50 */
+    --muted-foreground: #64748b; /* Slate 500 */
+    
+    --accent: #0891b2; /* Cyan 600 */
+    --accent-foreground: #ffffff;
+    
+    --destructive: #e11d48; /* Rose 600 */
+    --destructive-foreground: #ffffff;
+    
+    --border: #e2e8f0; /* Slate 200 */
+    --input: #ffffff;
+    --ring: #4f46e5;
+    --radius: 0.75rem;
+    
+    --sidebar: #f8fafc; /* slightly lighter than page bg */
+    --sidebar-foreground: #64748b;
+    --sidebar-primary: #4f46e5;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: rgba(0, 0, 0, 0.035);
+    --sidebar-accent-foreground: #0f172a;
+    --sidebar-border: #e2e8f0;
+    --sidebar-ring: #4f46e5;
+  }
+
+  /* Support toggles or explicit overrides cleanly */
+  .dark {
+    --background: #060f23; /* deep navy, not pure black */
+    --foreground: #f1f5f9;
+    
+    --card: rgba(10, 18, 38, 0.70);
+    --card-foreground: #f1f5f9;
+    
+    --popover: #0a1226;
+    --popover-foreground: #f1f5f9;
+    
+    --primary: #6366f1; /* Indigo 500 */
+    --primary-foreground: #ffffff;
+    
+    --secondary: #0f1e3a; /* slightly lighter than bg */
+    --secondary-foreground: #cbd5e1;
+    
+    --muted: #0c1530;
     --muted-foreground: #94a3b8;
     
     --accent: #06b6d4;
@@ -122,25 +198,18 @@ body {
     --destructive: #f43f5e;
     --destructive-foreground: #ffffff;
     
-    --border: rgba(255, 255, 255, 0.08);
-    --input: rgba(255, 255, 255, 0.04);
+    --border: rgba(255, 255, 255, 0.09);
+    --input: rgba(255, 255, 255, 0.05);
     --ring: #6366f1;
-    --radius: 0.75rem;
     
-    --sidebar: #040811;
+    --sidebar: #050d1f; /* slightly darker than page bg */
     --sidebar-foreground: #94a3b8;
     --sidebar-primary: #6366f1;
     --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: rgba(255, 255, 255, 0.03);
-    --sidebar-accent-foreground: #f8fafc;
-    --sidebar-border: rgba(255, 255, 255, 0.06);
+    --sidebar-accent: rgba(255, 255, 255, 0.04);
+    --sidebar-accent-foreground: #f1f5f9;
+    --sidebar-border: rgba(255, 255, 255, 0.07);
     --sidebar-ring: #6366f1;
-  }
-
-  /* Support toggles or explicit overrides cleanly */
-  .dark {
-    --background: #030712;
-    --foreground: #f8fafc;
   }
   
   * {

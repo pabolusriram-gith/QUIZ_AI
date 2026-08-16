@@ -28,20 +28,20 @@ export default function DashboardShell({ children }: DashboardShellProps) {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#030712] text-slate-100 flex overflow-hidden">
+    <div className="relative min-h-screen bg-background text-foreground flex overflow-hidden">
       
       {/* ----------------- Premium Theme Background Visuals ----------------- */}
       
       {/* Suble grid line overlay matching Login branding */}
       <div 
-        className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1.2px,transparent_1.2px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1.2px,transparent_1.2px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_80%,transparent_100%)] opacity-85 pointer-events-none -z-10" 
+        className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1.2px,transparent_1.2px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1.2px,transparent_1.2px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1.2px,transparent_1.2px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1.2px,transparent_1.2px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_80%,transparent_100%)] opacity-85 pointer-events-none -z-10" 
         aria-hidden="true"
       />
 
-      {/* Subtle soft gradient blobs */}
+      {/* Background blobs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden -z-20" aria-hidden="true">
-        <div className="absolute top-1/4 left-1/4 h-[500px] w-[500px] rounded-full bg-indigo-900/10 blur-[130px]" />
-        <div className="absolute bottom-1/4 right-1/4 h-[500px] w-[500px] rounded-full bg-cyan-900/10 blur-[130px]" />
+        <div className="absolute top-1/4 left-1/4 h-[600px] w-[600px] rounded-full bg-indigo-500/4 dark:bg-indigo-900/15 blur-[150px]" />
+        <div className="absolute bottom-1/4 right-1/4 h-[500px] w-[500px] rounded-full bg-cyan-500/4 dark:bg-cyan-900/15 blur-[130px]" />
       </div>
 
       {/* ----------------- Sidebar ----------------- */}
@@ -62,8 +62,8 @@ export default function DashboardShell({ children }: DashboardShellProps) {
         <TopNavbar setIsMobileOpen={setIsMobileOpen} />
 
         {/* Scrollable page body */}
-        <main className="flex-1 overflow-y-auto px-4 py-6 md:px-8 md:py-8 z-10">
-          <div className="max-w-7xl mx-auto w-full">
+        <main className="flex-1 overflow-y-auto px-5 py-7 md:px-8 md:py-8 z-10">
+          <div className="max-w-[1400px] mx-auto w-full">
             {children}
           </div>
         </main>

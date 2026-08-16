@@ -6,6 +6,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AILoader } from "@/components/ui/AILoader";
+import { VoiceWaveform, VoiceState } from "@/components/ui/VoiceWaveform";
 import { 
   FileText, 
   MessageSquare, 
@@ -253,6 +254,7 @@ function CreateQuizContent() {
 
   // Per-question regeneration loading state — null means no regeneration in progress
   const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null);
+  const [recentlyRegeneratedIndex, setRecentlyRegeneratedIndex] = useState<number | null>(null);
 
   // Unsaved draft recovery states
   const [draftBanner, setDraftBanner] = useState<{
@@ -300,6 +302,8 @@ function CreateQuizContent() {
 
   // Voice input states
   const [isRecording, setIsRecording] = useState(false);
+  const [voiceState, setVoiceState] = useState<VoiceState>("ready");
+  const [voiceError, setVoiceError] = useState<string>("");
   const [recordingTime, setRecordingTime] = useState(0);
   const [recognition, setRecognition] = useState<any>(null);
 
@@ -456,7 +460,14 @@ function CreateQuizContent() {
         rec.interimResults = true;
         rec.lang = "en-US";
         
+        rec.onstart = () => {
+          setIsRecording(true);
+          setVoiceState("listening");
+          setVoiceError("");
+        };
+
         rec.onresult = (event: any) => {
+          setVoiceState("processing");
           let textResult = "";
           for (let i = 0; i < event.results.length; ++i) {
             textResult += event.results[i][0].transcript;
@@ -464,15 +475,21 @@ function CreateQuizContent() {
           if (textResult) {
             setTopic(textResult);
           }
+          setTimeout(() => {
+            setVoiceState("listening");
+          }, 350);
         };
         
         rec.onerror = (e: any) => {
           console.error("Speech recognition error:", e);
           setIsRecording(false);
+          setVoiceState("error");
+          setVoiceError(e.error ? `Microphone: ${e.error}` : "Voice capture failed. Please try again.");
         };
         
         rec.onend = () => {
           setIsRecording(false);
+          setVoiceState((prev) => (prev === "error" ? "error" : "ready"));
         };
         
         setRecognition(rec);
@@ -498,6 +515,8 @@ function CreateQuizContent() {
       toast.error("Speech recognition is not supported in this browser. Please use Google Chrome.");
       return;
     }
+    setVoiceError("");
+    setVoiceState("listening");
     setIsRecording(true);
     setRecordingTime(0);
     try {
@@ -510,10 +529,15 @@ function CreateQuizContent() {
 
   const stopRecording = () => {
     if (recognition) {
-      recognition.stop();
+      try {
+        recognition.stop();
+      } catch (err) {
+        console.error(err);
+      }
     }
     setIsRecording(false);
-    toast.success("Voice recording stopped. Text generated!");
+    setVoiceState("ready");
+    toast.success("Voice recording complete!");
   };
 
   const formatTime = (secs: number) => {
@@ -842,44 +866,23 @@ function CreateQuizContent() {
       }));
 
       const generatedCode = `AI-QZ-${Math.floor(100000 + Math.random() * 900000)}`;
+      const suggestedMetadata = dataPayload.metadata;
+      
+      const finalTitle = quiz.title.trim() !== "" ? quiz.title : (suggestedMetadata?.title || `AI Quiz: ${topic.substring(0, 40) || "Document"}`);
+      const finalSubject = quiz.subject.trim() !== "" ? quiz.subject : (suggestedMetadata?.subject || topic.substring(0, 30) || "Computer Science");
+      const finalDescription = quiz.description.trim() !== "" ? quiz.description : (suggestedMetadata?.description || `Generated on ${new Date().toLocaleDateString()} using AI.`);
+      const finalDepartment = quiz.department.trim() !== "" ? quiz.department : (suggestedMetadata?.department || "AI Generation");
+      const finalSemester = quiz.semester.trim() !== "" ? quiz.semester : "2026";
+
       const newQuiz: QuizState = {
-        title: `AI Quiz: ${topic.substring(0, 40) || "Document"}`,
-        description: `Generated on ${new Date().toLocaleDateString()} using AI.`,
-        subject: topic.substring(0, 30) || "Computer Science",
-        duration: 15,
-        randomize_questions: false,
-        randomize_options: false,
-        anti_cheating_enabled: false,
-        ai_feedback_enabled: false,
-        department: "AI Generation",
-        semester: "2026",
+        ...quiz,
+        title: finalTitle,
+        description: finalDescription,
+        subject: finalSubject,
+        department: finalDepartment,
+        semester: finalSemester,
         total_marks: questions.reduce((sum, q) => sum + q.marks, 0),
-        pass_percentage: 40,
-        visibility: "public",
-        status: "draft",
-        language: "en",
-        fullscreen_required: false,
-        adaptive_mode: false,
-        allow_review: true,
-        start_time: null,
-        end_time: null,
-        quiz_code: generatedCode,
-        max_attempts: 1,
-        timer_mode: "none",
-        overall_time_limit_seconds: null,
-        auto_submit_on_expiry: true,
-        available_from: null,
-        available_until: null,
-        result_visibility: "immediate",
-        show_score: true,
-        show_answers: true,
-        show_explanations: true,
-        show_solutions: true,
-        show_marks: true,
-        shuffle_questions: false,
-        shuffle_options: false,
-        access_code: "",
-        custom_instructions: "",
+        quiz_code: quiz.quiz_code || generatedCode,
         ai_provider: questions[0]?.ai_provider || aiProvider,
         ai_model: questions[0]?.ai_model || aiModel,
         generation_prompt: topic || text || "AI file generation",
@@ -945,7 +948,7 @@ function CreateQuizContent() {
     // (so the user sees the dropdown change right away, even before the AI responds)
     if (overrides) {
       const optimisticQuestions = [...quiz.questions];
-      optimisticQuestions[idx] = { ...q, ...overrides };
+      optimisticQuestions[idx] = { ...q, ...overrides } as QuestionState;
       setQuiz(prev => ({ ...prev, questions: optimisticQuestions }));
     }
 
@@ -1083,6 +1086,11 @@ function CreateQuizContent() {
         saveDraft(next);
         return next;
       });
+
+      setRecentlyRegeneratedIndex(idx);
+      setTimeout(() => {
+        setRecentlyRegeneratedIndex((prev) => (prev === idx ? null : prev));
+      }, 3000);
 
       toast.success("Question regenerated successfully!", { id: `regen-${idx}` });
 
@@ -2278,6 +2286,44 @@ function CreateQuizContent() {
                       className="bg-white/3 border-white/10 rounded-xl h-11 text-white font-medium text-sm focus:border-cyan-500/50"
                     />
                   </div>
+
+                  {/* Optional Quiz Metadata */}
+                  <div className="space-y-3 pt-3 border-t border-white/5">
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <FileText className="h-3.5 w-3.5 text-cyan-400" />
+                      <span>Quiz Metadata (Optional)</span>
+                    </h4>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Quiz Title</label>
+                      <Input
+                        type="text"
+                        value={quiz.title}
+                        onChange={(e) => setQuiz({ ...quiz, title: e.target.value })}
+                        placeholder="Leave blank to generate automatically"
+                        className="bg-white/3 border-white/10 rounded-xl h-10 text-white font-medium text-xs focus:border-cyan-500/50"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Subject</label>
+                      <Input
+                        type="text"
+                        value={quiz.subject}
+                        onChange={(e) => setQuiz({ ...quiz, subject: e.target.value })}
+                        placeholder="Leave blank to generate automatically"
+                        className="bg-white/3 border-white/10 rounded-xl h-10 text-white font-medium text-xs focus:border-cyan-500/50"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Description</label>
+                      <textarea
+                        value={quiz.description}
+                        onChange={(e) => setQuiz({ ...quiz, description: e.target.value })}
+                        placeholder="Leave blank to generate automatically"
+                        rows={2}
+                        className="w-full bg-slate-900 border border-white/10 rounded-xl p-2 text-white font-medium text-xs focus:border-cyan-500/50 outline-none transition-colors resize-none"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2345,42 +2391,20 @@ function CreateQuizContent() {
                             }
                           }}
                         />
-
-                        {/* Speech Waveform Overlay */}
-                        {isRecording && (
-                          <div className="absolute inset-0 bg-[#030712]/95 backdrop-blur-sm flex flex-col items-center justify-center space-y-3 z-20">
-                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-bold motion-safe:animate-pulse">
-                              <Activity className="h-3.5 w-3.5 text-rose-500 shrink-0" />
-                              <span>Listening...</span>
-                              <span className="font-mono ml-1.5">{formatTime(recordingTime)}</span>
-                            </div>
-                            <div className="flex items-end justify-center gap-1.5 h-12">
-                              {[1, 2, 3, 4, 5, 6, 7, 8].map((bar) => {
-                                const heights = ["h-3", "h-6", "h-10", "h-8", "h-12", "h-5", "h-9", "h-4"];
-                                const delays = ["0s", "0.2s", "0.4s", "0.1s", "0.3s", "0.5s", "0.15s", "0.25s"];
-                                return (
-                                  <div
-                                    key={bar}
-                                    style={{
-                                      animationDelay: delays[bar - 1],
-                                      animationDuration: "0.6s"
-                                    }}
-                                    className={`w-1 bg-gradient-to-t from-purple-500 to-cyan-400 rounded-full motion-safe:animate-bounce ${heights[bar - 1]}`}
-                                  />
-                                );
-                              })}
-                            </div>
-                            <Button
-                              type="button"
-                              onClick={stopRecording}
-                              className="h-9 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold flex items-center gap-2 border-none cursor-pointer"
-                            >
-                              <Mic className="h-3.5 w-3.5" />
-                              <span>Stop Recording</span>
-                            </Button>
-                          </div>
-                        )}
                       </div>
+
+                      {/* Horizontal Voice Waveform (ChatGPT Style) */}
+                      {voiceState !== "ready" && (
+                        <div className="pt-1">
+                          <VoiceWaveform
+                            state={voiceState}
+                            durationSeconds={recordingTime}
+                            errorMessage={voiceError}
+                            onStop={stopRecording}
+                            onRetry={startRecording}
+                          />
+                        </div>
+                      )}
 
                       {/* Character Count & Shortcuts bar */}
                       <div className="flex items-center justify-between text-[10px] font-semibold text-slate-500 px-1 select-none">
@@ -3458,23 +3482,42 @@ function CreateQuizContent() {
                   {/* Main editing area */}
                   <div className="lg:col-span-3 space-y-6">
                     {quiz.questions[selectedQuestionIndex] ? (
-                      <div className="glass-panel border-white/5 rounded-2xl p-6 space-y-6">
+                      <div className="relative glass-panel border-white/5 rounded-2xl p-6 space-y-6">
+
+                        {/* Targeted Regeneration Loading Overlay */}
+                        {regeneratingIndex === selectedQuestionIndex && (
+                          <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-[2px] rounded-2xl z-20 flex flex-col items-center justify-center space-y-3">
+                            <div className="h-10 w-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-lg shadow-cyan-500/10">
+                              <RefreshCw className="h-5 w-5 animate-spin text-cyan-400" />
+                            </div>
+                            <div className="space-y-1 text-center">
+                              <p className="text-xs font-bold text-white">Regenerating Question with AI</p>
+                              <p className="text-[10px] font-semibold text-cyan-400/80 animate-pulse">Applying pedagogical constraints & variations...</p>
+                            </div>
+                          </div>
+                        )}
 
                         {/* ── Editing Panel Header: Question number + AI badge + Regenerate button ── */}
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-wrap items-center justify-between gap-3">
                           <div className="flex items-center gap-2">
                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                               Question {selectedQuestionIndex + 1} of {quiz.questions.length}
                             </span>
                             {quiz.questions[selectedQuestionIndex].generated_by_ai && (
-                              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold">
+                              <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold">
                                 <Sparkles className="h-2.5 w-2.5" />
                                 AI Generated
                               </span>
                             )}
                             {quiz.questions[selectedQuestionIndex].is_user_modified && (
-                              <span className="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-bold">
+                              <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-bold">
                                 Edited
+                              </span>
+                            )}
+                            {recentlyRegeneratedIndex === selectedQuestionIndex && (
+                              <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold animate-pulse">
+                                <Check className="h-2.5 w-2.5" />
+                                Replaced with New Question
                               </span>
                             )}
                           </div>
@@ -3486,9 +3529,9 @@ function CreateQuizContent() {
                               id={`regenerate-btn-${selectedQuestionIndex}`}
                               disabled={regeneratingIndex !== null}
                               onClick={() => handleRegenerateQuestion(selectedQuestionIndex)}
-                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-sm ${
                                 regeneratingIndex === selectedQuestionIndex
-                                  ? "bg-cyan-500/20 border-cyan-500/30 text-cyan-300 cursor-wait"
+                                  ? "bg-cyan-500/20 border-cyan-500/40 text-cyan-300 cursor-wait"
                                   : regeneratingIndex !== null
                                   ? "bg-white/3 border-white/10 text-slate-500 cursor-not-allowed opacity-50"
                                   : "bg-cyan-500/10 border-cyan-500/25 text-cyan-400 hover:bg-cyan-500/20 hover:border-cyan-500/40 hover:text-cyan-300"
@@ -3547,7 +3590,6 @@ function CreateQuizContent() {
                           </div>
                         )}
 
-
                         {/* Restore AI Version Banner */}
                         {quiz.questions[selectedQuestionIndex].is_user_modified && 
                          quiz.questions[selectedQuestionIndex].ai_original_json && (
@@ -3574,8 +3616,7 @@ function CreateQuizContent() {
                           </div>
                         )}
 
-
-                        {/* Header: Type and Difficulty */}
+                        {/* Header: Type, Difficulty, Marks */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                           <div className="space-y-1.5 col-span-2">
                             <label className="text-xs font-bold text-slate-400 flex items-center gap-1.5">
@@ -3592,10 +3633,8 @@ function CreateQuizContent() {
                                 onChange={(e) => {
                                   const newType = e.target.value;
                                   if (quiz.questions[selectedQuestionIndex].generated_by_ai) {
-                                    // AI question: trigger full backend regeneration with new type
                                     callRegenerateAPI(selectedQuestionIndex, { question_type: newType });
                                   } else {
-                                    // Manual question: just update locally (no AI call needed)
                                     updateQuestionField("question_type", newType);
                                   }
                                 }}
@@ -3607,11 +3646,6 @@ function CreateQuizContent() {
                                 <option value="fill_in_the_blank">Fill in the Blank</option>
                                 <option value="short_answer">Short Answer (Manual / Keyword graded)</option>
                               </select>
-                              {regeneratingIndex === selectedQuestionIndex && (
-                                <div className="absolute inset-0 rounded-xl bg-slate-900/60 flex items-center justify-center pointer-events-none">
-                                  <Loader2 className="h-4 w-4 animate-spin text-cyan-400" />
-                                </div>
-                              )}
                             </div>
                           </div>
 
@@ -3630,10 +3664,8 @@ function CreateQuizContent() {
                                 onChange={(e) => {
                                   const newDiff = e.target.value;
                                   if (quiz.questions[selectedQuestionIndex].generated_by_ai) {
-                                    // AI question: trigger full backend regeneration with new difficulty
                                     callRegenerateAPI(selectedQuestionIndex, { difficulty: newDiff });
                                   } else {
-                                    // Manual question: just update locally
                                     updateQuestionField("difficulty", newDiff);
                                   }
                                 }}
@@ -3643,11 +3675,6 @@ function CreateQuizContent() {
                                 <option value="medium">Medium</option>
                                 <option value="hard">Hard</option>
                               </select>
-                              {regeneratingIndex === selectedQuestionIndex && (
-                                <div className="absolute inset-0 rounded-xl bg-slate-900/60 flex items-center justify-center pointer-events-none">
-                                  <Loader2 className="h-4 w-4 animate-spin text-cyan-400" />
-                                </div>
-                              )}
                             </div>
                           </div>
 
@@ -3667,7 +3694,6 @@ function CreateQuizContent() {
                           </div>
                         </div>
 
-
                         {/* Text and Time limit */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                           <div className="space-y-1.5 col-span-3">
@@ -3677,7 +3703,7 @@ function CreateQuizContent() {
                               onChange={(e) => updateQuestionField("text", e.target.value)}
                               placeholder="Type the question content here..."
                               rows={3}
-                              className="w-full bg-white/3 border border-white/10 rounded-xl p-3 text-white font-medium text-sm focus:border-indigo-500/50 outline-none transition-colors"
+                              className="w-full bg-white/3 border border-white/10 rounded-xl p-3.5 text-white font-medium text-sm focus:border-indigo-500/50 outline-none transition-colors leading-relaxed"
                             />
                           </div>
 
@@ -3723,7 +3749,9 @@ function CreateQuizContent() {
                               {quiz.questions[selectedQuestionIndex].question_type === "fill_in_the_blank" || 
                                quiz.questions[selectedQuestionIndex].question_type === "short_answer"
                                 ? "Acceptable Answer Keys"
-                                : "Option Answers Options"}
+                                : quiz.questions[selectedQuestionIndex].question_type === "true_false"
+                                ? "True / False Answers"
+                                : "Option Answers"}
                             </h4>
                             
                             {/* Add Option button for MCQ/MSQ */}
@@ -3732,10 +3760,10 @@ function CreateQuizContent() {
                               <button
                                 type="button"
                                 onClick={addOption}
-                                className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-bold cursor-pointer"
+                                className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-bold cursor-pointer transition-colors"
                               >
                                 <Plus className="h-4 w-4" />
-                                <span>Add Choice option</span>
+                                <span>Add Choice Option</span>
                               </button>
                             )}
 
@@ -3745,68 +3773,146 @@ function CreateQuizContent() {
                               <button
                                 type="button"
                                 onClick={addOption}
-                                className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-bold cursor-pointer"
+                                className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-bold cursor-pointer transition-colors"
                               >
                                 <Plus className="h-4 w-4" />
-                                <span>Add Acceptable Answer Phrase</span>
+                                <span>Add Alternative Phrase</span>
                               </button>
                             )}
                           </div>
 
-                          <div className="space-y-3">
-                            {quiz.questions[selectedQuestionIndex].options.map((opt, optIdx) => (
-                              <div
-                                key={opt.id}
-                                className="flex items-center gap-3 p-3 rounded-xl bg-white/2 border border-white/5"
-                              >
-                                {/* Correct option mark */}
-                                {(quiz.questions[selectedQuestionIndex].question_type === "multiple_choice" || 
-                                  quiz.questions[selectedQuestionIndex].question_type === "true_false") && (
-                                  <input
-                                    type="radio"
-                                    name={`q-${quiz.questions[selectedQuestionIndex].id}-correct`}
-                                    checked={opt.is_correct}
-                                    onChange={() => toggleOptionCorrectness(optIdx)}
-                                    className="h-4.5 w-4.5 text-indigo-600 border-white/10 focus:ring-indigo-500 cursor-pointer"
-                                  />
-                                )}
-                                {quiz.questions[selectedQuestionIndex].question_type === "multiple_select" && (
-                                  <input
-                                    type="checkbox"
-                                    checked={opt.is_correct}
-                                    onChange={() => toggleOptionCorrectness(optIdx)}
-                                    className="h-4.5 w-4.5 rounded text-indigo-600 border-white/10 focus:ring-indigo-500 cursor-pointer"
-                                  />
-                                )}
-
-                                {/* Choice Text input */}
-                                <Input
-                                  type="text"
-                                  value={opt.text}
-                                  onChange={(e) => updateOptionText(optIdx, e.target.value)}
-                                  disabled={quiz.questions[selectedQuestionIndex].question_type === "true_false"}
-                                  placeholder={
-                                    quiz.questions[selectedQuestionIndex].question_type === "fill_in_the_blank" || 
-                                    quiz.questions[selectedQuestionIndex].question_type === "short_answer"
-                                      ? "Enter acceptable correct text phrase (case-insensitive grading)..."
-                                      : `Option choice content ${optIdx + 1}`
-                                  }
-                                  className="bg-transparent border-none text-white text-sm font-semibold h-8 placeholder:text-slate-600 focus:bg-white/3"
-                                />
-
-                                {/* Delete option (Only for MCQ/MSQ/Answers list) */}
-                                {quiz.questions[selectedQuestionIndex].question_type !== "true_false" && (
-                                  <button
-                                    type="button"
-                                    onClick={() => removeOption(optIdx)}
-                                    className="p-1 rounded hover:bg-rose-500/20 text-rose-400 shrink-0 cursor-pointer"
+                          {/* True / False Dedicated Layout */}
+                          {quiz.questions[selectedQuestionIndex].question_type === "true_false" ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                              {quiz.questions[selectedQuestionIndex].options.map((opt, optIdx) => {
+                                const isTrueOption = opt.text.toLowerCase().includes("true");
+                                return (
+                                  <div
+                                    key={opt.id}
+                                    onClick={() => toggleOptionCorrectness(optIdx)}
+                                    className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 flex items-center justify-between ${
+                                      opt.is_correct
+                                        ? "bg-emerald-500/15 border-emerald-500/40 shadow-sm shadow-emerald-500/10 text-white"
+                                        : "bg-white/3 border-white/5 text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                                    }`}
                                   >
-                                    <Trash2 className="h-4 w-4" />
-                                  </button>
-                                )}
-                              </div>
-                            ))}
-                          </div>
+                                    <div className="flex items-center gap-3">
+                                      <div className={`h-8 w-8 rounded-xl flex items-center justify-center font-bold text-sm ${
+                                        opt.is_correct
+                                          ? "bg-emerald-500 text-white"
+                                          : isTrueOption
+                                          ? "bg-emerald-500/10 text-emerald-400"
+                                          : "bg-rose-500/10 text-rose-400"
+                                      }`}>
+                                        {isTrueOption ? "T" : "F"}
+                                      </div>
+                                      <div>
+                                        <div className="text-sm font-bold text-white">{opt.text}</div>
+                                        <div className="text-[10px] text-slate-500">Click to set as correct answer</div>
+                                      </div>
+                                    </div>
+                                    <div className={`h-6 w-6 rounded-full flex items-center justify-center border ${
+                                      opt.is_correct
+                                        ? "bg-emerald-500 border-emerald-500 text-white"
+                                        : "border-slate-700 bg-slate-900"
+                                    }`}>
+                                      {opt.is_correct && <Check className="h-3.5 w-3.5 stroke-[3]" />}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            /* Standard Options List for MCQ / Multiple Select / Fill Blank / Short Answer */
+                            <div className="space-y-3">
+                              {quiz.questions[selectedQuestionIndex].options.map((opt, optIdx) => {
+                                const optionLetter = String.fromCharCode(65 + (optIdx % 26));
+                                const isMultipleChoice = quiz.questions[selectedQuestionIndex].question_type === "multiple_choice";
+                                const isMultipleSelect = quiz.questions[selectedQuestionIndex].question_type === "multiple_select";
+                                const isTextBased = quiz.questions[selectedQuestionIndex].question_type === "fill_in_the_blank" || 
+                                                    quiz.questions[selectedQuestionIndex].question_type === "short_answer";
+
+                                return (
+                                  <div
+                                    key={opt.id}
+                                    className={`flex items-center gap-3 p-3 rounded-2xl border transition-all duration-200 ${
+                                      opt.is_correct && !isTextBased
+                                        ? "bg-emerald-500/10 border-emerald-500/30 shadow-sm"
+                                        : "bg-white/3 border-white/5 hover:border-white/10"
+                                    }`}
+                                  >
+                                    {/* Option Letter Indicator */}
+                                    {!isTextBased && (
+                                      <div className={`h-7 w-7 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
+                                        opt.is_correct
+                                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                                          : "bg-white/5 text-slate-400 border border-white/5"
+                                      }`}>
+                                        {optionLetter}
+                                      </div>
+                                    )}
+
+                                    {/* Correct option toggle mark */}
+                                    {isMultipleChoice && (
+                                      <input
+                                        type="radio"
+                                        name={`q-${quiz.questions[selectedQuestionIndex].id}-correct`}
+                                        checked={opt.is_correct}
+                                        onChange={() => toggleOptionCorrectness(optIdx)}
+                                        className="h-4.5 w-4.5 text-emerald-600 border-white/10 focus:ring-emerald-500 cursor-pointer"
+                                        title="Mark as correct answer"
+                                      />
+                                    )}
+                                    {isMultipleSelect && (
+                                      <input
+                                        type="checkbox"
+                                        checked={opt.is_correct}
+                                        onChange={() => toggleOptionCorrectness(optIdx)}
+                                        className="h-4.5 w-4.5 rounded text-emerald-600 border-white/10 focus:ring-emerald-500 cursor-pointer"
+                                        title="Mark as correct answer"
+                                      />
+                                    )}
+
+                                    {/* Choice Text input */}
+                                    <Input
+                                      type="text"
+                                      value={opt.text}
+                                      onChange={(e) => updateOptionText(optIdx, e.target.value)}
+                                      placeholder={
+                                        isTextBased
+                                          ? `Acceptable answer key phrase ${optIdx + 1} (case-insensitive grading)...`
+                                          : `Choice ${optionLetter} content...`
+                                      }
+                                      className="bg-transparent border-none text-white text-sm font-semibold h-9 placeholder:text-slate-600 focus:bg-white/3 focus:ring-0"
+                                    />
+
+                                    {/* Delete option */}
+                                    <button
+                                      type="button"
+                                      onClick={() => removeOption(optIdx)}
+                                      className="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 shrink-0 cursor-pointer transition-colors"
+                                      title="Remove option"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  </div>
+                                );
+                              })}
+
+                              {/* Clean Dashed Add Option Button */}
+                              {(quiz.questions[selectedQuestionIndex].question_type === "multiple_choice" || 
+                                quiz.questions[selectedQuestionIndex].question_type === "multiple_select") && (
+                                <button
+                                  type="button"
+                                  onClick={addOption}
+                                  className="w-full py-2.5 rounded-2xl border border-dashed border-indigo-500/30 hover:border-indigo-500/50 bg-indigo-500/5 hover:bg-indigo-500/10 text-indigo-400 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                  <span>Add Another Option Choice</span>
+                                </button>
+                              )}
+                            </div>
+                          )}
                         </div>
 
                         {/* EXPLANATION / HINTS */}

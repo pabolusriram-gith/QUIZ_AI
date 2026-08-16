@@ -70,7 +70,8 @@ class AIMetricsService:
         generation_latency_ms: float = 0.0,
         tokens_input: int = 0,
         tokens_output: int = 0,
-        total_questions_generated: int = 0
+        total_questions_generated: int = 0,
+        user_id: Optional[str] = None
     ):
         trace_data = {
             "request_id": request_id,
@@ -95,7 +96,8 @@ class AIMetricsService:
             "tokens_input": tokens_input,
             "tokens_output": tokens_output,
             "total_questions_generated": total_questions_generated,
-            "timestamp": datetime.now(timezone.utc).isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "user_id": user_id
         }
         self.request_traces.append(trace_data)
         
@@ -149,27 +151,65 @@ class AIMetricsService:
             if not user_dates:
                 del self.daily_usage[user_id]
 
-    def get_internal_snapshot(self, include_traces: bool = False, trace_limit: int = 50) -> Dict[str, Any]:
-        snapshot = {
-            "successful_requests": self.successful_requests,
-            "rejected_requests": self.rejected_requests,
-            "providers": {}
-        }
-        for p, stats in self.provider_stats.items():
-            avg_latency = 0.0
-            if stats["success"] > 0:
-                avg_latency = stats["total_latency_ms"] / stats["success"]
-            snapshot["providers"][p] = {
-                "total": stats["total"],
-                "success": stats["success"],
-                "failed": stats["failed"],
-                "avg_latency_ms": round(avg_latency, 2)
-            }
+    def get_internal_snapshot(self, include_traces: bool = False, trace_limit: int = 50, user_id: Optional[str] = None) -> Dict[str, Any]:
+        target_traces = list(self.request_traces)
+        if user_id:
+            target_traces = [t for t in target_traces if t.get("user_id") == user_id]
+
+        # Calculate counts from filtered traces
+        total_requests = len(target_traces)
+        success_requests = sum(1 for t in target_traces if t.get("success", False))
+        failed_requests = total_requests - success_requests
         
+        # Calculate average latency from filtered traces
+        success_latency_sum = sum(t.get("total_ms", 0.0) for t in target_traces if t.get("success", False))
+        avg_latency = round(success_latency_sum / success_requests, 2) if success_requests > 0 else 0.0
+
+        # Calculate self healing actions count (repair_count)
+        self_healing_actions = sum(t.get("repair_count", 0) for t in target_traces)
+
+        # Provider breakdown for this user
+        providers_snapshot = {}
+        for p in ["gemini", "groq", "openai", "mock"]:
+            p_traces = [t for t in target_traces if t.get("provider") == p]
+            p_total = len(p_traces)
+            p_success = sum(1 for t in p_traces if t.get("success", False))
+            p_failed = p_total - p_success
+            p_lat_sum = sum(t.get("total_ms", 0.0) for t in p_traces if t.get("success", False))
+            p_avg = round(p_lat_sum / p_success, 2) if p_success > 0 else 0.0
+            providers_snapshot[p] = {
+                "total": p_total,
+                "success": p_success,
+                "failed": p_failed,
+                "avg_latency_ms": p_avg
+            }
+
+        # Daily usage series for the last 30 days
+        daily_series = []
+        user_daily = self.daily_usage.get(user_id, {}) if user_id else {}
+        for i in range(29, -1, -1):
+            date_str = (datetime.now(timezone.utc) - timedelta(days=i)).strftime("%Y-%m-%d")
+            day_reqs = user_daily.get(date_str, [])
+            daily_series.append({
+                "date": date_str,
+                "count": len(day_reqs),
+                "generate": sum(1 for r in day_reqs if r.get("request_type") == "generate"),
+                "regenerate": sum(1 for r in day_reqs if r.get("request_type") == "regenerate"),
+                "enhance": sum(1 for r in day_reqs if r.get("request_type") == "enhance"),
+            })
+
+        snapshot = {
+            "successful_requests": success_requests,
+            "rejected_requests": self.rejected_requests if not user_id else 0,
+            "providers": providers_snapshot,
+            "avg_latency_ms": avg_latency,
+            "self_healing_actions": self_healing_actions,
+            "daily_series": daily_series
+        }
+
         if include_traces:
-            limit = min(max(1, trace_limit), len(self.request_traces))
-            traces_list = list(self.request_traces)
-            snapshot["request_traces"] = list(reversed(traces_list[-limit:]))
+            limit = min(max(1, trace_limit), len(target_traces))
+            snapshot["request_traces"] = list(reversed(target_traces[-limit:]))
             
         return snapshot
 

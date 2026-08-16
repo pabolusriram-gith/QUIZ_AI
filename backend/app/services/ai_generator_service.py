@@ -645,7 +645,8 @@ class PipelineCoordinator:
         document_names: Optional[List[str]] = None,
         total_extracted_text: Optional[str] = "",
         marks_mode: str = "default",
-        default_marks: int = 1
+        default_marks: int = 1,
+        user_id: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         start_time = time.time()
         perf_start = time.perf_counter()
@@ -1389,6 +1390,7 @@ Generated on: {datetime.now(timezone.utc).isoformat()}
                 processing_ms=total_ms - provider_ms,
                 total_ms=total_ms,
                 success=True,
+                user_id=user_id,
                 prompt_version=PROMPT_VERSION,
                 model=active_model,
                 selected_provider=provider,
@@ -1419,6 +1421,7 @@ Generated on: {datetime.now(timezone.utc).isoformat()}
                 processing_ms=total_ms,
                 total_ms=total_ms,
                 success=False,
+                user_id=user_id,
                 prompt_version=PROMPT_VERSION,
                 model=model_name or "default",
                 selected_provider=provider,
@@ -1524,7 +1527,8 @@ Generated on: {datetime.now(timezone.utc).isoformat()}
         quiz_style: str,
         question_quality: str,
         final_context: str,
-        request_id: str
+        request_id: str,
+        user_id: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         import time
         start_time = time.perf_counter()
@@ -1729,6 +1733,14 @@ Generated on: {datetime.now(timezone.utc).isoformat()}
                         rejected_candidates.append((cand.get("text", "")[:30], f"DB duplicate: {db_msg}"))
                         continue
 
+                    # 4b. Topic validation: reject candidates unrelated to the target topic
+                    if not cls._is_related_to_topic(cand, topic):
+                        rejected_candidates.append((
+                            cand.get("text", "")[:30],
+                            f"Unrelated to topic '{topic}'"
+                        ))
+                        continue
+
                     # 5. Hard-exclude: reject candidates too similar to the original question stem
                     sim_to_orig = DeterministicValidator.calculate_jaccard(
                         cand.get("text", ""), original_question.get("text", "")
@@ -1874,7 +1886,8 @@ Generated on: {datetime.now(timezone.utc).isoformat()}
                 network_ms=provider_network_time,
                 processing_ms=total_ms - provider_network_time,
                 total_ms=total_ms,
-                success=True
+                success=True,
+                user_id=user_id
             )
 
             return [best_cand]
@@ -1888,6 +1901,41 @@ Generated on: {datetime.now(timezone.utc).isoformat()}
                 network_ms=0.0,
                 processing_ms=total_ms,
                 total_ms=total_ms,
-                success=False
+                success=False,
+                user_id=user_id
             )
             raise
+
+    @classmethod
+    def _is_related_to_topic(cls, question: Dict[str, Any], target_topic: str) -> bool:
+        """Validates that the candidate question relates to the target topic using keyword mapping."""
+        if not target_topic:
+            return True
+            
+        topic_lower = target_topic.lower()
+        stop_words = {
+            "quiz", "quizzes", "question", "questions", "generate", "generator", 
+            "on", "about", "covering", "the", "a", "an", "of", "and", "or", "in", 
+            "to", "for", "with", "testing", "test", "topic", "subject", "concept", 
+            "concepts", "some", "any", "exactly", "medium", "easy", "hard", "level"
+        }
+        
+        # Split topic into keywords and filter out stop words
+        keywords = [w.strip() for w in re.split(r"\W+", topic_lower) if w.strip() and w.strip() not in stop_words]
+        if not keywords:
+            keywords = [topic_lower]
+            
+        # Combine candidate text: stem, options, explanation, candidate topic
+        cand_text = " ".join([
+            question.get("text", ""),
+            question.get("explanation", "") or "",
+            question.get("topic", "") or "",
+            " ".join([opt.get("text", "") for opt in question.get("options", [])])
+        ]).lower()
+        
+        # Check if any keyword matches as a substring or word
+        for kw in keywords:
+            if kw in cand_text:
+                return True
+                
+        return False

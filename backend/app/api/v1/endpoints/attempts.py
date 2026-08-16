@@ -123,10 +123,40 @@ async def get_student_dashboard(
                 quiz_info["attempt_id"] = best_attempt.id
             available_quizzes.append(quiz_info)
             
+    # 3. Compute student statistics overview across all attempts
+    completed_user_attempts = [att for att in user_attempts if att.completed_at is not None]
+    total_completed = len(completed_user_attempts)
+    avg_percentage = round(sum(att.percentage for att in completed_user_attempts) / total_completed, 1) if total_completed > 0 else 0.0
+    quizzes_passed = sum(1 for att in completed_user_attempts if att.passed)
+    total_time_spent = sum(att.time_spent_seconds for att in completed_user_attempts)
+
+    # 4. Compute performance trend mapping last 10 completed attempts sorted by completed_at
+    sorted_attempts = sorted(completed_user_attempts, key=lambda x: x.completed_at)
+    trend_list = []
+    for att in sorted_attempts[-10:]:
+        quiz_title = "Quiz"
+        q_item = next((q for q in all_quizzes if q.id == att.quiz_id), None)
+        if q_item:
+            quiz_title = q_item.title
+        trend_list.append({
+            "quiz_title": quiz_title,
+            "percentage": att.percentage,
+            "date": att.completed_at.strftime("%b %d") if att.completed_at else ""
+        })
+
+    overview = {
+        "total_completed": total_completed,
+        "avg_percentage": avg_percentage,
+        "quizzes_passed": quizzes_passed,
+        "total_time_spent": total_time_spent,
+        "trend": trend_list
+    }
+
     return {
         "available": available_quizzes,
         "completed": completed_quizzes,
-        "upcoming": upcoming_quizzes
+        "upcoming": upcoming_quizzes,
+        "overview": overview
     }
 
 

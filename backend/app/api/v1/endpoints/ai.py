@@ -502,9 +502,9 @@ async def generate_questions(
 
     co_list = [c.strip() for c in course_outcomes.split(",") if c.strip()] if course_outcomes else []
 
-    # Check if single-question regeneration is requested (count == 1)
+    user_id = str(current_user.id) if current_user else None
     is_regeneration = (question_count == 1) and (existing_questions is not None or "replace this one" in (custom_prompt or ""))
-    
+
     if is_regeneration:
         # Premium Regeneration Pipeline
         exist_list = []
@@ -522,13 +522,24 @@ async def generate_questions(
         if original_match:
             original_q_text = original_match.group(1).strip()
             
+        # Extract the clean, non-generic original quiz topic/subject
+        original_quiz_topic = ""
+        for candidate in [topic, course_outcomes, original_q_text]:
+            if candidate:
+                cand_clean = candidate.strip().lower()
+                if cand_clean not in ["", "general", "general knowledge", "project alpha", "general topic", "general concept", "assessment questions"]:
+                    original_quiz_topic = candidate.strip()
+                    break
+
+        target_topic = original_quiz_topic or topic or "General"
+
         original_question = {
             "text": original_q_text or "Original placeholder question text",
             "difficulty": difficulty,
             "bloom_level": bloom_list[0] if bloom_list else "Understand",
             "question_type": q_types_list[0] if q_types_list else "multiple_choice",
-            "topic": topic or "General Topic",
-            "learning_objective": topic or "General concept",
+            "topic": target_topic,
+            "learning_objective": target_topic,
             "marks_mode": marks_mode,
             "marks": default_marks
         }
@@ -542,9 +553,9 @@ async def generate_questions(
             quiz_style=quiz_style,
             question_quality=question_quality,
             final_context=final_context,
-            request_id=request_id
+            request_id=request_id,
+            user_id=user_id
         )
-        user_id = str(current_user.id) if current_user else None
         if user_id:
             ai_metrics_service.track_user_usage(user_id, "regenerate", provider)
         return result
@@ -569,7 +580,8 @@ async def generate_questions(
             document_names=document_names,
             total_extracted_text=total_extracted_text,
             marks_mode=marks_mode,
-            default_marks=default_marks
+            default_marks=default_marks,
+            user_id=user_id
         )
         if has_document_context and len(questions) < question_count:
             warning_msg = f"Insufficient document content. Generated {len(questions)} of {question_count} requested questions."
@@ -728,10 +740,17 @@ async def regenerate_single_question(
             logger.warning(f"Failed to parse existing_questions_json: {e}. Continuing without deduplication list.")
 
     # ── 4. Build RAG context for this question ─────────────────────────────────
-    # Use quiz_topic (original quiz prompt) + quiz_subject as the search query.
-    # This mirrors exactly what generate_quiz does for RAG retrieval.
-    topic = original_question.get("topic") or quiz_topic or quiz_subject or "General"
-    search_query = quiz_topic or quiz_subject or topic or "assessment questions"
+    # Extract the clean, non-generic original quiz topic/subject
+    original_quiz_topic = ""
+    for candidate in [quiz_topic, quiz_subject, original_question.get("topic")]:
+        if candidate:
+            cand_clean = candidate.strip().lower()
+            if cand_clean not in ["", "general", "general knowledge", "project alpha", "general topic", "general concept", "assessment questions"]:
+                original_quiz_topic = candidate.strip()
+                break
+
+    topic = original_quiz_topic or original_question.get("topic") or quiz_topic or quiz_subject or "General"
+    search_query = topic
 
     final_context = ""
     retrieval_service = AIRetrievalService()
@@ -816,6 +835,8 @@ async def regenerate_single_question(
                 f"diff_override={target_difficulty_override!r} "
                 f"type_override={target_type_override!r}")
 
+    user_id = str(current_user.id) if current_user else None
+
     # ── 7. Call the existing PipelineCoordinator.regenerate_question ──────────
     result = await PipelineCoordinator.regenerate_question(
         db=db,
@@ -826,11 +847,11 @@ async def regenerate_single_question(
         quiz_style=quiz_style,
         question_quality=question_quality,
         final_context=final_context,
-        request_id=request_id
+        request_id=request_id,
+        user_id=user_id
     )
 
     # ── 8. Track usage metrics ────────────────────────────────────────────────
-    user_id = str(current_user.id) if current_user else None
     if user_id:
         ai_metrics_service.track_user_usage(user_id, "regenerate", provider)
 
@@ -1080,7 +1101,8 @@ async def get_ai_metrics(
     """
     return ai_metrics_service.get_internal_snapshot(
         include_traces=include_traces,
-        trace_limit=trace_limit
+        trace_limit=trace_limit,
+        user_id=str(current_user.id) if current_user.role != "admin" else None
     )
 
 

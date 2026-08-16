@@ -83,14 +83,14 @@ export function StatCard({
 
       <div className="flex justify-between items-start">
         <div className="space-y-1">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">{title}</span>
-          <h4 className="text-3xl font-extrabold font-display text-white tracking-tight">{value}</h4>
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">{title}</span>
+          <h4 className="text-3xl font-extrabold font-display text-foreground tracking-tight">{value}</h4>
         </div>
-        <div className="p-2.5 rounded-xl bg-white/5 border border-white/5 text-slate-300 shrink-0 shadow-inner">
+        <div className="p-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-border text-foreground/80 shrink-0 shadow-inner">
           {icon}
         </div>
       </div>
-
+ 
       <div className="flex items-end justify-between mt-6">
         <div className="space-y-1">
           {trend && (
@@ -104,11 +104,11 @@ export function StatCard({
                 <ArrowDownRight className="h-3.5 w-3.5" />
               )}
               <span>{trend.value}%</span>
-              <span className="text-slate-500 font-medium">{trend.label}</span>
+              <span className="text-muted-foreground font-medium">{trend.label}</span>
             </div>
           )}
           {description && (
-            <p className="text-xs text-slate-400 font-medium">{description}</p>
+            <p className="text-xs text-muted-foreground font-medium">{description}</p>
           )}
         </div>
 

@@ -948,17 +948,21 @@ class MockProvider(BaseAIProvider):
 
         # 2. Extract Topic
         topic_val = "General Knowledge"
-        topic_match = re.search(r"Topic/Context Prompt:\s*(.*)", prompt)
-        if topic_match:
-            topic_val = topic_match.group(1).strip()
+        sys_topic_match = re.search(r"topic:\s*([^\n\r]+)", system_instruction or "", re.IGNORECASE)
+        if sys_topic_match:
+            topic_val = sys_topic_match.group(1).strip()
         else:
-            topic_match = re.search(r"Topic=\s*(.*)", prompt)
+            topic_match = re.search(r"Topic/Context Prompt:\s*(.*)", prompt)
             if topic_match:
                 topic_val = topic_match.group(1).strip()
             else:
-                topic_match = re.search(r"covering\s+([^,]+)", prompt)
+                topic_match = re.search(r"Topic=\s*(.*)", prompt)
                 if topic_match:
                     topic_val = topic_match.group(1).strip()
+                else:
+                    topic_match = re.search(r"covering\s+([^,]+)", prompt)
+                    if topic_match:
+                        topic_val = topic_match.group(1).strip()
 
         # Clean topic
         topic_val = re.sub(r"[^\w\s\-\.]", "", topic_val).strip()

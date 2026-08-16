@@ -323,26 +323,26 @@ export default function LiveQuizDashboard() {
   const offlineCount = participants.filter(p => !p.connected).length;
 
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-6 text-white min-h-screen">
+    <div className="container mx-auto p-4 md:p-6 space-y-6 text-foreground min-h-screen">
       <PageHeader
         title="Live Hosting Dashboard"
         description="Monitor, launch, and host interactive live quizzes for your students in real time."
       />
-
+ 
       {/* Quick Statistics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Active Sessions", value: sessions.stats.active_sessions_count, icon: Activity, color: "text-emerald-400" },
-          { label: "Waiting Sessions", value: sessions.stats.waiting_sessions_count, icon: Clock, color: "text-amber-400" },
-          { label: "Completed Sessions", value: sessions.stats.recent_sessions_count, icon: CheckCircle, color: "text-indigo-400" },
-          { label: "Total Participants", value: sessions.stats.total_participants_all_time, icon: Users, color: "text-cyan-400" }
+          { label: "Active Sessions", value: sessions.stats.active_sessions_count, icon: Activity, color: "text-emerald-500 dark:text-emerald-400" },
+          { label: "Waiting Sessions", value: sessions.stats.waiting_sessions_count, icon: Clock, color: "text-amber-500 dark:text-amber-400" },
+          { label: "Completed Sessions", value: sessions.stats.recent_sessions_count, icon: CheckCircle, color: "text-indigo-500 dark:text-indigo-400" },
+          { label: "Total Participants", value: sessions.stats.total_participants_all_time, icon: Users, color: "text-cyan-500 dark:text-cyan-400" }
         ].map((stat, i) => (
-          <div key={i} className="glass-panel border-white/5 p-5 rounded-2xl flex items-center justify-between">
+          <div key={i} className="glass-panel border-border p-5 rounded-2xl flex items-center justify-between">
             <div className="space-y-1">
-              <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">{stat.label}</span>
+              <span className="text-muted-foreground text-xs font-bold uppercase tracking-wider">{stat.label}</span>
               <h2 className="text-3xl font-extrabold">{stat.value}</h2>
             </div>
-            <div className={`p-3 rounded-xl bg-white/5 border border-white/10 ${stat.color}`}>
+            <div className={`p-3 rounded-xl bg-black/5 dark:bg-white/5 border border-border ${stat.color}`}>
               <stat.icon className="h-6 w-6" />
             </div>
           </div>
@@ -353,33 +353,33 @@ export default function LiveQuizDashboard() {
         
         {/* Left Column: Quick Start Form */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="glass-panel border-white/5 p-6 rounded-2xl space-y-5">
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <Plus className="h-5 w-5 text-indigo-400" />
+          <div className="glass-panel border-border p-6 rounded-2xl space-y-5 bg-card text-card-foreground">
+            <h3 className="text-base font-bold text-foreground flex items-center gap-2">
+              <Plus className="h-5 w-5 text-indigo-500 dark:text-indigo-400" />
               <span>Quick Start Live Session</span>
             </h3>
-
+ 
             <form onSubmit={handleCreateSession} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-400">Select Published Quiz</label>
+                <label className="text-xs font-bold text-muted-foreground">Select Published Quiz</label>
                 <select
                   value={selectedQuizId}
                   onChange={(e) => setSelectedQuizId(e.target.value)}
-                  className="w-full bg-slate-900 border border-white/10 rounded-xl h-11 px-3 text-slate-300 font-medium text-sm focus:border-indigo-500/50 outline-none select-custom"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-border rounded-xl h-11 px-3 text-foreground font-medium text-sm focus:border-indigo-500/50 outline-none select-custom"
                 >
-                  <option value="">-- Choose Quiz --</option>
+                  <option value="" className="bg-popover text-popover-foreground">-- Choose Quiz --</option>
                   {quizzes.map((q) => (
-                    <option key={q.id} value={q.id} className="bg-[#060d1c]">
+                    <option key={q.id} value={q.id} className="bg-popover text-popover-foreground">
                       {q.title} ({q.subject})
                     </option>
                   ))}
                 </select>
               </div>
-
+ 
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
-                  <label className="text-xs font-bold text-slate-400">Game Session PIN</label>
-                  <label className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer">
+                  <label className="text-xs font-bold text-muted-foreground">Game Session PIN</label>
+                  <label className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider cursor-pointer">
                     <input
                       type="checkbox"
                       checked={autoGeneratePin}
@@ -387,7 +387,7 @@ export default function LiveQuizDashboard() {
                         setAutoGeneratePin(e.target.checked);
                         if (e.target.checked) setCustomPin("");
                       }}
-                      className="rounded bg-white/10 border-white/20 text-indigo-600 focus:ring-indigo-500/30 h-3.5 w-3.5"
+                      className="rounded bg-black/10 dark:bg-white/10 border-border text-indigo-600 focus:ring-indigo-500/30 h-3.5 w-3.5"
                     />
                     <span>Auto-Generate PIN</span>
                   </label>
@@ -406,12 +406,12 @@ export default function LiveQuizDashboard() {
                     }}
                     placeholder={autoGeneratePin ? "Auto-generated PIN" : "Enter custom PIN (e.g. 1234)"}
                     disabled={autoGeneratePin}
-                    className="bg-slate-900 border-white/10 h-10 text-sm grow disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-slate-50 dark:bg-slate-900 border-border h-10 text-sm grow disabled:opacity-50 disabled:cursor-not-allowed text-foreground"
                   />
                   <button
                     type="button"
                     onClick={handleGenerateRandomPin}
-                    className="h-10 bg-white/5 border border-white/10 text-xs px-3 hover:bg-white/10 text-slate-350 hover:text-white cursor-pointer rounded-xl flex items-center justify-center shrink-0 transition"
+                    className="h-10 bg-slate-100 hover:bg-slate-200 dark:bg-white/5 border border-border text-xs px-3 text-muted-foreground hover:text-foreground cursor-pointer rounded-xl flex items-center justify-center shrink-0 transition"
                   >
                     Generate Random
                   </button>
@@ -419,87 +419,87 @@ export default function LiveQuizDashboard() {
               </div>
 
               {/* Settings Card */}
-              <div className="bg-white/2 border border-white/5 rounded-xl p-4 space-y-3.5">
-                <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                  <span className="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
+              <div className="bg-black/5 dark:bg-white/2 border border-border rounded-xl p-4 space-y-3.5">
+                <div className="flex items-center justify-between border-b border-border pb-2">
+                  <span className="text-xs font-bold text-indigo-500 dark:text-indigo-400 flex items-center gap-1.5">
                     <Settings2 className="h-3.5 w-3.5" /> Lobby Settings
                   </span>
                 </div>
-
+ 
                 <div className="space-y-2">
-                  <label className="flex items-center justify-between text-xs text-slate-300 cursor-pointer">
+                  <label className="flex items-center justify-between text-xs text-foreground/80 cursor-pointer">
                     <span>Allow Late Join</span>
                     <input
                       type="checkbox"
                       checked={allowLateJoin}
                       onChange={(e) => setAllowLateJoin(e.target.checked)}
-                      className="rounded bg-white/10 border-white/20 text-indigo-600 focus:ring-indigo-500/30"
+                      className="rounded bg-black/10 dark:bg-white/10 border-border text-indigo-600 focus:ring-indigo-500/30"
                     />
                   </label>
-
-                  <label className="flex items-center justify-between text-xs text-slate-300 cursor-pointer">
+ 
+                  <label className="flex items-center justify-between text-xs text-foreground/80 cursor-pointer">
                     <span>Shuffle Questions</span>
                     <input
                       type="checkbox"
                       checked={shuffleQuestions}
                       onChange={(e) => setShuffleQuestions(e.target.checked)}
-                      className="rounded bg-white/10 border-white/20 text-indigo-600 focus:ring-indigo-500/30"
+                      className="rounded bg-black/10 dark:bg-white/10 border-border text-indigo-600 focus:ring-indigo-500/30"
                     />
                   </label>
-
-                  <label className="flex items-center justify-between text-xs text-slate-300 cursor-pointer">
+ 
+                  <label className="flex items-center justify-between text-xs text-foreground/80 cursor-pointer">
                     <span>Shuffle Options</span>
                     <input
                       type="checkbox"
                       checked={shuffleOptions}
                       onChange={(e) => setShuffleOptions(e.target.checked)}
-                      className="rounded bg-white/10 border-white/20 text-indigo-600 focus:ring-indigo-500/30"
+                      className="rounded bg-black/10 dark:bg-white/10 border-border text-indigo-600 focus:ring-indigo-500/30"
                     />
                   </label>
-
-                  <label className="flex items-center justify-between text-xs text-slate-300 cursor-pointer">
+ 
+                  <label className="flex items-center justify-between text-xs text-foreground/80 cursor-pointer">
                     <span>Show Leaderboard</span>
                     <input
                       type="checkbox"
                       checked={showLeaderboard}
                       onChange={(e) => setShowLeaderboard(e.target.checked)}
-                      className="rounded bg-white/10 border-white/20 text-indigo-600 focus:ring-indigo-500/30"
+                      className="rounded bg-black/10 dark:bg-white/10 border-border text-indigo-600 focus:ring-indigo-500/30"
                     />
                   </label>
                 </div>
-
+ 
                 <div className="grid grid-cols-2 gap-3 pt-2">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Timer (s)</label>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Timer (s)</label>
                     <select
                       value={questionTimer}
                       onChange={(e) => setQuestionTimer(e.target.value)}
-                      className="w-full bg-slate-900 border border-white/10 rounded-lg h-9 px-2 text-xs text-slate-300 outline-none select-custom"
+                      className="w-full bg-slate-50 dark:bg-slate-900 border border-border rounded-lg h-9 px-2 text-xs text-foreground outline-none select-custom"
                     >
-                      <option value="">Default</option>
-                      <option value="15">15s</option>
-                      <option value="30">30s</option>
-                      <option value="45">45s</option>
-                      <option value="60">60s</option>
-                      <option value="90">90s</option>
-                      <option value="120">120s</option>
+                      <option value="" className="bg-popover text-popover-foreground">Default</option>
+                      <option value="15" className="bg-popover text-popover-foreground">15s</option>
+                      <option value="30" className="bg-popover text-popover-foreground">30s</option>
+                      <option value="45" className="bg-popover text-popover-foreground">45s</option>
+                      <option value="60" className="bg-popover text-popover-foreground">60s</option>
+                      <option value="90" className="bg-popover text-popover-foreground">90s</option>
+                      <option value="120" className="bg-popover text-popover-foreground">120s</option>
                     </select>
                   </div>
-
+ 
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Max players</label>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Max players</label>
                     <Input
                       type="number"
                       min={5}
                       max={500}
                       value={maxParticipants}
                       onChange={(e) => setMaxParticipants(Number(e.target.value))}
-                      className="bg-slate-900 border-white/10 h-9 text-xs"
+                      className="bg-slate-50 dark:bg-slate-900 border-border h-9 text-xs text-foreground"
                     />
                   </div>
                 </div>
               </div>
-
+ 
               <button
                 type="submit"
                 disabled={creating}
@@ -518,44 +518,44 @@ export default function LiveQuizDashboard() {
               
               {/* Active Session info card & Local QR */}
               <div className="md:col-span-5 space-y-6">
-                <div className="glass-panel border-white/5 p-6 rounded-2xl space-y-5">
+                <div className="glass-panel border-border p-6 rounded-2xl space-y-5 bg-card text-card-foreground">
                   <div className="flex justify-between items-start">
-                    <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded uppercase tracking-wider font-bold">
+                    <span className="text-[10px] bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded uppercase tracking-wider font-bold">
                       {activeSession.status}
                     </span>
-                    <span className="text-[10px] text-slate-500 font-bold uppercase">PIN Code</span>
+                    <span className="text-[10px] text-muted-foreground font-bold uppercase">PIN Code</span>
                   </div>
-
+ 
                   <div className="text-center space-y-1">
-                    <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400 tracking-wider">
+                    <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-indigo-600 dark:from-cyan-400 dark:to-indigo-400 tracking-wider">
                       {activeSession.game_pin}
                     </h1>
-                    <p className="text-xs text-slate-400 font-semibold line-clamp-1">{activeSession.quiz_title}</p>
+                    <p className="text-xs text-muted-foreground font-semibold line-clamp-1">{activeSession.quiz_title}</p>
                   </div>
-
+ 
                   {/* QR Code Container */}
-                  <div className="bg-white/3 border border-white/5 p-4 rounded-xl flex flex-col items-center gap-3">
+                  <div className="bg-black/5 dark:bg-white/3 border border-border p-4 rounded-xl flex flex-col items-center gap-3">
                     <QRCodeSVG 
                       value={joinUrl} 
                       size={140} 
                       level="H" 
                       includeMargin={true} 
-                      className="rounded-lg bg-white p-1 border border-white/10" 
+                      className="rounded-lg bg-white p-1 border border-border" 
                     />
-                    <span className="text-[10px] text-slate-400 text-center leading-relaxed">
+                    <span className="text-[10px] text-muted-foreground text-center leading-relaxed">
                       Students scan the QR or enter the PIN to join.
                     </span>
                   </div>
-
+ 
                   <div className="flex gap-2">
                     <button
                       onClick={copyJoinLink}
-                      className="flex-1 h-10 border border-white/10 hover:bg-white/5 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="flex-1 h-10 border border-border hover:bg-black/5 dark:hover:bg-white/5 text-muted-foreground hover:text-foreground rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <Copy className="h-3.5 w-3.5" />
                       Copy Link
                     </button>
-
+ 
                     <button
                       onClick={handleStartQuiz}
                       className="flex-1 h-10 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-indigo-600/10"
@@ -567,23 +567,23 @@ export default function LiveQuizDashboard() {
                 </div>
 
                 {/* Session Health Card */}
-                <div className="glass-panel border-white/5 p-5 rounded-2xl space-y-4">
-                  <h4 className="text-xs font-bold uppercase text-slate-400 tracking-wider flex items-center gap-1.5">
-                    <Activity className="h-4 w-4 text-emerald-400" />
+                <div className="glass-panel border-border p-5 rounded-2xl space-y-4 bg-card text-card-foreground">
+                  <h4 className="text-xs font-bold uppercase text-muted-foreground tracking-wider flex items-center gap-1.5">
+                    <Activity className="h-4 w-4 text-emerald-555 dark:text-emerald-400" />
                     Session health
                   </h4>
                   <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="bg-white/2 border border-white/5 p-3 rounded-xl">
-                      <span className="text-[10px] text-slate-500 block">Connected</span>
-                      <span className="text-lg font-bold text-emerald-400">{connectedCount}</span>
+                    <div className="bg-black/5 dark:bg-white/2 border border-border p-3 rounded-xl">
+                      <span className="text-[10px] text-muted-foreground block">Connected</span>
+                      <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{connectedCount}</span>
                     </div>
-                    <div className="bg-white/2 border border-white/5 p-3 rounded-xl">
-                      <span className="text-[10px] text-slate-500 block">Offline</span>
-                      <span className="text-lg font-bold text-rose-400">{offlineCount}</span>
+                    <div className="bg-black/5 dark:bg-white/2 border border-border p-3 rounded-xl">
+                      <span className="text-[10px] text-muted-foreground block">Offline</span>
+                      <span className="text-lg font-bold text-rose-600 dark:text-rose-400">{offlineCount}</span>
                     </div>
-                    <div className="bg-white/2 border border-white/5 p-3 rounded-xl">
-                      <span className="text-[10px] text-slate-500 block">Total</span>
-                      <span className="text-lg font-bold text-white">{participants.length}</span>
+                    <div className="bg-black/5 dark:bg-white/2 border border-border p-3 rounded-xl">
+                      <span className="text-[10px] text-muted-foreground block">Total</span>
+                      <span className="text-lg font-bold text-foreground">{participants.length}</span>
                     </div>
                   </div>
                 </div>
@@ -591,26 +591,26 @@ export default function LiveQuizDashboard() {
 
               {/* Connected Participant Table */}
               <div className="md:col-span-7 space-y-6">
-                <div className="glass-panel border-white/5 p-6 rounded-2xl space-y-4 min-h-[350px] flex flex-col">
-                  <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                      <Users className="h-4.5 w-4.5 text-indigo-400" />
+                <div className="glass-panel border-border p-6 rounded-2xl space-y-4 min-h-[350px] flex flex-col bg-card text-card-foreground">
+                  <div className="flex justify-between items-center border-b border-border pb-3">
+                    <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                      <Users className="h-4.5 w-4.5 text-indigo-500 dark:text-indigo-400" />
                       <span>Live Participant Grid ({participants.length})</span>
                     </h3>
                   </div>
-
+ 
                   <div className="flex-1 overflow-y-auto max-h-[320px] pr-1">
                     {participants.length === 0 ? (
                       <div className="h-full flex flex-col items-center justify-center text-center py-20 space-y-3">
-                        <div className="h-10 w-10 bg-indigo-500/10 rounded-full flex items-center justify-center text-indigo-400 animate-pulse">
+                        <div className="h-10 w-10 bg-indigo-500/10 rounded-full flex items-center justify-center text-indigo-500 dark:text-indigo-400 animate-pulse">
                           <Users className="h-5 w-5" />
                         </div>
-                        <p className="text-xs text-slate-500 font-semibold">No participants connected yet.</p>
+                        <p className="text-xs text-muted-foreground font-semibold">No participants connected yet.</p>
                       </div>
                     ) : (
                       <table className="w-full text-left text-xs border-collapse">
                         <thead>
-                          <tr className="border-b border-white/5 text-slate-500 uppercase font-bold tracking-wider">
+                          <tr className="border-b border-border text-muted-foreground uppercase font-bold tracking-wider">
                             <th className="py-2.5">Avatar</th>
                             <th className="py-2.5">Nickname</th>
                             <th className="py-2.5">Status</th>
@@ -620,21 +620,21 @@ export default function LiveQuizDashboard() {
                           {participants.map((p, idx) => {
                             const initials = p.nickname.slice(0, 2).toUpperCase();
                             return (
-                              <tr key={p.id || idx} className="border-b border-white/2 hover:bg-white/1 transition-colors">
+                              <tr key={p.id || idx} className="border-b border-border/40 hover:bg-black/5 dark:hover:bg-white/1 transition-colors">
                                 <td className="py-2.5">
-                                  <div className="h-7 w-7 rounded-full bg-indigo-500/20 border border-indigo-500/35 flex items-center justify-center text-[10px] font-bold text-indigo-300">
+                                  <div className="h-7 w-7 rounded-full bg-indigo-500/20 border border-indigo-500/35 flex items-center justify-center text-[10px] font-bold text-indigo-600 dark:text-indigo-300">
                                     {initials}
                                   </div>
                                 </td>
-                                <td className="py-2.5 text-white font-medium">{p.nickname}</td>
+                                <td className="py-2.5 text-foreground font-medium">{p.nickname}</td>
                                 <td className="py-2.5">
                                   {p.connected ? (
-                                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
                                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                       Connected
                                     </span>
                                   ) : (
-                                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
+                                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-600 dark:text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
                                       <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
                                       Offline
                                     </span>
@@ -650,43 +650,43 @@ export default function LiveQuizDashboard() {
                 </div>
 
                 {/* Session Timeline Card */}
-                <div className="glass-panel border-white/5 p-6 rounded-2xl space-y-4">
-                  <h4 className="text-xs font-bold uppercase text-slate-400 tracking-wider flex items-center gap-1.5">
-                    <Activity className="h-4 w-4 text-indigo-400" />
+                <div className="glass-panel border-border p-6 rounded-2xl space-y-4 bg-card text-card-foreground">
+                  <h4 className="text-xs font-bold uppercase text-muted-foreground tracking-wider flex items-center gap-1.5">
+                    <Activity className="h-4 w-4 text-indigo-555 dark:text-indigo-400" />
                     Live Session Events
                   </h4>
                   <div className="space-y-3 max-h-[150px] overflow-y-auto pr-1">
                     {timeline.length === 0 ? (
-                      <p className="text-[10px] text-slate-600 italic">No events logged yet.</p>
+                      <p className="text-[10px] text-muted-foreground/75 italic">No events logged yet.</p>
                     ) : (
                       timeline.map((ev, i) => (
                         <div key={i} className="flex gap-3 text-xs leading-relaxed">
-                          <span className="text-[10px] text-slate-500 font-mono shrink-0">{ev.time}</span>
-                          <span className="text-slate-300">{ev.text}</span>
+                          <span className="text-[10px] text-muted-foreground font-mono shrink-0">{ev.time}</span>
+                          <span className="text-foreground/80">{ev.text}</span>
                         </div>
                       ))
                     )}
                   </div>
                 </div>
-
+ 
               </div>
-
+ 
             </div>
           ) : (
-            <div className="glass-panel border-white/5 p-12 rounded-2xl text-center space-y-4 flex flex-col items-center justify-center min-h-[300px]">
-              <div className="h-12 w-12 bg-white/5 border border-white/10 rounded-full flex items-center justify-center text-slate-400">
+            <div className="glass-panel border-border p-12 rounded-2xl text-center space-y-4 flex flex-col items-center justify-center min-h-[300px] bg-card text-card-foreground">
+              <div className="h-12 w-12 bg-black/5 dark:bg-white/5 border border-border rounded-full flex items-center justify-center text-muted-foreground">
                 <QrCode className="h-6 w-6" />
               </div>
               <div className="space-y-1">
-                <h4 className="text-sm font-bold text-white">No Active Session Selected</h4>
-                <p className="text-xs text-slate-500 max-w-sm font-medium">Select an existing waiting/active session below or create a new session to get started.</p>
+                <h4 className="text-sm font-bold text-foreground">No Active Session Selected</h4>
+                <p className="text-xs text-muted-foreground max-w-sm font-medium">Select an existing waiting/active session below or create a new session to get started.</p>
               </div>
             </div>
           )}
 
           {/* Waiting / Active / History Tabs */}
           <div className="space-y-4">
-            <div className="flex border-b border-white/5 gap-4">
+            <div className="flex border-b border-border gap-4">
               {[
                 { id: "waiting", label: `Waiting (${sessions.waiting.length})` },
                 { id: "active", label: `Active (${sessions.active.length})` },
@@ -697,15 +697,15 @@ export default function LiveQuizDashboard() {
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`pb-2.5 text-xs font-bold tracking-wider uppercase border-b-2 transition-all cursor-pointer ${
                     activeTab === tab.id
-                      ? "border-indigo-500 text-indigo-400"
-                      : "border-transparent text-slate-400 hover:text-slate-200"
+                      ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {tab.label}
                 </button>
               ))}
             </div>
-
+ 
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
@@ -717,21 +717,21 @@ export default function LiveQuizDashboard() {
               >
                 {activeTab === "waiting" && (
                   sessions.waiting.length === 0 ? (
-                    <p className="text-xs text-slate-500 py-6 text-center italic font-medium">No waiting sessions found.</p>
+                    <p className="text-xs text-muted-foreground py-6 text-center italic font-medium">No waiting sessions found.</p>
                   ) : (
                     sessions.waiting.map((s) => (
-                      <div key={s.id} className="bg-white/2 border border-white/5 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-white/4 transition-colors">
+                      <div key={s.id} className="bg-black/5 dark:bg-white/2 border border-border rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-black/10 dark:hover:bg-white/4 transition-colors">
                         <div className="space-y-1">
-                          <h4 className="text-sm font-bold text-white">{s.quiz_title}</h4>
-                          <div className="flex items-center gap-3 text-[10px] text-slate-400 font-semibold uppercase">
-                            <span>PIN: <span className="text-indigo-400 font-bold">{s.game_pin}</span></span>
+                          <h4 className="text-sm font-bold text-foreground">{s.quiz_title}</h4>
+                          <div className="flex items-center gap-3 text-[10px] text-muted-foreground font-semibold uppercase">
+                            <span>PIN: <span className="text-indigo-600 dark:text-indigo-400 font-bold">{s.game_pin}</span></span>
                             <span>•</span>
                             <span>{s.total_participant_count} Players</span>
                           </div>
                         </div>
                         <button
                           onClick={() => handleSelectSession(s)}
-                          className="h-8 px-4 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/35 rounded-lg text-xs font-bold transition cursor-pointer"
+                          className="h-8 px-4 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/35 rounded-lg text-xs font-bold transition cursor-pointer"
                         >
                           Monitor Lobby
                         </button>
@@ -739,17 +739,17 @@ export default function LiveQuizDashboard() {
                     ))
                   )
                 )}
-
+ 
                 {activeTab === "active" && (
                   sessions.active.length === 0 ? (
-                    <p className="text-xs text-slate-500 py-6 text-center italic font-medium">No active sessions found.</p>
+                    <p className="text-xs text-muted-foreground py-6 text-center italic font-medium">No active sessions found.</p>
                   ) : (
                     sessions.active.map((s) => (
-                      <div key={s.id} className="bg-white/2 border border-white/5 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-white/4 transition-colors">
+                      <div key={s.id} className="bg-black/5 dark:bg-white/2 border border-border rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-black/10 dark:hover:bg-white/4 transition-colors">
                         <div className="space-y-1">
-                          <h4 className="text-sm font-bold text-white">{s.quiz_title}</h4>
-                          <div className="flex items-center gap-3 text-[10px] text-slate-400 font-semibold uppercase">
-                            <span>PIN: <span className="text-indigo-400 font-bold">{s.game_pin}</span></span>
+                          <h4 className="text-sm font-bold text-foreground">{s.quiz_title}</h4>
+                          <div className="flex items-center gap-3 text-[10px] text-muted-foreground font-semibold uppercase">
+                            <span>PIN: <span className="text-indigo-600 dark:text-indigo-400 font-bold">{s.game_pin}</span></span>
                             <span>•</span>
                             <span>{s.total_participant_count} Players</span>
                           </div>
@@ -757,7 +757,7 @@ export default function LiveQuizDashboard() {
                         <div className="flex gap-2 w-full sm:w-auto">
                           <button
                             onClick={() => handleSelectSession(s)}
-                            className="flex-1 sm:flex-none h-8 px-4 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/35 rounded-lg text-xs font-bold transition cursor-pointer"
+                            className="flex-1 sm:flex-none h-8 px-4 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/35 rounded-lg text-xs font-bold transition cursor-pointer"
                           >
                             Monitor Stats
                           </button>
@@ -772,17 +772,17 @@ export default function LiveQuizDashboard() {
                     ))
                   )
                 )}
-
+ 
                 {activeTab === "history" && (
                   sessions.recent.length === 0 ? (
-                    <p className="text-xs text-slate-500 py-6 text-center italic font-medium">No finished sessions found.</p>
+                    <p className="text-xs text-muted-foreground py-6 text-center italic font-medium">No finished sessions found.</p>
                   ) : (
                     sessions.recent.map((s) => (
-                      <div key={s.id} className="bg-white/2 border border-white/5 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-white/4 transition-colors">
+                      <div key={s.id} className="bg-black/5 dark:bg-white/2 border border-border rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-black/10 dark:hover:bg-white/4 transition-colors">
                         <div className="space-y-1">
-                          <h4 className="text-sm font-bold text-white">{s.quiz_title}</h4>
-                          <div className="flex items-center gap-3 text-[10px] text-slate-400 font-semibold uppercase">
-                            <span>PIN: <span className="text-slate-500 font-bold">{s.game_pin}</span></span>
+                          <h4 className="text-sm font-bold text-foreground">{s.quiz_title}</h4>
+                          <div className="flex items-center gap-3 text-[10px] text-muted-foreground font-semibold uppercase">
+                            <span>PIN: <span className="text-muted-foreground font-bold">{s.game_pin}</span></span>
                             <span>•</span>
                             <span>{s.total_participant_count} Players</span>
                             {s.ended_at && (
@@ -796,13 +796,13 @@ export default function LiveQuizDashboard() {
                         <div className="flex gap-2 w-full sm:w-auto">
                           <button
                             onClick={() => router.push(`/lobby/${s.game_pin}`)}
-                            className="flex-1 sm:flex-none h-8 px-4 border border-white/10 hover:bg-white/5 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition cursor-pointer"
+                            className="flex-1 sm:flex-none h-8 px-4 border border-border hover:bg-black/5 dark:hover:bg-white/5 text-muted-foreground hover:text-foreground rounded-lg text-xs font-bold transition cursor-pointer"
                           >
                             View Report
                           </button>
                           <button
                             onClick={() => handleHostAgain(s)}
-                            className="flex-1 sm:flex-none h-8 px-4 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/35 rounded-lg text-xs font-bold transition cursor-pointer"
+                            className="flex-1 sm:flex-none h-8 px-4 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/35 rounded-lg text-xs font-bold transition cursor-pointer"
                           >
                             Host Again
                           </button>
@@ -814,11 +814,11 @@ export default function LiveQuizDashboard() {
               </motion.div>
             </AnimatePresence>
           </div>
-
+ 
         </div>
-
+ 
       </div>
-
+ 
     </div>
   );
 }
