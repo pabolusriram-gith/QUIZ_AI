@@ -112,18 +112,43 @@ export default function StudentDashboard() {
         <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-cyan-500/10 blur-[80px] pointer-events-none" />
         <div className="absolute -left-24 -bottom-24 h-64 w-64 rounded-full bg-indigo-500/10 blur-[80px] pointer-events-none" />
         
-        <div className="max-w-2xl space-y-3 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 text-xs font-bold">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Interactive Student Practice Zone</span>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+          <div className="max-w-xl space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 text-xs font-bold">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Interactive Student Practice Zone</span>
+            </div>
+
+            <h2 className="text-3xl md:text-4xl font-extrabold font-display text-slate-900 dark:text-white tracking-tight leading-tight">
+              {greeting}, <span className="bg-gradient-to-r from-cyan-500 via-indigo-400 to-indigo-500 bg-clip-text text-transparent">{currentUser?.full_name || "Student"}</span> 👋
+            </h2>
+            <p className="text-slate-600 dark:text-slate-300 text-sm md:text-base font-medium leading-relaxed">
+              Ready to test your comprehension? Choose any active assessment below to begin, or review past performance insights to master key concepts.
+            </p>
           </div>
 
-          <h2 className="text-3xl md:text-4xl font-extrabold font-display text-slate-900 dark:text-white tracking-tight leading-tight">
-            {greeting}, <span className="bg-gradient-to-r from-cyan-500 via-indigo-400 to-indigo-500 bg-clip-text text-transparent">{currentUser?.full_name || "Student"}</span> 👋
-          </h2>
-          <p className="text-slate-600 dark:text-slate-300 text-sm md:text-base font-medium leading-relaxed">
-            Ready to test your comprehension? Choose any active assessment below to begin, or review past performance insights to master key concepts.
-          </p>
+          <div className="shrink-0 p-4 rounded-2xl bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-cyan-500/10 border border-indigo-500/20 flex flex-col items-start gap-2.5 max-w-xs">
+            <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+              Want to create quizzes or host live games?
+            </p>
+            <Button
+              onClick={async () => {
+                try {
+                  const { switchRole } = useAuth();
+                } catch {}
+                try {
+                  await api.patch("/users/me/role", { role: "teacher" });
+                  toast.success("Switched to Teacher Mode! Loading dashboard...");
+                  window.location.reload();
+                } catch (e) {
+                  toast.error("Failed to switch role. Please try again.");
+                }
+              }}
+              className="w-full text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 shadow-md rounded-xl h-9 cursor-pointer"
+            >
+              Switch to Teacher Mode 🚀
+            </Button>
+          </div>
         </div>
       </motion.div>
 

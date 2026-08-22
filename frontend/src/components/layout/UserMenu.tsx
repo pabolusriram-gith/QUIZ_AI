@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { User, Settings, LogOut, ChevronDown } from "lucide-react";
 
 export default function UserMenu() {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, switchRole } = useAuth();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -91,6 +91,24 @@ export default function UserMenu() {
             </div>
  
             <div className="space-y-0.5">
+              <button
+                type="button"
+                onClick={async () => {
+                  setIsOpen(false);
+                  const targetRole = currentUser.role === "teacher" ? "student" : "teacher";
+                  try {
+                    await switchRole(targetRole);
+                    window.location.reload();
+                  } catch (e) {
+                    console.error("Failed to switch role:", e);
+                  }
+                }}
+                className="flex items-center justify-between w-full px-3 py-2 rounded-xl text-xs font-bold text-indigo-600 dark:text-cyan-400 bg-indigo-500/10 hover:bg-indigo-500/20 transition-colors cursor-pointer text-left"
+              >
+                <span>Switch to {currentUser.role === "teacher" ? "Student" : "Teacher"}</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20">Mode</span>
+              </button>
+ 
               <Link
                 href="/profile"
                 onClick={() => setIsOpen(false)}

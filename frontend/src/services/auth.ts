@@ -84,6 +84,14 @@ export const authService = {
   },
 
   /**
+   * Updates user role between teacher and student.
+   */
+  updateRole: async (role: "teacher" | "student"): Promise<UserResponse> => {
+    const response = await api.patch<UserResponse>("/users/me/role", { role });
+    return response.data;
+  },
+
+  /**
    * Attempts to refresh the authentication session token.
    */
   refreshToken: async (token: string): Promise<LoginResponse> => {

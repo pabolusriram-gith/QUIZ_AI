@@ -736,7 +736,7 @@ def is_google_configured() -> bool:
 
 
 @router.get("/google/login")
-async def google_login(request: Request) -> Any:
+async def google_login(request: Request, role: Optional[str] = "teacher") -> Any:
     """Initiates Google OAuth redirect to Google consent screen."""
     print("[OAUTH DEBUG] /google/login endpoint called.")
     print(f"[OAUTH DEBUG] settings.GOOGLE_CLIENT_ID loaded: {settings.GOOGLE_CLIENT_ID is not None} (Length: {len(settings.GOOGLE_CLIENT_ID) if settings.GOOGLE_CLIENT_ID else 0})")
@@ -757,13 +757,15 @@ async def google_login(request: Request) -> Any:
     if redirect_uri != "http://localhost:8000/api/v1/auth/google/callback":
         print(f"[OAUTH DEBUG] WARNING: Redirect URI does NOT match exact Google Console callback string: http://localhost:8000/api/v1/auth/google/callback")
         
+    normalized_role = role.lower().strip() if role and role.lower().strip() in ["teacher", "student"] else "teacher"
     params = {
         "client_id": settings.GOOGLE_CLIENT_ID.strip() if settings.GOOGLE_CLIENT_ID else "",
         "redirect_uri": redirect_uri,
         "response_type": "code",
         "scope": "openid email profile",
         "access_type": "offline",
-        "prompt": "select_account"
+        "prompt": "select_account",
+        "state": normalized_role
     }
     url = f"https://accounts.google.com/o/oauth2/v2/auth?{urllib.parse.urlencode(params)}"
     print(f"[OAUTH DEBUG] Redirect generated: {url}")
@@ -775,6 +777,7 @@ async def google_callback(
     request: Request,
     code: Optional[str] = None,
     error: Optional[str] = None,
+    state: Optional[str] = None,
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """Processes Google OAuth callback, creating user if necessary, and issuing session JWT."""
@@ -852,18 +855,20 @@ async def google_callback(
             
         email_clean = email.lower().strip()
         
+        desired_role = state.lower().strip() if state and state.lower().strip() in ["teacher", "student"] else "teacher"
+        
         # 3. Check / Create User in DB
         print("[OAUTH DEBUG] Checking database for existing user record...")
         result = await db.execute(select(User).where(User.email == email_clean))
         user = result.scalar_one_or_none()
         
         if not user:
-            print(f"[OAUTH DEBUG] User record not found. Creating user for {email_clean}...")
+            print(f"[OAUTH DEBUG] User record not found. Creating user for {email_clean} with role {desired_role}...")
             user = User(
                 email=email_clean,
                 full_name=full_name,
                 hashed_password=hash_password(secrets.token_urlsafe(32)),
-                role="teacher",
+                role=desired_role,
                 token_version=1,
                 is_active=True
             )

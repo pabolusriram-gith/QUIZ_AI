@@ -315,14 +315,12 @@ export default function LoginForm() {
                     <Label htmlFor="password" className="text-slate-600 dark:text-slate-400 font-medium text-xs">
                       Password
                     </Label>
-                    <button
-                      type="button"
-                      onClick={() => router.push("/forgot-password")}
-                      tabIndex={-1}
-                      className="text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 hover:underline focus:outline-none cursor-pointer"
+                    <Link
+                      href="/forgot-password"
+                      className="text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 hover:underline inline-block"
                     >
                       Forgot password?
-                    </button>
+                    </Link>
                   </div>
                   <div className="relative group">
                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-400 dark:text-slate-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-cyan-400 transition-colors duration-200" />
@@ -416,10 +414,10 @@ export default function LoginForm() {
                   type="button"
                   onClick={() => {
                     setOauthLoading("google");
-                    window.location.href = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1") + "/auth/google/login";
+                    window.location.href = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1") + "/auth/google/login?role=teacher";
                   }}
                   disabled={isSubmitting || oauthLoading !== null}
-                  className="w-full h-11 rounded-xl border border-slate-200 dark:border-indigo-400/30 bg-slate-100/80 dark:bg-[#132356]/85 hover:bg-slate-200/70 dark:hover:bg-[#182b68] text-slate-800 dark:text-slate-200 font-medium transition-all duration-200 shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full h-11 rounded-xl border border-slate-200 dark:border-indigo-400/30 bg-slate-100/80 dark:bg-[#132356]/85 hover:bg-slate-200/70 dark:hover:bg-[#182b68] text-slate-800 dark:text-slate-200 font-medium transition-all duration-200 shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {oauthLoading === "google" ? (
                     <svg className="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -438,13 +436,12 @@ export default function LoginForm() {
               {/* --- Sign Up Redirect --- */}
               <div className="pt-2 text-center text-sm text-slate-500 dark:text-slate-400">
                 Don&apos;t have an account?{" "}
-                <button
-                  type="button"
-                  onClick={() => router.push("/register")}
-                  className="font-semibold text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 hover:underline focus:outline-none cursor-pointer"
+                <Link
+                  href="/register"
+                  className="font-semibold text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 hover:underline inline-block py-1"
                 >
                   Create one free
-                </button>
+                </Link>
               </div>
  
             </CardContent>

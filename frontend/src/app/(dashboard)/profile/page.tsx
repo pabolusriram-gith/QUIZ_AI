@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { User, Mail, ShieldAlert, Calendar } from "lucide-react";
 
 export default function ProfilePage() {
-  const { currentUser } = useAuth();
+  const { currentUser, switchRole } = useAuth();
 
   // Derive initials
   const initials = currentUser?.full_name
@@ -59,12 +59,36 @@ export default function ProfilePage() {
               <span className="text-sm text-foreground/80 font-semibold block pt-1">{currentUser.email}</span>
             </div>
  
-            <div className="p-4 rounded-xl bg-black/5 dark:bg-white/3 border border-border space-y-1">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                <ShieldAlert className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400" />
-                <span>Role Type</span>
-              </span>
-              <span className="text-sm text-foreground/80 font-semibold block pt-1 capitalize">{currentUser.role}</span>
+            <div className="p-4 rounded-xl bg-black/5 dark:bg-white/3 border border-border space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                  <ShieldAlert className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400" />
+                  <span>Role Type</span>
+                </span>
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 capitalize">
+                  {currentUser.role}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {currentUser.role === "teacher"
+                  ? "Educator account: create AI quizzes, launch live arenas, and view student analytics."
+                  : "Student account: take quizzes and monitor personal learning progress."}
+              </p>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    const targetRole = currentUser.role === "teacher" ? "student" : "teacher";
+                    await switchRole(targetRole);
+                    window.location.reload();
+                  } catch (e) {
+                    console.error("Failed to switch role", e);
+                  }
+                }}
+                className="w-full py-2 px-3 text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 rounded-lg shadow-sm transition-all cursor-pointer"
+              >
+                Switch to {currentUser.role === "teacher" ? "Student" : "Teacher"} Mode
+              </button>
             </div>
  
             <div className="p-4 rounded-xl bg-black/5 dark:bg-white/3 border border-border space-y-1">

@@ -12,6 +12,7 @@ interface AuthContextType {
   login: (email: string, password: string, rememberMe: boolean) => Promise<void>;
   loginWithToken: (token: string, refreshToken?: string | null, rememberMe?: boolean) => Promise<void>;
   refreshAccessToken: () => Promise<void>;
+  switchRole: (newRole: "teacher" | "student") => Promise<void>;
   logout: () => Promise<void>;
   checkSession: () => Promise<void>;
 }
@@ -155,6 +156,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  const switchRole = useCallback(async (newRole: "teacher" | "student") => {
+    setLoading(true);
+    try {
+      const updatedUser = await authService.updateRole(newRole);
+      setCurrentUser(updatedUser);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     setLoading(true);
     try {
@@ -177,9 +188,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     login,
     loginWithToken,
     refreshAccessToken,
+    switchRole,
     logout,
     checkSession,
-  }), [currentUser, loading, login, loginWithToken, refreshAccessToken, logout, checkSession]);
+  }), [currentUser, loading, login, loginWithToken, refreshAccessToken, switchRole, logout, checkSession]);
 
   return (
     <AuthContext.Provider value={contextValue}>

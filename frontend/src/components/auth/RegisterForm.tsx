@@ -468,13 +468,12 @@ export default function RegisterForm() {
               {/* Redirect to Login */}
               <div className="pt-2 text-center text-sm text-slate-500 dark:text-slate-400">
                 Already have an account?{" "}
-                <button
-                  type="button"
-                  onClick={() => router.push("/login")}
-                  className="font-semibold text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 hover:underline focus:outline-none cursor-pointer"
+                <Link
+                  href="/login"
+                  className="font-semibold text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 hover:underline inline-block py-1"
                 >
                   Sign In
-                </button>
+                </Link>
               </div>
  
             </CardContent>
