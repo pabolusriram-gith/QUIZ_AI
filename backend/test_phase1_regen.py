@@ -32,8 +32,10 @@ try:
 except ImportError:
     pass  # dotenv not required if env is already set
 
-# Ensure ENABLE_MOCK_PROVIDER is on (already true in .env, but set as fallback)
-os.environ.setdefault("ENABLE_MOCK_PROVIDER", "True")
+# Ensure ENABLE_MOCK_PROVIDER is on for unit/integration tests
+os.environ["ENABLE_MOCK_PROVIDER"] = "True"
+from app.config.settings import settings
+settings.ENABLE_MOCK_PROVIDER = True
 
 
 # -- helpers -------------------------------------------------------------------

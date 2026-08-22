@@ -9,11 +9,12 @@ import {
   Search, Filter, Edit2, Trash2, ChevronLeft, ChevronRight,
   X, Plus, Check, Layers, Sparkles, BookOpen, Tag,
   AlertTriangle, CheckCircle2, Clock, Info, ChevronDown, RotateCcw,
-  CheckSquare, Square
+  CheckSquare, Square, UploadCloud
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { StatCard } from "@/components/ui/StatCard";
 import Link from "next/link";
+import ImportQuestionBankModal from "@/components/modals/ImportQuestionBankModal";
 
 interface QuestionOption {
   id: string;
@@ -664,6 +665,7 @@ export default function QuestionBankPage() {
   const [editQuestion, setEditQuestion] = useState<Question | null>(null);
   const [deleteQuestion, setDeleteQuestion] = useState<Question | null>(null);
   const [showDeleteAll, setShowDeleteAll] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
@@ -783,13 +785,22 @@ export default function QuestionBankPage() {
         title="Question Bank"
         description={`Manage and search across all ${total.toLocaleString()} questions across your created quizzes.`}
         actions={
-          <Link
-            href="/create-quiz"
-            className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition cursor-pointer shadow-sm shadow-indigo-600/10"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Create Quiz</span>
-          </Link>
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={() => setShowImportModal(true)}
+              className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-[#101e4a] hover:bg-slate-100 dark:hover:bg-[#162963] border border-slate-200 dark:border-indigo-400/30 rounded-xl transition cursor-pointer shadow-xs"
+            >
+              <UploadCloud className="h-4 w-4 text-indigo-500" />
+              <span>Import Questions</span>
+            </button>
+            <Link
+              href="/create-quiz"
+              className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition cursor-pointer shadow-sm shadow-indigo-600/10"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Create Quiz</span>
+            </Link>
+          </div>
         }
       />
 
@@ -1380,6 +1391,14 @@ export default function QuestionBankPage() {
             }}
           />
         )}
+        <ImportQuestionBankModal
+          key="import-modal"
+          isOpen={showImportModal}
+          onClose={() => setShowImportModal(false)}
+          onImportSuccess={() => {
+            fetchQuestions();
+          }}
+        />
       </AnimatePresence>
     </div>
   );

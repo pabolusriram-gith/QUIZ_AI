@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "../styles/globals.css";
+import "@/styles/globals.css";
 import { Inter } from "next/font/google";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/components/ThemeProvider";

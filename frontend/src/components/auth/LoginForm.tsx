@@ -5,13 +5,14 @@ import { isAxiosError } from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { BrainCircuit, Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { BrainCircuit, Eye, EyeOff, Lock, Mail, Gamepad2, ArrowRight } from "lucide-react";
 
 // Zod Validation Schema
 const loginSchema = z.object({
@@ -154,44 +155,48 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-background text-foreground flex flex-col justify-between items-center py-10 px-4">
+    <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-b from-[#f8fafc] via-[#eef2ff] to-[#e0e7ff] dark:bg-gradient-to-b dark:from-[#0d1e57] dark:via-[#091745] dark:to-[#061033] text-foreground flex flex-col justify-between items-center py-10 px-4">
       
       {/* ----------------- Background Design ----------------- */}
       
-      {/* Premium subtle grid overlay */}
+      {/* Subtle Tech Dot Matrix Grid */}
       <div 
-        className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-85 pointer-events-none" 
+        className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(15,23,42,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.03)_1px,transparent_1px)] dark:bg-[radial-gradient(#818cf840_1.2px,transparent_1.2px)] dark:bg-[size:30px_30px] [mask-image:radial-gradient(ellipse_80%_70%_at_50%_45%,#000_70%,transparent_100%)] pointer-events-none" 
         aria-hidden="true"
       />
+
+      {/* Overhead Aurora Glow Beam */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[850px] h-[380px] bg-gradient-to-b from-indigo-400/40 via-cyan-400/20 to-transparent blur-[90px] -z-15 pointer-events-none" />
  
-      {/* Animated soft gradient blobs for premium AI look */}
+      {/* Animated soft ambient gradient mesh */}
       <div className="absolute inset-0 -z-20 overflow-hidden pointer-events-none" aria-hidden="true">
         <motion.div
           animate={{
-            scale: [1, 1.1, 1],
-            x: [0, 40, 0],
-            y: [0, -30, 0],
+            scale: [1, 1.15, 1],
+            x: [0, 35, 0],
+            y: [0, -25, 0],
           }}
           transition={{
-            duration: 14,
+            duration: 13,
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute -top-12 -left-12 h-[450px] w-[450px] rounded-full bg-indigo-500/5 dark:bg-indigo-950/20 blur-[110px]"
+          className="absolute -top-24 -left-16 h-[580px] w-[580px] rounded-full bg-gradient-to-tr from-indigo-500/45 via-blue-600/35 to-violet-500/30 blur-[120px]"
         />
         <motion.div
           animate={{
-            scale: [1, 1.15, 1],
+            scale: [1, 1.18, 1],
             x: [0, -30, 0],
-            y: [0, 40, 0],
+            y: [0, 30, 0],
           }}
           transition={{
-            duration: 18,
+            duration: 16,
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute -bottom-16 -right-16 h-[450px] w-[450px] rounded-full bg-cyan-500/5 dark:bg-cyan-950/20 blur-[110px]"
+          className="absolute -bottom-24 -right-16 h-[580px] w-[580px] rounded-full bg-gradient-to-bl from-cyan-400/40 via-sky-500/35 to-blue-600/30 blur-[130px]"
         />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[520px] w-[520px] rounded-full bg-indigo-500/25 blur-[100px] pointer-events-none" />
       </div>
  
       <div className="flex-1 flex items-center justify-center w-full z-10">
@@ -204,7 +209,7 @@ export default function LoginForm() {
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="w-full max-w-[440px]"
         >
-          <Card className="glass-panel border-border shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-2xl overflow-hidden p-1">
+          <Card className="bg-slate-50/85 dark:bg-[#101e4a]/90 backdrop-blur-2xl border border-slate-200/80 dark:border-indigo-400/30 shadow-[0_10px_35px_rgba(15,23,42,0.06)] dark:shadow-[0_20px_50px_rgba(6,16,51,0.8)] rounded-2xl overflow-hidden p-1">
             <CardContent className="pt-8 pb-7 px-8 space-y-6">
               
               {/* --- Header Section (Branding & Welcome) --- */}
@@ -215,7 +220,7 @@ export default function LoginForm() {
                   initial={{ scale: 0.85, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.1, duration: 0.4 }}
-                  className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 shadow-md shadow-indigo-500/20"
+                  className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-600 shadow-md shadow-indigo-500/25 ring-1 ring-white/20"
                 >
                   <BrainCircuit className="h-6 w-6 text-white animate-pulse" />
                   <span className="absolute -inset-0.5 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 opacity-30 blur-sm -z-10" />
@@ -223,7 +228,7 @@ export default function LoginForm() {
  
                 {/* Title & Subtitle */}
                 <div className="space-y-1">
-                  <h1 className="text-2xl font-extrabold tracking-tight text-foreground font-display">
+                  <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 font-display">
                     QuizVerse AI
                   </h1>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-cyan-600 dark:text-cyan-400">
@@ -233,14 +238,36 @@ export default function LoginForm() {
  
                 {/* Greeting */}
                 <div className="space-y-1 pt-1">
-                  <h2 className="text-lg font-bold text-foreground font-display">
+                  <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 font-display">
                     Welcome Back 👋
                   </h2>
-                  <p className="text-xs text-muted-foreground max-w-[320px]">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-[320px]">
                     Sign in to continue creating and managing AI-powered quizzes.
                   </p>
                 </div>
               </div>
+
+              {/* Live Quiz Quick Callout */}
+              <Link
+                href="/join"
+                className="group flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-cyan-500/10 hover:from-blue-500/15 hover:via-indigo-500/15 hover:to-cyan-500/15 border border-indigo-500/20 hover:border-indigo-500/40 transition-all duration-200"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400 group-hover:scale-105 transition-transform duration-200">
+                    <Gamepad2 className="h-4 w-4" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                      Joining a Live Quiz?
+                      <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400">No Account Needed</span>
+                    </p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Enter your PIN & nickname directly
+                    </p>
+                  </div>
+                </div>
+                <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all duration-200" />
+              </Link>
 
               {/* --- API Response Error --- */}
               {apiError && (
@@ -261,18 +288,18 @@ export default function LoginForm() {
                 
                 {/* Email Input */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="email" className="text-muted-foreground font-medium text-xs">
+                  <Label htmlFor="email" className="text-slate-600 dark:text-slate-400 font-medium text-xs">
                     Email address
                   </Label>
                   <div className="relative group">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-cyan-400 transition-colors duration-200" />
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-400 dark:text-slate-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-cyan-400 transition-colors duration-200" />
                     <Input
                       id="email"
                       type="email"
                       disabled={isSubmitting || oauthLoading !== null}
                       placeholder="name@example.com"
                       {...register("email")}
-                      className={`pl-11 pr-4 h-11 w-full bg-slate-50 dark:bg-white/4 border-border rounded-xl hover:border-slate-300 dark:hover:border-white/20 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-background focus:ring-primary/10 text-foreground transition-all duration-200 ${errors.email ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
+                      className={`pl-11 pr-4 h-11 w-full bg-slate-100/70 dark:bg-[#132356]/85 border border-slate-200 dark:border-indigo-400/30 rounded-xl hover:border-slate-300 dark:hover:border-indigo-400/50 focus:border-indigo-500 dark:focus:border-cyan-400 focus:bg-white dark:focus:bg-[#182b68] focus:ring-4 focus:ring-indigo-500/10 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-all duration-200 ${errors.email ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
                     />
                   </div>
                   {errors.email && (
@@ -285,7 +312,7 @@ export default function LoginForm() {
                 {/* Password Input */}
                 <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
-                    <Label htmlFor="password" className="text-muted-foreground font-medium text-xs">
+                    <Label htmlFor="password" className="text-slate-600 dark:text-slate-400 font-medium text-xs">
                       Password
                     </Label>
                     <button
@@ -298,14 +325,14 @@ export default function LoginForm() {
                     </button>
                   </div>
                   <div className="relative group">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-cyan-400 transition-colors duration-200" />
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-400 dark:text-slate-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-cyan-400 transition-colors duration-200" />
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
                       disabled={isSubmitting || oauthLoading !== null}
                       placeholder="••••••••"
                       {...register("password")}
-                      className={`pl-11 pr-11 h-11 w-full bg-slate-50 dark:bg-white/4 border-border rounded-xl hover:border-slate-300 dark:hover:border-white/20 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-background focus:ring-primary/10 text-foreground transition-all duration-200 ${errors.password ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
+                      className={`pl-11 pr-11 h-11 w-full bg-slate-100/70 dark:bg-[#132356]/85 border border-slate-200 dark:border-indigo-400/30 rounded-xl hover:border-slate-300 dark:hover:border-indigo-400/50 focus:border-indigo-500 dark:focus:border-cyan-400 focus:bg-white dark:focus:bg-[#182b68] focus:ring-4 focus:ring-indigo-500/10 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-all duration-200 ${errors.password ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
                     />
                     <button
                       type="button"
@@ -325,8 +352,8 @@ export default function LoginForm() {
  
                 {/* Remember Me */}
                 <div className="flex items-center pt-0.5">
-                  <label className="group flex items-center gap-2.5 cursor-pointer text-xs text-muted-foreground select-none">
-                    <div className="relative flex items-center justify-center h-4.5 w-4.5 rounded-md border border-border bg-slate-50 dark:bg-white/5 transition-all group-hover:border-indigo-500 group-hover:shadow-[0_0_0_3px_rgba(99,102,241,0.1)] has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-600">
+                  <label className="group flex items-center gap-2.5 cursor-pointer text-xs text-slate-600 dark:text-slate-400 select-none">
+                    <div className="relative flex items-center justify-center h-4.5 w-4.5 rounded-md border border-slate-300 dark:border-indigo-400/30 bg-slate-100 dark:bg-[#132356] transition-all group-hover:border-indigo-500 group-hover:shadow-[0_0_0_3px_rgba(99,102,241,0.15)] has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-600">
                       <input 
                         type="checkbox" 
                         disabled={isSubmitting || oauthLoading !== null}
@@ -337,7 +364,7 @@ export default function LoginForm() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                       </svg>
                     </div>
-                    <span className="group-hover:text-foreground transition-colors font-medium">Remember for 30 days</span>
+                    <span className="group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors font-medium">Remember for 30 days</span>
                   </label>
                 </div>
  
@@ -350,37 +377,39 @@ export default function LoginForm() {
                   <Button
                     type="submit"
                     disabled={isSubmitting || oauthLoading !== null}
-                    className="w-full h-11 font-semibold text-white bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 rounded-xl shadow-md shadow-indigo-500/25 cursor-pointer border-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full h-11 font-semibold text-white bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-600 hover:from-indigo-500 hover:via-indigo-400 hover:to-cyan-500 rounded-xl shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 cursor-pointer border-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {isSubmitting ? (
                       <>
-                        <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                         <span>Signing In...</span>
                       </>
                     ) : (
-                      "Sign In"
+                      <>
+                        <span>Sign In</span>
+                        <ArrowRight className="h-4 w-4" />
+                      </>
                     )}
                   </Button>
                 </motion.div>
               </form>
  
               {/* --- Divider --- */}
-              <div className="relative flex items-center py-1">
-                <div className="flex-grow border-t border-border"></div>
-                <span className="flex-shrink mx-4 text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-transparent">
-                  or
+              <div className="relative flex items-center justify-center">
+                <div className="border-t border-slate-200 dark:border-indigo-400/25 w-full" />
+                <span className="bg-slate-50 dark:bg-[#101e4a] px-3 text-[11px] font-semibold tracking-wider text-slate-400 dark:text-slate-400 uppercase">
+                  Or continue with
                 </span>
-                <div className="flex-grow border-t border-border"></div>
+                <div className="border-t border-slate-200 dark:border-indigo-400/25 w-full" />
               </div>
  
-              {/* --- Social Buttons --- */}
+              {/* --- Google OAuth Button --- */}
               <motion.div
                 whileHover={!(isSubmitting || oauthLoading !== null) ? { scale: 1.01 } : {}}
                 whileTap={!(isSubmitting || oauthLoading !== null) ? { scale: 0.99 } : {}}
-                className="w-full"
               >
                 <Button
                   variant="outline"
@@ -390,7 +419,7 @@ export default function LoginForm() {
                     window.location.href = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1") + "/auth/google/login";
                   }}
                   disabled={isSubmitting || oauthLoading !== null}
-                  className="w-full h-11 rounded-xl border border-border bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-foreground transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full h-11 rounded-xl border border-slate-200 dark:border-indigo-400/30 bg-slate-100/80 dark:bg-[#132356]/85 hover:bg-slate-200/70 dark:hover:bg-[#182b68] text-slate-800 dark:text-slate-200 font-medium transition-all duration-200 shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {oauthLoading === "google" ? (
                     <svg className="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -407,7 +436,7 @@ export default function LoginForm() {
               </motion.div>
  
               {/* --- Sign Up Redirect --- */}
-              <div className="pt-2 text-center text-sm text-muted-foreground">
+              <div className="pt-2 text-center text-sm text-slate-500 dark:text-slate-400">
                 Don&apos;t have an account?{" "}
                 <button
                   type="button"
@@ -424,7 +453,7 @@ export default function LoginForm() {
       </div>
  
       {/* --- Footer Section --- */}
-      <footer className="text-center text-xs text-muted-foreground pt-6">
+      <footer className="text-center text-xs text-slate-400 dark:text-slate-500 pt-6">
         &copy; 2026 QuizVerse AI. All rights reserved.
       </footer>
  
@@ -436,9 +465,9 @@ export default function LoginForm() {
             animate={{ opacity: 1, y: 0, scale: 1, x: "-50%" }}
             exit={{ opacity: 0, y: -20, scale: 0.95, x: "-50%" }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="fixed top-6 left-1/2 z-50 px-4 py-3 rounded-xl border border-rose-500/20 bg-popover/85 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex items-center gap-2.5 text-xs font-semibold text-rose-600 dark:text-rose-400 max-w-sm w-full mx-4"
+            className="fixed top-6 left-1/2 z-50 px-4 py-3 rounded-xl border border-rose-500/25 bg-slate-900/90 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] flex items-center gap-2.5 text-xs font-semibold text-rose-300 max-w-sm w-full mx-4"
           >
-            <svg className="h-4.5 w-4.5 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+            <svg className="h-4.5 w-4.5 text-rose-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <span>{toast.message}</span>

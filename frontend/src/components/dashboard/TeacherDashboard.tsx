@@ -5,16 +5,6 @@ import { useAuth } from "@/context/AuthContext";
 import PageHeader from "@/components/layout/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
 import dynamic from "next/dynamic";
-
-const ChartCard = dynamic(() => import("@/components/ui/ChartCard"), {
-  ssr: false,
-  loading: () => (
-    <div className="h-72 w-full rounded-3xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 animate-pulse flex items-center justify-center text-xs text-slate-400 font-bold">
-      Loading chart analytics...
-    </div>
-  ),
-});
-
 import { 
   Sparkles, 
   Plus, 
@@ -26,12 +16,23 @@ import {
   ArrowRight, 
   FileText,
   FileDown,
-  ListTodo
+  ListTodo,
+  UploadCloud
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import api from "@/services/api";
 import { toast } from "sonner";
+import ImportQuestionBankModal from "@/components/modals/ImportQuestionBankModal";
+
+const ChartCard = dynamic(() => import("@/components/ui/ChartCard"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-72 w-full rounded-3xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 animate-pulse flex items-center justify-center text-xs text-slate-400 font-bold">
+      Loading chart analytics...
+    </div>
+  ),
+});
 
 interface DashboardData {
   manual_quizzes: number;
@@ -52,10 +53,11 @@ export default function TeacherDashboard() {
   const { currentUser } = useAuth();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   const teacherName = currentUser?.full_name || "Educator";
 
-  useEffect(() => {
+  const fetchDashboardData = () => {
     api.get("/quizzes/teacher/dashboard")
       .then(res => {
         setData(res.data);
@@ -66,6 +68,10 @@ export default function TeacherDashboard() {
         toast.error("Failed to load teacher dashboard statistics.");
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
   }, []);
 
   // Time-of-day greeting
@@ -281,17 +287,19 @@ export default function TeacherDashboard() {
                 <ArrowRight className="h-4 w-4 shrink-0 opacity-60 group-hover:translate-x-0.5 transition-transform" />
               </Link>
 
-              {/* Import Action (Clean & Unobtrusive Disabled Presentation) */}
-              <div
-                className="w-full h-[56px] px-5 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30 text-slate-400 dark:text-slate-500 font-medium text-sm flex items-center justify-between select-none opacity-60 cursor-not-allowed"
-                title="Import Question Bank (Planned Feature)"
+              {/* Import Action (Active Interactive Presentation) */}
+              <button
+                type="button"
+                onClick={() => setShowImportModal(true)}
+                className="w-full h-[56px] px-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100/70 hover:bg-slate-200/70 active:bg-slate-200 dark:bg-slate-900/60 dark:hover:bg-slate-800/80 dark:active:bg-slate-800 hover:border-indigo-500/40 dark:hover:border-indigo-500/40 text-slate-800 dark:text-slate-100 font-bold text-sm flex items-center justify-between cursor-pointer transition-all group shadow-xs focus-visible:ring-2 focus-visible:ring-indigo-500/40 focus-visible:outline-none"
+                title="Import questions from CSV or JSON into your assessments"
               >
                 <span className="flex items-center gap-2.5">
-                  <FileDown className="h-4 w-4 shrink-0 opacity-60" />
+                  <UploadCloud className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                   <span>Import Question Bank</span>
                 </span>
-                <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-600">Planned</span>
-              </div>
+                <ArrowRight className="h-4 w-4 shrink-0 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+              </button>
             </div>
           </div>
 
@@ -409,6 +417,15 @@ export default function TeacherDashboard() {
           )}
         </>
       )}
+
+      {/* Import Question Bank Modal */}
+      <ImportQuestionBankModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImportSuccess={() => {
+          fetchDashboardData();
+        }}
+      />
     </div>
   );
 }

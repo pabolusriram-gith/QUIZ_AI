@@ -1,7 +1,9 @@
 import uuid
-from datetime import datetime
+import json
+import logging
+from datetime import datetime, timezone
 from typing import Any, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form, Response
 from sqlalchemy import select, or_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -11,8 +13,12 @@ from app.database.session import get_db
 from app.models.user import User
 from app.models.quiz import Quiz, Question, QuestionOption, QuizAttempt, GameSession, GameSessionStatus
 from app.schemas.quiz import QuizCreate, QuizUpdate, QuizResponse, QuestionResponse, QuestionUpdate
+from app.services.question_processor import QuestionProcessor
+from app.services.question_importer import QuestionImporter
+from app.core.security import escape_html
 
 router = APIRouter()
+logger = logging.getLogger("app.api.quizzes")
 
 async def get_active_session_pin(quiz_id: uuid.UUID, db: AsyncSession) -> Optional[str]:
     res = await db.execute(
@@ -26,11 +32,186 @@ async def get_active_session_pin(quiz_id: uuid.UUID, db: AsyncSession) -> Option
     return res.scalar_one_or_none()
 
 
-from app.services.question_processor import QuestionProcessor
+# ---------------------------------------------------------------------------
+# Question Bank Import & Template Endpoints
+# ---------------------------------------------------------------------------
 
-# ---------------------------------------------------------------------------
-# Question Bank Endpoints
-# ---------------------------------------------------------------------------
+@router.get("/questions/template/csv")
+async def get_csv_template(
+    current_user: User = Depends(check_role(["teacher", "admin"]))
+) -> Response:
+    """Download sample CSV template for Question Bank import."""
+    csv_content = QuestionImporter.get_sample_csv()
+    return Response(
+        content=csv_content,
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": 'attachment; filename="quizverse_question_bank_template.csv"'
+        }
+    )
+
+
+@router.get("/questions/template/json")
+async def get_json_template(
+    current_user: User = Depends(check_role(["teacher", "admin"]))
+) -> Response:
+    """Download sample JSON template for Question Bank import."""
+    json_content = json.dumps(QuestionImporter.get_sample_json(), indent=2)
+    return Response(
+        content=json_content,
+        media_type="application/json",
+        headers={
+            "Content-Disposition": 'attachment; filename="quizverse_question_bank_template.json"'
+        }
+    )
+
+
+@router.post("/questions/import", response_model=dict)
+async def import_questions_to_quiz(
+    quiz_id: uuid.UUID = Form(..., description="Target existing quiz ID to import questions into"),
+    file: UploadFile = File(..., description="CSV or JSON file containing structured questions"),
+    preview_only: bool = Form(False, description="If true, parse and validate without committing to DB"),
+    current_user: User = Depends(check_role(["teacher", "admin"])),
+    db: AsyncSession = Depends(get_db)
+) -> Any:
+    """
+    Import bulk questions from a CSV or JSON file into an existing Quiz.
+    Validates all rows, checks schema constraints, and executes an atomic DB transaction.
+    """
+    # 1. Verify target quiz exists and is owned by current teacher (or admin)
+    quiz_res = await db.execute(
+        select(Quiz)
+        .where(Quiz.id == quiz_id)
+        .options(selectinload(Quiz.questions).selectinload(Question.options))
+    )
+    db_quiz = quiz_res.scalar_one_or_none()
+    if not db_quiz:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Target quiz '{quiz_id}' not found."
+        )
+
+    if db_quiz.created_by_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied. You do not own the destination quiz."
+        )
+
+    # 2. Check file type and read contents
+    filename = (file.filename or "").lower()
+    if not (filename.endswith(".csv") or filename.endswith(".json")):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Unsupported file format. Please upload a valid .csv or .json file."
+        )
+
+    file_bytes = await file.read()
+    if not file_bytes:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Uploaded file is empty."
+        )
+
+    # 3. Parse file through QuestionImporter
+    if filename.endswith(".csv"):
+        valid_questions, errors = QuestionImporter.parse_csv(file_bytes)
+    else:
+        valid_questions, errors = QuestionImporter.parse_json(file_bytes)
+
+    total_parsed = len(valid_questions) + len(errors)
+
+    # If preview_only requested, return parsed preview and validation errors without saving
+    if preview_only:
+        return {
+            "status": "preview",
+            "quiz_id": str(db_quiz.id),
+            "quiz_title": db_quiz.title,
+            "total_parsed": total_parsed,
+            "valid_count": len(valid_questions),
+            "error_count": len(errors),
+            "errors": errors,
+            "preview_questions": valid_questions
+        }
+
+    # If no valid questions were parsed, reject the import
+    if len(valid_questions) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "message": "No valid questions could be extracted from the file.",
+                "errors": errors
+            }
+        )
+
+    # 4. Atomic Database Insert Transaction
+    try:
+        current_max_order = max([q.order_index for q in db_quiz.questions], default=-1)
+        created_questions_res = []
+
+        for idx, q_dict in enumerate(valid_questions):
+            order_idx = current_max_order + 1 + idx
+
+            new_q = Question(
+                quiz_id=db_quiz.id,
+                text=escape_html(q_dict.get("text", "")),
+                question_type=q_dict.get("question_type", "multiple_choice"),
+                difficulty=q_dict.get("difficulty", "medium"),
+                topic=escape_html(q_dict.get("topic", "General")),
+                subtopic=escape_html(q_dict.get("subtopic", "")) if q_dict.get("subtopic") else None,
+                marks=int(q_dict.get("marks", 1)),
+                negative_marks=float(q_dict.get("negative_marks", 0.0)),
+                explanation=escape_html(q_dict.get("explanation", "")) if q_dict.get("explanation") else None,
+                hint=escape_html(q_dict.get("hint", "")) if q_dict.get("hint") else None,
+                bloom_level=q_dict.get("bloom_level"),
+                order_index=order_idx,
+                ai_generated=False,
+                generated_by_ai=False
+            )
+            db.add(new_q)
+
+            # Add options
+            for opt_idx, opt_dict in enumerate(q_dict.get("options", [])):
+                new_opt = QuestionOption(
+                    text=escape_html(opt_dict.get("text", "")),
+                    is_correct=bool(opt_dict.get("is_correct", False)),
+                    display_order=opt_dict.get("display_order", opt_idx),
+                    question=new_q
+                )
+                db.add(new_opt)
+
+            created_questions_res.append({
+                "text": new_q.text,
+                "question_type": new_q.question_type,
+                "difficulty": new_q.difficulty,
+                "marks": new_q.marks,
+                "options_count": len(q_dict.get("options", []))
+            })
+
+        # Update quiz total marks
+        total_additional_marks = sum(q.get("marks", 1) for q in valid_questions)
+        db_quiz.total_marks = (db_quiz.total_marks or 0) + total_additional_marks
+        db_quiz.updated_at = datetime.now(timezone.utc)
+
+        await db.commit()
+
+    except Exception as e:
+        await db.rollback()
+        logger.exception("Failed to import questions to database: %s", str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database transaction failed while saving imported questions: {str(e)}"
+        )
+
+    return {
+        "status": "success",
+        "quiz_id": str(db_quiz.id),
+        "quiz_title": db_quiz.title,
+        "total_imported": len(valid_questions),
+        "error_count": len(errors),
+        "errors": errors,
+        "imported_questions": created_questions_res
+    }
+
 
 @router.delete("/questions", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_all_my_questions(

@@ -16,10 +16,12 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   async rewrites() {
+    const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+    const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
     return [
       {
         source: '/api/v1/:path*',
-        destination: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1/:path*',
+        destination: `${cleanApiUrl}/:path*`,
       },
     ];
   },

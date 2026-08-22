@@ -111,6 +111,20 @@ class Settings(BaseSettings):
     AI_CIRCUIT_FAILURE_THRESHOLD: int = 5
     AI_CIRCUIT_COOLDOWN_SECONDS: int = 60
 
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def validate_and_parse_cors_origins(cls, v):
+        if isinstance(v, str):
+            v_trimmed = v.strip()
+            if v_trimmed.startswith("[") and v_trimmed.endswith("]"):
+                import json
+                try:
+                    return json.loads(v_trimmed)
+                except Exception:
+                    pass
+            return [x.strip() for x in v_trimmed.split(",") if x.strip()]
+        return v
+
     @field_validator("AUTO_PROVIDER_ORDER", mode="before")
     @classmethod
     def validate_and_parse_auto_provider_order(cls, v):

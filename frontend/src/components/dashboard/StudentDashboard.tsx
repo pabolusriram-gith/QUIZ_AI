@@ -6,19 +6,6 @@ import PageHeader from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/ui/StatCard";
 import dynamic from "next/dynamic";
-
-const StudentProgressionChart = dynamic(
-  () => import("@/components/dashboard/StudentProgressionChart"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-52 w-full flex items-center justify-center text-xs text-slate-400 font-bold animate-pulse">
-        Loading score progression...
-      </div>
-    ),
-  }
-);
-
 import { 
   PlayCircle, 
   Clock, 
@@ -35,6 +22,18 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import api from "@/services/api";
 import { toast } from "sonner";
+
+const StudentProgressionChart = dynamic(
+  () => import("@/components/dashboard/StudentProgressionChart"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-52 w-full flex items-center justify-center text-xs text-slate-400 font-bold animate-pulse">
+        Loading score progression...
+      </div>
+    ),
+  }
+);
 
 
 interface TrendItem {

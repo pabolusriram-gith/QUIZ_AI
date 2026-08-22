@@ -2,8 +2,9 @@ import axios from "axios";
 import { tokenStorage } from "@/utils/storage";
 
 const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL,
+    baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1",
     withCredentials: true,
+    timeout: 15000,
     headers: {
         "Content-Type": "application/json",
     },

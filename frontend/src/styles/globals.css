@@ -255,3 +255,36 @@ body {
     height: 12px;
   }
 }
+
+/* Background floating nebula orbs */
+@keyframes float-nebula-1 {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(30px, -25px) scale(1.08);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+@keyframes float-nebula-2 {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(-25px, 30px) scale(1.10);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-nebula-1 {
+  animation: float-nebula-1 14s ease-in-out infinite;
+}
+
+.animate-nebula-2 {
+  animation: float-nebula-2 18s ease-in-out infinite;
+}

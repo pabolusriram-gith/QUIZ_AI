@@ -92,18 +92,18 @@ export default function ErrorState({ type, message, onAction, actionText }: Erro
   const details = getErrorDetails();
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 text-center max-w-md mx-auto min-h-[300px] space-y-6 bg-slate-950/40 border border-white/5 rounded-3xl backdrop-blur-md">
-      <div className="p-4 rounded-full bg-white/3 border border-white/5 flex items-center justify-center">
+    <div className="flex flex-col items-center justify-center p-8 text-center max-w-md mx-auto min-h-[300px] space-y-6 bg-slate-50/80 dark:bg-[#0c1427]/85 border border-slate-200/80 dark:border-slate-800/80 rounded-3xl backdrop-blur-md shadow-xl">
+      <div className="p-4 rounded-full bg-slate-100 dark:bg-[#121c33] border border-slate-200 dark:border-slate-700/60 flex items-center justify-center">
         {details.icon}
       </div>
       <div className="space-y-2">
-        <h2 className="text-xl font-bold text-white tracking-tight">{details.title}</h2>
-        <p className="text-slate-400 text-xs font-semibold leading-relaxed px-4">{details.description}</p>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">{details.title}</h2>
+        <p className="text-slate-600 dark:text-slate-400 text-xs font-semibold leading-relaxed px-4">{details.description}</p>
       </div>
       {onAction && (
         <Button
           onClick={onAction}
-          className="rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 h-10 border-none cursor-pointer brand-button-glow transition-all"
+          className="rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 h-10 border-none cursor-pointer shadow-md shadow-indigo-500/20 transition-all"
         >
           {details.actionLabel}
         </Button>

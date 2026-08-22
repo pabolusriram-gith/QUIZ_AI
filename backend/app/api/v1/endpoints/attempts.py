@@ -504,13 +504,31 @@ async def save_quiz_progress(
                             if game_session.current_question_index + 1 < total_qs:
                                 game_session.current_question_index += 1
                                 game_session.answers_locked = False
-                                game_session.current_question_started_at = None
-                                game_session.current_question_end_time = None
+                                game_session.is_paused = False
+                                game_session.pause_started_at = None
+
+                                # Next question duration from configured question or override
+                                next_q_id = game_session.randomized_question_ids[game_session.current_question_index] if game_session.randomized_question_ids else None
+                                next_q = next((q for q in quiz.questions if str(q.id) == next_q_id), None) if next_q_id else (quiz.questions[game_session.current_question_index] if game_session.current_question_index < len(quiz.questions) else None)
+                                duration = game_session.question_timer_override or (next_q.time_limit_seconds if next_q and next_q.time_limit_seconds else 30) or 30
+                                now_time = datetime.now(timezone.utc)
+                                game_session.current_question_started_at = now_time
+                                game_session.current_question_duration = duration
+                                game_session.current_question_end_time = now_time + timedelta(seconds=duration)
+
                                 manager.reset_question_state(game_session.game_pin)
                                 await db.commit()
                                 await manager.broadcast(game_session.game_pin, "next_question", {
-                                    "current_question_index": game_session.current_question_index
+                                    "current_question_index": game_session.current_question_index,
+                                    "question_started_at": game_session.current_question_started_at.isoformat(),
+                                    "question_end_time": game_session.current_question_end_time.isoformat(),
+                                    "duration": duration,
+                                    "server_time": now_time.isoformat(),
+                                    "answers_locked": False,
+                                    "is_paused": False
                                 })
+                                from app.api.v1.endpoints.sessions import broadcast_timer_sync
+                                await broadcast_timer_sync(game_session.game_pin, game_session)
         return attempt
     except Exception as e:
         await db.rollback()

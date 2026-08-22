@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from typing import Dict, Any, List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class QuizAttemptCreate(BaseModel):
@@ -27,6 +27,8 @@ class QuizAttemptSubmit(BaseModel):
 
 
 class QuizAttemptResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: uuid.UUID
     quiz_id: uuid.UUID
     user_id: uuid.UUID
@@ -44,11 +46,10 @@ class QuizAttemptResponse(BaseModel):
     started_at: datetime
     completed_at: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True
-
 
 class QuizAttemptResultResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: uuid.UUID
     quiz_id: uuid.UUID
     score: float
@@ -68,6 +69,3 @@ class QuizAttemptResultResponse(BaseModel):
     correct_count: int
     incorrect_count: int
     graded_questions: List[Dict[str, Any]]
-
-    class Config:
-        from_attributes = True

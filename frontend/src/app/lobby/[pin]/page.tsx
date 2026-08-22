@@ -174,8 +174,8 @@ export default function HostLobbyPage() {
     if (!pin || !token || loading) return;
 
     const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-    const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
-    const wsUrl = apiBaseUrl.replace(/^http/, wsScheme) + `/sessions/ws/session/${pin}?role=host&token=${token}`;
+    const wsBaseUrl = apiBaseUrl.replace(/^https:\/\//i, "wss://").replace(/^http:\/\//i, "ws://");
+    const wsUrl = `${wsBaseUrl}/sessions/ws/session/${pin}?role=host&token=${token}`;
 
     console.log("[WS] Connecting to host channel:", wsUrl);
     const ws = new WebSocket(wsUrl);

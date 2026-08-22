@@ -20,6 +20,9 @@ import {
   AlertCircle,
 } from "lucide-react";
 import dynamic from "next/dynamic";
+import { Input } from "@/components/ui/input";
+import { StatCard } from "@/components/ui/StatCard";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 const ClassroomAttemptChart = dynamic(
   () => import("@/components/analytics/ClassroomAttemptChart"),
@@ -32,10 +35,6 @@ const ClassroomAttemptChart = dynamic(
     ),
   }
 );
-
-import { Input } from "@/components/ui/input";
-import { StatCard } from "@/components/ui/StatCard";
-import { Skeleton } from "@/components/ui/Skeleton";
 
 interface Overview {
   total_quizzes: number;

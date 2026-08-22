@@ -17,20 +17,32 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
   useEffect(() => {
     if (!loading) {
       if (!isAuthenticated) {
-        router.push("/login");
+        router.replace("/login");
       } else if (allowedRoles && currentUser && !allowedRoles.includes(currentUser.role as any)) {
         toast.error("Unauthorized access. Redirecting...");
-        router.push("/dashboard");
+        router.replace("/dashboard");
       }
     }
   }, [isAuthenticated, loading, currentUser, allowedRoles, router]);
 
+  // Safety fallback: if loading takes more than 3.5 seconds, redirect to login
+  useEffect(() => {
+    if (loading) {
+      const timeout = setTimeout(() => {
+        if (!isAuthenticated) {
+          router.replace("/login");
+        }
+      }, 3500);
+      return () => clearTimeout(timeout);
+    }
+  }, [loading, isAuthenticated, router]);
+
   if (loading) {
     return (
-      <div className="min-h-screen w-full bg-[#fafbfc] flex items-center justify-center">
-        <div className="flex flex-col items-center space-y-3">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600" />
-          <p className="text-xs font-medium text-gray-500">Checking authorization...</p>
+      <div className="min-h-screen w-full bg-gradient-to-b from-[#0a1538] via-[#07102a] to-[#050b1e] text-slate-100 flex items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="animate-spin rounded-full h-9 w-9 border-3 border-indigo-500 border-t-transparent shadow-lg shadow-indigo-500/20" />
+          <p className="text-xs font-bold text-slate-300 tracking-wide font-sans">Checking authorization...</p>
         </div>
       </div>
     );

@@ -89,6 +89,10 @@ function WaitingRoomContent() {
         if (joinRes.data && joinRes.data.connection_token) {
           sessionStorage.setItem(`connection_token:${pin}:${nickname}`, joinRes.data.connection_token);
         }
+        if (joinRes.data && joinRes.data.access_token && joinRes.data.refresh_token) {
+          tokenStorage.setAccessToken(joinRes.data.access_token, false);
+          tokenStorage.setRefreshToken(joinRes.data.refresh_token, false);
+        }
       } catch (joinErr: any) {
         const status = joinErr?.response?.status;
         const detail = joinErr?.response?.data?.detail;
@@ -107,10 +111,10 @@ function WaitingRoomContent() {
       }
 
       const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-      const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+      const wsBaseUrl = apiBaseUrl.replace(/^https:\/\//i, "wss://").replace(/^http:\/\//i, "ws://");
 
       const connToken = sessionStorage.getItem(`connection_token:${pin}:${nickname}`);
-      let wsUrl = apiBaseUrl.replace(/^http/, wsScheme) + `/sessions/ws/session/${pin}?role=student&nickname=${encodeURIComponent(nickname)}`;
+      let wsUrl = `${wsBaseUrl}/sessions/ws/session/${pin}?role=student&nickname=${encodeURIComponent(nickname)}`;
       if (connToken) {
         wsUrl += `&connection_token=${encodeURIComponent(connToken)}`;
       }
@@ -238,16 +242,16 @@ function WaitingRoomContent() {
         <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10" aria-hidden="true">
           <div className="absolute top-[30%] left-[20%] h-[400px] w-[400px] rounded-full bg-rose-500/5 blur-[120px]" />
         </div>
-        <div className="glass-panel border-white/5 rounded-3xl p-8 max-w-md w-full text-center space-y-6 shadow-2xl">
-          <div className="h-12 w-12 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 mx-auto">
+        <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-8 max-w-md w-full text-center space-y-6 shadow-xl">
+          <div className="h-12 w-12 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-600 dark:text-rose-400 mx-auto">
             <ShieldAlert className="h-6 w-6" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-xl font-bold text-white tracking-tight">Cannot Join Lobby</h2>
-            <p className="text-slate-400 text-xs font-medium leading-relaxed">{errorMsg}</p>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Cannot Join Lobby</h2>
+            <p className="text-slate-600 dark:text-slate-400 text-xs font-medium leading-relaxed">{errorMsg}</p>
           </div>
           <Link href="/join" className="block w-full">
-            <button className="w-full h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-semibold rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-colors text-xs">
+            <button className="w-full h-11 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-semibold rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-colors text-xs">
               <ArrowLeft className="h-4 w-4" />
               <span>Back to Join Page</span>
             </button>
@@ -258,23 +262,23 @@ function WaitingRoomContent() {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#02050c] text-slate-100 flex flex-col justify-between items-center px-6 overflow-hidden">
+    <div className="relative min-h-screen bg-slate-50 dark:bg-[#060b18] text-slate-900 dark:text-slate-100 flex flex-col justify-between items-center px-6 overflow-hidden">
       
       {/* Decorative Blur Background Panels */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10" aria-hidden="true">
-        <div className="absolute top-[20%] left-[20%] h-[500px] w-[500px] rounded-full bg-indigo-500/5 blur-[150px]" />
-        <div className="absolute bottom-[20%] right-[20%] h-[500px] w-[500px] rounded-full bg-cyan-500/5 blur-[150px]" />
+        <div className="absolute top-[20%] left-[20%] h-[500px] w-[500px] rounded-full bg-indigo-500/5 dark:bg-indigo-500/10 blur-[150px]" />
+        <div className="absolute bottom-[20%] right-[20%] h-[500px] w-[500px] rounded-full bg-cyan-500/5 dark:bg-cyan-500/10 blur-[150px]" />
       </div>
 
       {/* Header */}
       <header className="w-full max-w-6xl py-6 flex items-center justify-between z-10">
-        <Link href="/join" className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors">
+        <Link href="/join" className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
           <ArrowLeft className="h-4 w-4" />
           <span>Leave Lobby</span>
         </Link>
         <Link href="/" className="flex items-center gap-2 group">
-          <BrainCircuit className="h-5 w-5 text-indigo-400 group-hover:text-cyan-400 transition-colors" />
-          <span className="text-sm font-extrabold font-display text-white tracking-tight">QuizVerse</span>
+          <BrainCircuit className="h-5 w-5 text-indigo-600 dark:text-indigo-400 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors" />
+          <span className="text-sm font-extrabold font-display text-slate-900 dark:text-white tracking-tight">QuizVerse</span>
         </Link>
       </header>
 
@@ -284,53 +288,53 @@ function WaitingRoomContent() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="glass-panel border-white/5 rounded-3xl p-8 space-y-8 shadow-2xl text-center"
+          className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-8 space-y-8 shadow-xl text-center"
         >
           <div className="space-y-4">
-            <div className="h-16 w-16 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mx-auto shadow-lg shadow-indigo-500/5 relative">
-              <Loader2 className="h-8 w-8 animate-spin text-cyan-400 absolute" />
-              <Sparkles className="h-5 w-5 text-indigo-400 animate-pulse" />
+            <div className="h-16 w-16 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mx-auto shadow-lg shadow-indigo-500/5 relative">
+              <Loader2 className="h-8 w-8 animate-spin text-cyan-500 dark:text-cyan-400 absolute" />
+              <Sparkles className="h-5 w-5 text-indigo-500 dark:text-indigo-400 animate-pulse" />
             </div>
             
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-wider select-none">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 text-[10px] font-bold uppercase tracking-wider select-none">
                 Joined Successfully
               </div>
-              <h2 className="text-2xl font-extrabold text-white tracking-tight">Waiting for Host...</h2>
-              <p className="text-slate-400 text-xs font-semibold">The quiz will start as soon as the host begins the session.</p>
+              <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Waiting for Host...</h2>
+              <p className="text-slate-600 dark:text-slate-400 text-xs font-semibold">The quiz will start as soon as the host begins the session.</p>
             </div>
           </div>
 
           {/* Student Info and PIN Card */}
-          <div className="p-5 bg-slate-950/40 border border-white/5 rounded-2xl space-y-4 text-left">
-            <div className="flex justify-between items-center pb-3 border-b border-white/5">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Player Name</span>
-              <span className="text-xs font-bold text-white truncate max-w-[150px]">{nickname}</span>
+          <div className="p-5 bg-slate-100/80 dark:bg-[#121c33]/85 border border-slate-200 dark:border-slate-700/60 rounded-2xl space-y-4 text-left shadow-inner">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200 dark:border-slate-800">
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Player Name</span>
+              <span className="text-xs font-bold text-slate-900 dark:text-white truncate max-w-[150px]">{nickname}</span>
             </div>
             {session?.host_name && (
-              <div className="flex justify-between items-center pb-3 border-b border-white/5">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Teacher</span>
-                <span className="text-xs font-bold text-slate-200 truncate max-w-[150px]">{session.host_name}</span>
+              <div className="flex justify-between items-center pb-3 border-b border-slate-200 dark:border-slate-800">
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Teacher</span>
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate max-w-[150px]">{session.host_name}</span>
               </div>
             )}
-            <div className="flex justify-between items-center pb-3 border-b border-white/5">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Game PIN</span>
-              <span className="text-sm font-black text-cyan-400 font-mono tracking-widest">{pin}</span>
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200 dark:border-slate-800">
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Game PIN</span>
+              <span className="text-sm font-black text-cyan-600 dark:text-cyan-400 font-mono tracking-widest">{pin}</span>
             </div>
-            <div className="flex justify-between items-center pb-3 border-b border-white/5">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Players In Lobby</span>
-              <span className="text-xs font-bold text-slate-200 font-mono">{participants.length}</span>
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200 dark:border-slate-800">
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Players In Lobby</span>
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-200 font-mono">{participants.length}</span>
             </div>
             <div className="flex justify-between items-center pt-3">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Connection</span>
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Connection</span>
               {wsConnected ? (
-                <span className="text-xs font-bold text-emerald-400 flex items-center gap-1">
-                  <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
+                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                  <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
                   <span>🟢 Connected</span>
                 </span>
               ) : (
-                <span className="text-xs font-bold text-amber-400 flex items-center gap-1 animate-pulse">
-                  <div className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                <span className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1 animate-pulse">
+                  <div className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                   <span>🟡 Reconnecting...</span>
                 </span>
               )}
@@ -338,10 +342,10 @@ function WaitingRoomContent() {
           </div>
 
           {/* Tips Carousel/Card */}
-          <div className="p-4 bg-white/2 border border-white/5 rounded-2xl text-slate-400 text-[10px] font-medium leading-normal flex items-start gap-3">
-            <Trophy className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+          <div className="p-4 bg-slate-100/60 dark:bg-[#121c33]/60 border border-slate-200 dark:border-slate-800/80 rounded-2xl text-slate-600 dark:text-slate-400 text-[10px] font-medium leading-normal flex items-start gap-3">
+            <Trophy className="h-4 w-4 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
             <div className="text-left space-y-0.5">
-              <span className="font-bold text-slate-300 block">Pro Tip</span>
+              <span className="font-bold text-slate-800 dark:text-slate-300 block">Pro Tip</span>
               <span>Keep this tab active. The game will automatically transition to the first question once launched!</span>
             </div>
           </div>
@@ -349,13 +353,13 @@ function WaitingRoomContent() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full py-6 text-center text-[10px] text-slate-600 font-semibold z-10">
+      <footer className="w-full py-6 text-center text-[10px] text-slate-500 dark:text-slate-600 font-semibold z-10">
         QuizVerse AI • Live Student Session Interface
       </footer>
 
       {/* Synchronized Start Countdown Overlay */}
       {countdownVal !== null && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#02050c]/90 backdrop-blur-md">
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950/80 backdrop-blur-md">
           <motion.div
             key={countdownVal}
             initial={{ scale: 0.3, opacity: 0 }}
@@ -399,9 +403,9 @@ function ShieldAlert(props: any) {
 export default function StudentWaitingRoomPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#02050c] text-white flex flex-col justify-center items-center gap-4">
-        <Loader2 className="h-10 w-10 text-indigo-400 animate-spin" />
-        <p className="text-slate-400 text-xs font-semibold">Loading Live Lobby...</p>
+      <div className="min-h-screen bg-slate-50 dark:bg-[#060b18] text-slate-800 dark:text-white flex flex-col justify-center items-center gap-4">
+        <Loader2 className="h-10 w-10 text-indigo-500 animate-spin" />
+        <p className="text-slate-500 dark:text-slate-400 text-xs font-semibold">Loading Live Lobby...</p>
       </div>
     }>
       <WaitingRoomContent />

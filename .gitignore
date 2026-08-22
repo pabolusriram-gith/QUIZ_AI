@@ -21,6 +21,7 @@ build/
 .vercel/
 .npm
 .eslintcache
+*.tsbuildinfo
 
 # Databases & Cache
 *.db

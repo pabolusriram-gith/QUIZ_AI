@@ -1,6 +1,7 @@
 import re
 import uuid
 import random
+import secrets
 import logging
 import json
 from datetime import datetime, timezone, timedelta
@@ -17,10 +18,26 @@ from app.models.user import User
 from app.models.quiz import Quiz, QuizAttempt, GameSession, Participant, GameSessionStatus
 from app.schemas.game_session import GameSessionCreate, GameSessionResponse, ParticipantResponse
 from app.services.connection_manager import manager
-from app.core.security import decode_token
+from app.core.security import decode_token, hash_password, create_access_token, create_refresh_token
 
 logger = logging.getLogger("sessions_api")
 router = APIRouter()
+
+def get_session_question_ids(session: GameSession) -> List[str]:
+    raw = session.randomized_question_ids
+    if not raw:
+        return []
+    if isinstance(raw, list):
+        return [str(x) for x in raw]
+    if isinstance(raw, str):
+        try:
+            parsed = json.loads(raw)
+            if isinstance(parsed, list):
+                return [str(x) for x in parsed]
+        except Exception:
+            pass
+    return []
+
 
 async def broadcast_session_update(pin: str, session_id: uuid.UUID, session_status: str, db: AsyncSession):
     res = await db.execute(
@@ -57,7 +74,7 @@ async def join_session(
 
     Guards (in order):
     1. Nickname format validation
-    2. Token decoding (so user_id is available for all subsequent checks)
+    2. Token decoding (or automatic guest student provisioning so user_id is always available)
     3. Session existence and status check — returns 410 Gone for finished sessions
     4. Cross-session duplicate guard — rejects users already connected in another
        live session for the same quiz (e.g. duplicate tabs or stale sessions)
@@ -65,7 +82,7 @@ async def join_session(
        allows re-join when the existing participant's WebSocket is no longer tracked
     6. Capacity check
     7. Late-join policy check
-    8. Participant record creation
+    8. Participant record creation with unique student session identity
     """
 
     # ── 1. Validate nickname ───────────────────────────────────────────────
@@ -88,12 +105,15 @@ async def join_session(
 
     # ── 2. Parse token early so user_id is available for all guards ────────
     student_user_id = None
+    issued_access_token = None
+    issued_refresh_token = None
+
     if token:
         try:
             decoded = decode_token(token)
             student_user_id = uuid.UUID(decoded.get("sub"))
         except Exception:
-            pass  # Anonymous / invalid token — continue as guest
+            pass  # Anonymous / invalid token — will auto-provision guest
 
     # ── 3. Session lookup — two-phase for descriptive errors ───────────────
     # Phase A: find the session by PIN regardless of status
@@ -121,10 +141,6 @@ async def join_session(
         )
 
     # ── 4. Cross-session duplicate guard ──────────────────────────────────
-    # If we have a verified user_id, make sure they are not already connected
-    # to a *different* live session for the same quiz. This catches the case
-    # where a host ended one session, started a fresh one, and the student's
-    # old PIN still points to an active predecessor session.
     if student_user_id:
         other_res = await db.execute(
             select(Participant)
@@ -161,9 +177,7 @@ async def join_session(
 
     if existing_participant:
         if existing_participant.connected:
-            # Check whether the WebSocket manager still has a live socket for
-            # this nickname. If the WS was lost without a proper disconnect
-            # event, the DB flag stays True but the socket is gone (zombie).
+            # Check whether the WebSocket manager still has a live socket for this nickname
             active_nicknames_in_ws = manager.session_nicknames.get(pin, set())
             if nickname in active_nicknames_in_ws:
                 # Truly live connection — reject
@@ -171,22 +185,36 @@ async def join_session(
                     status_code=status.HTTP_409_CONFLICT,
                     detail="Nickname is already taken by an active player in this session."
                 )
-            # Zombie participant — the WS is gone but the flag wasn't cleared.
-            # Allow the student to reclaim their nickname and reconnect.
+            # Zombie participant — allow reclaim
             logger.warning(
-                "[join] Zombie participant detected for nickname=%s in session=%s. "
-                "Allowing reclaim.",
+                "[join] Zombie participant detected for nickname=%s in session=%s. Allowing reclaim.",
                 nickname, pin
             )
-        # Either disconnected or zombie → treat as re-join
+        # Re-issue tokens for existing user if missing
         token_str = str(uuid.uuid4())
         existing_participant.connection_token = token_str
+        if existing_participant.user_id:
+            user_res = await db.execute(select(User).where(User.id == existing_participant.user_id))
+            p_user = user_res.scalar_one_or_none()
+            if p_user:
+                issued_access_token = create_access_token(
+                    subject=p_user.id,
+                    role=p_user.role,
+                    token_version=p_user.token_version
+                )
+                issued_refresh_token = create_refresh_token(
+                    subject=p_user.id,
+                    token_version=p_user.token_version
+                )
         await db.commit()
         return {
             "status": "rejoined",
             "session_id": str(session.id),
             "quiz_id": str(session.quiz_id),
-            "connection_token": token_str
+            "connection_token": token_str,
+            "access_token": issued_access_token,
+            "refresh_token": issued_refresh_token,
+            "user_id": str(existing_participant.user_id) if existing_participant.user_id else None
         }
 
     # ── 6. Capacity check ──────────────────────────────────────────────────
@@ -220,9 +248,33 @@ async def join_session(
                 detail="Late joining is not allowed for this session."
             )
 
-    # ── 8. Create participant record ───────────────────────────────────────
-    # connected=False: the participant is pre-registered but the actual
-    # WebSocket connection (and the connected=True flip) happens next.
+    # ── 8. Provision anonymous student user identity if needed ─────────────
+    if not student_user_id:
+        guest_uuid = uuid.uuid4().hex
+        email = f"guest_{guest_uuid}@quizverse.guest"
+        hashed_pwd = hash_password(secrets.token_hex(16))
+        guest_user = User(
+            email=email,
+            hashed_password=hashed_pwd,
+            full_name=nickname,
+            role="student",
+            is_active=True
+        )
+        db.add(guest_user)
+        await db.commit()
+        await db.refresh(guest_user)
+        student_user_id = guest_user.id
+        issued_access_token = create_access_token(
+            subject=guest_user.id,
+            role=guest_user.role,
+            token_version=guest_user.token_version
+        )
+        issued_refresh_token = create_refresh_token(
+            subject=guest_user.id,
+            token_version=guest_user.token_version
+        )
+
+    # ── 9. Create participant record ───────────────────────────────────────
     token_str = str(uuid.uuid4())
     new_participant = Participant(
         session_id=session.id,
@@ -238,7 +290,10 @@ async def join_session(
         "status": "joined",
         "session_id": str(session.id),
         "quiz_id": str(session.quiz_id),
-        "connection_token": token_str
+        "connection_token": token_str,
+        "access_token": issued_access_token,
+        "refresh_token": issued_refresh_token,
+        "user_id": str(student_user_id) if student_user_id else None
     }
 
 
@@ -389,8 +444,8 @@ async def create_session(
             if not pin_check.scalar_one_or_none():
                 break
 
-    # Seed randomized question IDs
-    questions = list(quiz.questions)
+    # Seed question IDs sorted by order_index
+    questions = sorted(list(quiz.questions), key=lambda q: (q.order_index if q.order_index is not None else 0))
     if quiz.randomize_questions or quiz.shuffle_questions or session_in.question_order == "randomized":
         random.shuffle(questions)
     randomized_ids = [str(q.id) for q in questions]
@@ -561,39 +616,57 @@ async def start_session(
             detail="Only the session host can start the quiz."
         )
 
-    db_session.status = GameSessionStatus.ACTIVE.value
-    db_session.started_at = datetime.now(timezone.utc)
-    db_session.current_question_index = 0
-    db_session.current_question_started_at = datetime.now(timezone.utc)
-    db_session.current_question_end_time = None
+    # Get quiz questions
+    quiz_res = await db.execute(
+        select(Quiz).where(Quiz.id == db_session.quiz_id).options(selectinload(Quiz.questions))
+    )
+    quiz = quiz_res.scalar_one_or_none()
+    questions = list(quiz.questions) if quiz else []
 
     if not db_session.randomized_question_ids:
-        quiz_res = await db.execute(
-            select(Quiz).where(Quiz.id == db_session.quiz_id).options(selectinload(Quiz.questions))
-        )
-        quiz = quiz_res.scalar_one_or_none()
-        questions = list(quiz.questions) if quiz else []
         if quiz and (quiz.randomize_questions or quiz.shuffle_questions or db_session.question_order == "randomized"):
             random.shuffle(questions)
         db_session.randomized_question_ids = [str(q.id) for q in questions]
+
+    now = datetime.now(timezone.utc)
+    db_session.status = GameSessionStatus.ACTIVE.value
+    db_session.started_at = now
+    db_session.current_question_index = 0
+    db_session.answers_locked = False
+    db_session.is_paused = False
+    db_session.pause_started_at = None
+
+    # Slido timing: Determine Question 0 configured duration
+    q_ids = get_session_question_ids(db_session)
+    q0_id = q_ids[0] if q_ids else None
+    q0 = next((q for q in questions if str(q.id) == q0_id), None) if q0_id else (questions[0] if questions else None)
+    duration = db_session.question_timer_override or (q0.time_limit_seconds if q0 and q0.time_limit_seconds else 30) or 30
+    
+    db_session.current_question_started_at = now
+    db_session.current_question_duration = duration
+    db_session.current_question_end_time = now + timedelta(seconds=duration)
+
     await db.commit()
     await db.refresh(db_session)
 
-    # Broadcast start countdown event to all connected players (both host and students run locally)
+    # Broadcast start countdown and timer state to all connected players
     await manager.broadcast(
         pin=pin,
         msg_type="start_countdown",
         payload={
             "quiz_id": str(db_session.quiz_id),
-            "start_timestamp": datetime.now(timezone.utc).isoformat()
+            "start_timestamp": now.isoformat(),
+            "question_index": 0,
+            "duration": duration,
+            "question_started_at": db_session.current_question_started_at.isoformat(),
+            "question_end_time": db_session.current_question_end_time.isoformat(),
+            "server_time": now.isoformat()
         }
     )
 
-    # Broadcast updated state
+    await broadcast_timer_sync(pin, db_session)
     await broadcast_session_update(pin, db_session.id, db_session.status, db)
 
-    quiz_res = await db.execute(select(Quiz).where(Quiz.id == db_session.quiz_id))
-    quiz = quiz_res.scalar_one_or_none()
     db_session.quiz_title = quiz.title if quiz else None
     return db_session
 
@@ -726,13 +799,26 @@ async def next_question_session(
     if not quiz:
         raise HTTPException(status_code=404, detail="Quiz not found.")
 
-    if session.current_question_index + 1 >= len(quiz.questions):
+    total_questions = len(quiz.questions)
+    if session.current_question_index + 1 >= total_questions:
         raise HTTPException(status_code=400, detail="No more questions left.")
 
     session.current_question_index += 1
     session.answers_locked = False
-    session.current_question_started_at = None
-    session.current_question_end_time = None
+    session.is_paused = False
+    session.pause_started_at = None
+
+    # Slido timing: Determine current question's configured duration
+    questions = list(quiz.questions)
+    q_ids = get_session_question_ids(session)
+    current_q_id = q_ids[session.current_question_index] if q_ids and session.current_question_index < len(q_ids) else None
+    current_q = next((q for q in questions if str(q.id) == current_q_id), None) if current_q_id else (questions[session.current_question_index] if session.current_question_index < len(questions) else None)
+    
+    duration = session.question_timer_override or (current_q.time_limit_seconds if current_q and current_q.time_limit_seconds else 30) or 30
+    now = datetime.now(timezone.utc)
+    session.current_question_started_at = now
+    session.current_question_duration = duration
+    session.current_question_end_time = now + timedelta(seconds=duration)
     
     # Reset in-memory trackers on manager
     manager.reset_question_state(pin)
@@ -741,8 +827,15 @@ async def next_question_session(
     await db.refresh(session)
     
     await manager.broadcast(pin, "next_question", {
-        "current_question_index": session.current_question_index
+        "current_question_index": session.current_question_index,
+        "question_started_at": session.current_question_started_at.isoformat(),
+        "question_end_time": session.current_question_end_time.isoformat(),
+        "duration": duration,
+        "server_time": now.isoformat(),
+        "answers_locked": False,
+        "is_paused": False
     })
+    await broadcast_timer_sync(pin, session)
     return session
 
 
@@ -769,8 +862,10 @@ async def start_timer_session(
     if not quiz or session.current_question_index >= len(quiz.questions):
          raise HTTPException(status_code=400, detail="Invalid current question state.")
 
-    q = quiz.questions[session.current_question_index]
-    duration = session.question_timer_override or q.time_limit_seconds or 30
+    q_ids = get_session_question_ids(session)
+    current_q_id = q_ids[session.current_question_index] if q_ids and session.current_question_index < len(q_ids) else None
+    q = next((item for item in quiz.questions if str(item.id) == current_q_id), None) if current_q_id else quiz.questions[session.current_question_index]
+    duration = session.question_timer_override or (q.time_limit_seconds if q and q.time_limit_seconds else 30) or 30
 
     now = datetime.now(timezone.utc)
     session.current_question_started_at = now
@@ -1257,14 +1352,19 @@ async def get_session_state(
     remaining_time = 0
     if session.current_question_end_time and not session.is_paused:
         now = datetime.now(timezone.utc)
-        end_time = session.current_question_end_time.replace(tzinfo=timezone.utc)
-        remaining_time = max(0, int((end_time - now).total_seconds()))
+        end_time = session.current_question_end_time
+        if end_time.tzinfo is None:
+            end_time = end_time.replace(tzinfo=timezone.utc)
+        else:
+            end_time = end_time.astimezone(timezone.utc)
+        remaining_time = max(0, int(round((end_time - now).total_seconds())))
         
     return {
         "status": session.status,
         "current_question_index": session.current_question_index,
         "current_question_started_at": session.current_question_started_at,
         "current_question_end_time": session.current_question_end_time,
+        "current_question_duration": session.current_question_duration,
         "remaining_time": remaining_time,
         "is_paused": session.is_paused,
         "answers_locked": session.answers_locked,

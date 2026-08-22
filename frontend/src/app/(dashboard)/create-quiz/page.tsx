@@ -39,7 +39,8 @@ import {
   UploadCloud,
   Layers,
   Presentation,
-  RefreshCw
+  RefreshCw,
+  Lightbulb
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -1739,12 +1740,12 @@ function CreateQuizContent() {
       if (stepId === "questions") return quiz.questions.length > 0;
       if (stepId === "details") return !!quiz.title.trim() && !!quiz.subject.trim();
       if (stepId === "schedule") return true;
-      if (stepId === "preview") return simFinished;
+      if (stepId === "preview") return false;
       return false;
     };
 
     return (
-      <div className="glass-panel border-white/5 rounded-2xl p-4 flex items-center justify-between select-none mb-6">
+      <div className="bg-slate-100/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-4 flex items-center justify-between select-none mb-6">
         <div className="flex items-center w-full justify-around md:justify-center md:gap-12">
           {steps.map((step, idx) => {
             const isActive = activeTab === step.id;
@@ -1762,16 +1763,16 @@ function CreateQuizContent() {
                   <div
                     className={`h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
                       isActive
-                        ? "bg-indigo-500 border-indigo-500 text-white shadow-md shadow-indigo-500/20 scale-105"
+                        ? "bg-gradient-to-r from-indigo-600 to-cyan-600 border-indigo-500 text-white shadow-md shadow-indigo-500/25 scale-105"
                         : isCompleted
-                        ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                        ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
                         : isVisited
-                        ? "bg-white/10 border-white/20 text-slate-200"
-                        : "bg-white/5 border-white/5 text-slate-500"
+                        ? "bg-slate-200/70 dark:bg-slate-800/70 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300"
+                        : "bg-slate-200/40 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-600"
                     }`}
                   >
                     {isCompleted ? (
-                      <Check className="h-4 w-4 text-emerald-400 stroke-[3]" />
+                      <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 stroke-[3]" />
                     ) : (
                       step.num
                     )}
@@ -1779,12 +1780,12 @@ function CreateQuizContent() {
                   <span
                     className={`text-xs font-bold transition-colors hidden sm:inline ${
                       isActive
-                        ? "text-white"
+                        ? "text-slate-900 dark:text-white"
                         : isCompleted
-                        ? "text-emerald-400 group-hover:text-emerald-300"
+                        ? "text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-500"
                         : isVisited
-                        ? "text-slate-200 group-hover:text-white"
-                        : "text-slate-500 group-hover:text-slate-400"
+                        ? "text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white"
+                        : "text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-400"
                     }`}
                   >
                     {step.label}
@@ -1797,7 +1798,7 @@ function CreateQuizContent() {
                     className={`hidden md:block h-[2px] w-12 transition-colors ${
                       isStepCompleted(steps[idx].id)
                         ? "bg-emerald-500/30"
-                        : "bg-white/5"
+                        : "bg-slate-200 dark:bg-slate-800"
                     }`}
                   />
                 )}
@@ -1821,7 +1822,7 @@ function CreateQuizContent() {
   };
 
   return (
-    <div className="space-y-6 max-w-6xl pb-10">
+    <div className="space-y-8 max-w-5xl mx-auto w-full pb-16">
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes sound-wave-bar {
           0% { height: 3px; opacity: 0.35; }
@@ -1839,15 +1840,15 @@ function CreateQuizContent() {
             actions={
               <div className="flex gap-2 items-center">
                 <div className="hidden md:flex flex-col items-end mr-2 select-none">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Publish Readiness</span>
-                  <span className={`text-sm font-extrabold ${isReady ? "text-emerald-400" : "text-amber-400"}`}>
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Publish Readiness</span>
+                  <span className={`text-sm font-extrabold ${isReady ? "text-emerald-500 dark:text-emerald-400" : "text-amber-500 dark:text-amber-400"}`}>
                     {score}%
                   </span>
                 </div>
                 <Button
                   variant="outline"
                   onClick={handleExitEditor}
-                  className="rounded-xl border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 font-semibold px-4 cursor-pointer h-10 border flex items-center gap-2"
+                  className="rounded-xl border-slate-200 dark:border-slate-700/70 bg-slate-100/80 dark:bg-[#121c33]/80 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-[#172442] font-semibold px-4 cursor-pointer h-10 border flex items-center gap-2 transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>Exit Editor</span>
@@ -1855,7 +1856,7 @@ function CreateQuizContent() {
                 <Button
                   disabled={isSubmitting}
                   onClick={() => handleSaveQuiz("draft")}
-                  className="rounded-xl border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 font-semibold px-4 cursor-pointer h-10 border flex items-center gap-2"
+                  className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-semibold px-4 cursor-pointer h-10 flex items-center gap-2 transition-colors"
                 >
                   <Save className="h-4 w-4" />
                   <span>Save Draft</span>
@@ -1865,8 +1866,8 @@ function CreateQuizContent() {
                   onClick={() => handleSaveQuiz("published")}
                   className={`rounded-xl font-semibold px-5 h-10 flex items-center gap-2 border-none cursor-pointer transition-all ${
                     isReady 
-                      ? "bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white brand-button-glow" 
-                      : "bg-white/5 border border-white/10 text-slate-500 cursor-not-allowed opacity-50"
+                      ? "bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white shadow-md shadow-indigo-500/25" 
+                      : "bg-slate-200/60 dark:bg-slate-800/40 border border-slate-300/40 dark:border-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-60"
                   }`}
                   title={!isReady ? "Please complete all critical details before publishing" : "Publish Quiz"}
                 >
@@ -1887,7 +1888,7 @@ function CreateQuizContent() {
                 <Button
                   variant="outline"
                   onClick={() => setView("choice")}
-                  className="rounded-xl border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 font-semibold px-4 cursor-pointer h-10 border flex items-center gap-2"
+                  className="rounded-xl border-slate-200 dark:border-slate-700/70 bg-slate-100/80 dark:bg-[#121c33]/80 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-[#172442] font-semibold px-4 cursor-pointer h-10 border flex items-center gap-2 transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>Change Workflow</span>
@@ -1895,7 +1896,7 @@ function CreateQuizContent() {
               )}
               <Link
                 href="/dashboard"
-                className={buttonVariants({ variant: "outline", className: "rounded-xl border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 font-semibold px-4 cursor-pointer h-10 border flex items-center gap-2" })}
+                className={buttonVariants({ variant: "outline", className: "rounded-xl border-slate-200 dark:border-slate-700/70 bg-slate-100/80 dark:bg-[#121c33]/80 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-[#172442] font-semibold px-4 cursor-pointer h-10 border flex items-center gap-2 transition-colors" })}
               >
                 {view === "choice" && <ArrowLeft className="h-4 w-4" />}
                 <span>Back to Dashboard</span>
@@ -1917,11 +1918,11 @@ function CreateQuizContent() {
                 className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg relative overflow-hidden"
               >
                 <div className="space-y-1">
-                  <div className="text-sm font-bold text-amber-400 flex items-center gap-2">
+                  <div className="text-sm font-bold text-amber-500 dark:text-amber-400 flex items-center gap-2">
                     <span>📝</span>
                     <span>Unsaved draft found — &quot;{draftBanner.title}&quot;</span>
                   </div>
-                  <div className="text-xs text-slate-400 font-medium pl-6">
+                  <div className="text-xs text-slate-500 dark:text-slate-400 font-medium pl-6">
                     {draftBanner.questionCount} questions · saved {(() => {
                       const diffMins = Math.round((Date.now() - draftBanner.savedAt) / 60000);
                       if (diffMins < 1) return "just now";
@@ -1934,7 +1935,7 @@ function CreateQuizContent() {
                   <Button
                     onClick={handleDiscardDraft}
                     variant="outline"
-                    className="h-9 rounded-xl border-white/5 bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 text-xs font-semibold px-3 cursor-pointer"
+                    className="h-9 rounded-xl border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-semibold px-3 cursor-pointer"
                   >
                     Discard
                   </Button>
@@ -1954,104 +1955,236 @@ function CreateQuizContent() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="grid grid-cols-1 md:grid-cols-2 gap-6"
+              className="grid grid-cols-1 md:grid-cols-2 gap-7 w-full"
             >
-            {/* Manual Card */}
-            <motion.div
-              whileHover={{ y: -4 }}
-              className="glass-panel border-white/5 rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[380px] transition-all hover:border-indigo-500/30 hover:shadow-[0_0_40px_rgba(99,102,241,0.08)] group"
-            >
-              <div className="space-y-6">
-                <div className="h-14 w-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-md shadow-indigo-500/5">
-                  <PenTool className="h-7 w-7" />
-                </div>
-                <div className="space-y-2">
-                  <h3 className="text-xl font-extrabold text-white font-display tracking-tight">📝 Create Questions Manually</h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    Build assessment sessions with full edit control. Design questions step-by-step, assign distinct layouts, and configure flexible timers.
-                  </p>
-                </div>
-
-                <ul className="space-y-2.5 pt-2">
-                  <li className="flex items-center gap-2 text-xs text-slate-300">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
-                    <span>Multiple Choice, True/False & Short Answer types</span>
-                  </li>
-                  <li className="flex items-center gap-2 text-xs text-slate-300">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
-                    <span>Flexible timer configuration (overall, per-question, or both)</span>
-                  </li>
-                  <li className="flex items-center gap-2 text-xs text-slate-300">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
-                    <span>Rearrange indexes and adjust scoring parameters</span>
-                  </li>
-                  <li className="flex items-center gap-2 text-xs text-slate-300">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
-                    <span>Live test-drive simulator prior to publishing</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="pt-8">
-                <Button
-                  onClick={handleLaunchManual}
-                  className="w-full h-11 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-semibold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/10 cursor-pointer border-none transition-all group-hover:scale-[1.01]"
+              {/* Manual Creation Card */}
+              <motion.div
+                whileHover={{ y: -4 }}
+                className="group relative overflow-hidden rounded-3xl border border-indigo-500/35 bg-gradient-to-br from-slate-50 via-slate-100 to-indigo-50/50 dark:from-[#101e4a] dark:via-[#0d183f] dark:to-[#081230] p-7 md:p-8 flex flex-col justify-between min-h-[470px] shadow-[0_10px_35px_rgba(0,0,0,0.06)] dark:shadow-[0_16px_45px_rgba(6,16,51,0.7)] transition-all duration-300 hover:border-indigo-400/60 hover:shadow-[0_20px_50px_rgba(99,102,241,0.25)]"
+              >
+                {/* Subtle abstract glow and wave background */}
+                <div className="pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full bg-gradient-to-br from-indigo-500/20 via-purple-500/15 to-transparent blur-3xl group-hover:from-indigo-500/30 transition-all duration-500" />
+                <svg
+                  className="pointer-events-none absolute right-0 top-0 h-56 w-56 text-indigo-400/20 stroke-current fill-none overflow-visible opacity-40 group-hover:opacity-60 transition-opacity duration-500"
+                  viewBox="0 0 200 200"
                 >
-                  <span>Build Manually</span>
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </div>
+                  <path
+                    d="M30 180 C80 120, 120 160, 190 70"
+                    strokeWidth="1.5"
+                    strokeDasharray="4 4"
+                  />
+                  <path
+                    d="M60 200 C110 130, 150 140, 200 50"
+                    strokeWidth="1.2"
+                  />
+                  <path
+                    d="M10 150 C70 90, 140 120, 200 20"
+                    strokeWidth="1.8"
+                  />
+                  {/* Subtle decorative sparkle star */}
+                  <g transform="translate(145, 45) scale(0.6)">
+                    <path
+                      d="M0 -15 Q0 0 15 0 Q0 0 0 15 Q0 0 -15 0 Q0 0 0 -15 Z"
+                      fill="currentColor"
+                    />
+                  </g>
+                  <g transform="translate(175, 110) scale(0.4)">
+                    <path
+                      d="M0 -15 Q0 0 15 0 Q0 0 0 15 Q0 0 -15 0 Q0 0 0 -15 Z"
+                      fill="currentColor"
+                    />
+                  </g>
+                </svg>
+
+                <div className="relative z-10 space-y-6">
+                  {/* Icon Container */}
+                  <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-indigo-500/25 via-purple-500/20 to-indigo-900/40 border border-indigo-400/40 flex items-center justify-center text-indigo-400 dark:text-indigo-300 shadow-[0_4px_20px_rgba(99,102,241,0.25)] group-hover:border-indigo-400/60 group-hover:scale-105 transition-all duration-300">
+                    <svg
+                      viewBox="0 0 24 24"
+                      className="h-8 w-8 text-indigo-500 dark:text-indigo-300"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M12 19l7-7 3 3-7 7-3-3z" />
+                      <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18" />
+                      <path d="M2 2l7.586 7.586" />
+                      <circle cx="11" cy="11" r="2" />
+                    </svg>
+                  </div>
+
+                  {/* Title & Description */}
+                  <div className="space-y-2">
+                    <h3 className="text-xl md:text-[1.3rem] font-bold text-slate-900 dark:text-white font-display tracking-tight flex items-center gap-2">
+                      <span>📝</span>
+                      <span>Create Questions Manually</span>
+                    </h3>
+                    <p className="text-xs md:text-[0.8125rem] text-slate-600 dark:text-slate-300/80 leading-relaxed max-w-md">
+                      Build assessment sessions with full edit control. Design questions step-by-step, assign distinct layouts, and configure flexible timers.
+                    </p>
+                  </div>
+
+                  {/* Features List */}
+                  <ul className="space-y-3 pt-2">
+                    <li className="flex items-center gap-2.5 text-xs md:text-[0.8125rem] text-slate-700 dark:text-slate-200">
+                      <CheckCircle2 className="h-4.5 w-4.5 text-indigo-500 dark:text-indigo-400 shrink-0" />
+                      <span>Multiple Choice, True/False & Short Answer types</span>
+                    </li>
+                    <li className="flex items-center gap-2.5 text-xs md:text-[0.8125rem] text-slate-700 dark:text-slate-200">
+                      <CheckCircle2 className="h-4.5 w-4.5 text-indigo-500 dark:text-indigo-400 shrink-0" />
+                      <span>Flexible timer configuration (overall, per-question, or both)</span>
+                    </li>
+                    <li className="flex items-center gap-2.5 text-xs md:text-[0.8125rem] text-slate-700 dark:text-slate-200">
+                      <CheckCircle2 className="h-4.5 w-4.5 text-indigo-500 dark:text-indigo-400 shrink-0" />
+                      <span>Rearrange indexes and adjust scoring parameters</span>
+                    </li>
+                    <li className="flex items-center gap-2.5 text-xs md:text-[0.8125rem] text-slate-700 dark:text-slate-200">
+                      <CheckCircle2 className="h-4.5 w-4.5 text-indigo-500 dark:text-indigo-400 shrink-0" />
+                      <span>Live test-drive simulator prior to publishing</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* CTA Button */}
+                <div className="relative z-10 pt-8">
+                  <Button
+                    onClick={handleLaunchManual}
+                    className="w-full h-12 bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(79,70,229,0.3)] hover:shadow-[0_6px_25px_rgba(79,70,229,0.45)] cursor-pointer border border-indigo-400/30 transition-all group-hover:scale-[1.005]"
+                  >
+                    <span>Build Manually</span>
+                    <ArrowRight className="h-4.5 w-4.5" />
+                  </Button>
+                </div>
+              </motion.div>
+
+              {/* AI Assistant Card */}
+              <motion.div
+                whileHover={{ y: -4 }}
+                className="group relative overflow-hidden rounded-3xl border border-cyan-500/35 bg-gradient-to-br from-slate-50 via-slate-100 to-cyan-50/50 dark:from-[#0b2447] dark:via-[#081d38] dark:to-[#051428] p-7 md:p-8 flex flex-col justify-between min-h-[470px] shadow-[0_10px_35px_rgba(0,0,0,0.06)] dark:shadow-[0_16px_45px_rgba(6,16,51,0.7)] transition-all duration-300 hover:border-cyan-400/60 hover:shadow-[0_20px_50px_rgba(6,182,212,0.25)]"
+              >
+                {/* Subtle abstract glow and wave background */}
+                <div className="pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full bg-gradient-to-br from-cyan-500/20 via-teal-500/15 to-transparent blur-3xl group-hover:from-cyan-500/30 transition-all duration-500" />
+                <svg
+                  className="pointer-events-none absolute right-0 top-0 h-56 w-56 text-cyan-400/20 stroke-current fill-none overflow-visible opacity-40 group-hover:opacity-60 transition-opacity duration-500"
+                  viewBox="0 0 200 200"
+                >
+                  <path
+                    d="M20 170 C70 110, 130 150, 195 60"
+                    strokeWidth="1.5"
+                    strokeDasharray="4 4"
+                  />
+                  <path
+                    d="M50 190 C100 120, 160 130, 200 40"
+                    strokeWidth="1.2"
+                  />
+                  <path
+                    d="M10 130 C80 80, 130 110, 200 10"
+                    strokeWidth="1.8"
+                  />
+                  {/* Subtle decorative sparkle stars */}
+                  <g transform="translate(155, 35) scale(0.7)">
+                    <path
+                      d="M0 -15 Q0 0 15 0 Q0 0 0 15 Q0 0 -15 0 Q0 0 0 -15 Z"
+                      fill="currentColor"
+                    />
+                  </g>
+                  <g transform="translate(180, 95) scale(0.4)">
+                    <path
+                      d="M0 -15 Q0 0 15 0 Q0 0 0 15 Q0 0 -15 0 Q0 0 0 -15 Z"
+                      fill="currentColor"
+                    />
+                  </g>
+                </svg>
+
+                <div className="relative z-10 space-y-6">
+                  {/* Icon Container */}
+                  <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-cyan-500/25 via-teal-500/20 to-cyan-900/40 border border-cyan-400/40 flex items-center justify-center text-cyan-500 dark:text-cyan-300 shadow-[0_4px_20px_rgba(6,182,212,0.25)] group-hover:border-cyan-300/60 group-hover:scale-105 transition-all duration-300">
+                    <Sparkles className="h-8 w-8 text-cyan-500 dark:text-cyan-300" />
+                  </div>
+
+                  {/* Title & Description */}
+                  <div className="space-y-2">
+                    <h3 className="text-xl md:text-[1.3rem] font-bold text-slate-900 dark:text-white font-display tracking-tight flex items-center gap-2">
+                      <span>🤖</span>
+                      <span>Generate with AI</span>
+                    </h3>
+                    <p className="text-xs md:text-[0.8125rem] text-slate-600 dark:text-slate-300/80 leading-relaxed max-w-md">
+                      Accelerate drafting using machine learning models. Instantly synthesize high-fidelity quizzes from raw documentation or files.
+                    </p>
+                  </div>
+
+                  {/* Features List */}
+                  <ul className="space-y-3 pt-2">
+                    <li className="flex items-center gap-2.5 text-xs md:text-[0.8125rem] text-slate-700 dark:text-slate-200">
+                      <CheckCircle2 className="h-4.5 w-4.5 text-cyan-500 dark:text-cyan-400 shrink-0" />
+                      <span>Generate from PDF / Slides (PPT / PPTX)</span>
+                    </li>
+                    <li className="flex items-center gap-2.5 text-xs md:text-[0.8125rem] text-slate-700 dark:text-slate-200">
+                      <CheckCircle2 className="h-4.5 w-4.5 text-cyan-500 dark:text-cyan-400 shrink-0" />
+                      <span>Extract questions from documents (DOCX / TXT)</span>
+                    </li>
+                    <li className="flex items-center gap-2.5 text-xs md:text-[0.8125rem] text-slate-700 dark:text-slate-200">
+                      <CheckCircle2 className="h-4.5 w-4.5 text-cyan-500 dark:text-cyan-400 shrink-0" />
+                      <span>Generate directly from raw Prompt Topics</span>
+                    </li>
+                    <li className="flex items-center gap-2.5 text-xs md:text-[0.8125rem] text-slate-700 dark:text-slate-200">
+                      <CheckCircle2 className="h-4.5 w-4.5 text-cyan-500 dark:text-cyan-400 shrink-0" />
+                      <span>Synthesize based on learning outcomes</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* CTA Button */}
+                <div className="relative z-10 pt-8">
+                  <Button
+                    onClick={handleLaunchAI}
+                    className="w-full h-12 bg-gradient-to-r from-cyan-600 via-teal-500 to-cyan-600 hover:from-cyan-500 hover:to-teal-400 text-white font-semibold rounded-xl flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(6,182,212,0.3)] hover:shadow-[0_6px_25px_rgba(6,182,212,0.45)] cursor-pointer border border-cyan-400/30 transition-all group-hover:scale-[1.005]"
+                  >
+                    <span>Select AI Engine</span>
+                    <ArrowRight className="h-4.5 w-4.5" />
+                  </Button>
+                </div>
+              </motion.div>
             </motion.div>
 
-            {/* AI Assistant Card */}
+            {/* Bottom Tip Bar */}
             <motion.div
-              whileHover={{ y: -4 }}
-              className="glass-panel border-white/5 rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[380px] transition-all hover:border-cyan-500/30 hover:shadow-[0_0_40px_rgba(6,182,212,0.08)] group"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.3 }}
+              className="relative overflow-hidden rounded-2xl border border-indigo-500/25 bg-slate-100/80 dark:bg-gradient-to-r dark:from-[#101e4a]/90 dark:via-[#0d183f]/95 dark:to-[#101e4a]/90 p-4 sm:p-5 flex items-center justify-between gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(6,16,51,0.6)] backdrop-blur-md"
             >
-              <div className="space-y-6">
-                <div className="h-14 w-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 shadow-md shadow-cyan-500/5">
-                  <Sparkles className="h-7 w-7 animate-pulse" />
+              {/* Subtle background glow */}
+              <div className="pointer-events-none absolute -right-10 top-0 h-40 w-40 rounded-full bg-amber-500/10 blur-2xl" />
+
+              <div className="flex items-center gap-3.5 z-10">
+                <div className="h-11 w-11 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500 dark:text-amber-400 shrink-0 shadow-inner shadow-amber-500/10">
+                  <Lightbulb className="h-5.5 w-5.5 text-amber-500 dark:text-amber-400" />
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-xl font-extrabold text-white font-display tracking-tight">🤖 Generate with AI</h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    Accelerate drafting using machine learning models. Instantly synthesize high-fidelity quizzes from raw documentation or files.
+                <div className="space-y-0.5">
+                  <p className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
+                    Tip: You can always switch workflow anytime.
+                  </p>
+                  <p className="text-[0.75rem] sm:text-xs text-slate-500 dark:text-slate-400 font-normal">
+                    Your progress is automatically saved as you build.
                   </p>
                 </div>
-
-                <ul className="space-y-2.5 pt-2">
-                  <li className="flex items-center gap-2 text-xs text-slate-300">
-                    <Sparkles className="h-4 w-4 text-cyan-400 shrink-0" />
-                    <span>Generate from PDF / Slides (PPT / PPTX)</span>
-                  </li>
-                  <li className="flex items-center gap-2 text-xs text-slate-300">
-                    <Sparkles className="h-4 w-4 text-cyan-400 shrink-0" />
-                    <span>Extract questions from documents (DOCX / TXT)</span>
-                  </li>
-                  <li className="flex items-center gap-2 text-xs text-slate-300">
-                    <Sparkles className="h-4 w-4 text-cyan-400 shrink-0" />
-                    <span>Generate directly from raw Prompt Topics</span>
-                  </li>
-                  <li className="flex items-center gap-2 text-xs text-slate-300">
-                    <Sparkles className="h-4 w-4 text-cyan-400 shrink-0" />
-                    <span>Synthesize based on learning outcomes</span>
-                  </li>
-                </ul>
               </div>
 
-              <div className="pt-8">
-                <Button
-                  onClick={handleLaunchAI}
-                  className="w-full h-11 bg-white/5 border border-white/10 hover:border-cyan-500/30 hover:bg-white/10 text-white font-semibold rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all group-hover:scale-[1.01]"
-                >
-                  <span>Select AI Engine</span>
-                  <ArrowRight className="h-4 w-4 text-cyan-400" />
-                </Button>
+              {/* Decorative golden stars on the right */}
+              <div className="hidden sm:flex items-center gap-6 pr-4 opacity-40 pointer-events-none text-amber-500 dark:text-amber-400">
+                <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+                  <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
+                </svg>
+                <svg className="h-3.5 w-3.5 fill-current opacity-70" viewBox="0 0 24 24">
+                  <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
+                </svg>
               </div>
             </motion.div>
-          </motion.div>
-        </div>
-      )}
+          </div>
+        )}
 
         {/* LOADING ANIMATIONS */}
         {view === "loading" && (
@@ -2060,7 +2193,7 @@ function CreateQuizContent() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="glass-panel border-white/5 rounded-3xl p-12 flex flex-col items-center justify-center min-h-[400px] shadow-2xl"
+            className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-12 flex flex-col items-center justify-center min-h-[400px] shadow-2xl"
           >
             <AILoader
               steps={
@@ -2094,23 +2227,23 @@ function CreateQuizContent() {
           >
             {/* Left Column: AI Parameters */}
             <div className="lg:col-span-1 space-y-6">
-              <div className="glass-panel border-white/5 rounded-2xl p-6 space-y-4">
-                <h3 className="text-base font-bold text-white flex items-center gap-2">
-                  <Sparkles className="h-4.5 w-4.5 text-cyan-400" />
+              <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-6 space-y-4">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Sparkles className="h-4.5 w-4.5 text-cyan-500 dark:text-cyan-400" />
                   <span>AI Engine Settings</span>
                 </h3>
 
                 <div className="space-y-4">
                   {/* Provider Select */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-400">AI Model Provider</label>
+                    <label className="text-xs font-bold text-slate-600 dark:text-slate-400">AI Model Provider</label>
                     <select
                       value={aiProvider}
                       onChange={(e) => {
                         setAiProvider(e.target.value);
                         setAiModel(""); // Reset specific model
                       }}
-                      className="w-full bg-slate-900 border border-white/10 rounded-xl h-11 px-3 text-slate-300 font-medium text-sm focus:border-cyan-500/50 outline-none"
+                      className="w-full bg-slate-100/80 dark:bg-[#121c33]/85 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 px-3 text-slate-800 dark:text-slate-200 font-medium text-sm focus:border-cyan-500/50 outline-none"
                     >
                       {providers.map((p) => {
                         let label = p.name;
@@ -2126,7 +2259,7 @@ function CreateQuizContent() {
                           label = "🛠️ Mock Engine";
                         }
                         return (
-                          <option key={p.id} value={p.id}>
+                          <option key={p.id} value={p.id} className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">
                             {label}
                           </option>
                         );
@@ -2137,7 +2270,7 @@ function CreateQuizContent() {
                   {/* Model input (optional override) */}
                   {aiProvider !== "mock" && (
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-400">Specific Model Override (Optional)</label>
+                      <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Specific Model Override (Optional)</label>
                       <Input
                         type="text"
                         value={aiModel}
@@ -2151,75 +2284,75 @@ function CreateQuizContent() {
                             ? "e.g. gpt-4o-mini" 
                             : "Leave blank for default"
                         }
-                        className="bg-white/3 border-white/10 rounded-xl h-11 text-white font-medium text-sm focus:border-cyan-500/50"
+                        className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-cyan-500/50"
                       />
                     </div>
                   )}
 
                   {/* Question Count */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-400">Question Count</label>
+                    <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Question Count</label>
                     <Input
                       type="number"
                       value={questionCount}
                       onChange={(e) => setQuestionCount(Math.max(1, Math.min(30, Number(e.target.value))))}
                       min={1}
                       max={30}
-                      className="bg-white/3 border-white/10 rounded-xl h-11 text-white font-medium text-sm focus:border-cyan-500/50"
+                      className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-cyan-500/50"
                     />
                   </div>
 
                   {/* Difficulty */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-400">Difficulty</label>
+                    <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Difficulty</label>
                     <select
                       value={difficulty}
                       onChange={(e) => setDifficulty(e.target.value as "easy" | "medium" | "hard")}
-                      className="w-full bg-slate-900 border border-white/10 rounded-xl h-11 px-3 text-slate-300 font-medium text-sm focus:border-cyan-500/50 outline-none"
+                      className="w-full bg-slate-100/80 dark:bg-[#121c33]/85 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 px-3 text-slate-800 dark:text-slate-200 font-medium text-sm focus:border-cyan-500/50 outline-none"
                     >
-                      <option value="easy">Easy</option>
-                      <option value="medium">Medium</option>
-                      <option value="hard">Hard</option>
+                      <option value="easy" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Easy</option>
+                      <option value="medium" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Medium</option>
+                      <option value="hard" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Hard</option>
                     </select>
                   </div>
 
                   {/* Quiz Style */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-400">Quiz Style</label>
+                    <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Quiz Style</label>
                     <select
                       value={quizStyle}
                       onChange={(e) => setQuizStyle(e.target.value)}
-                      className="w-full bg-slate-900 border border-white/10 rounded-xl h-11 px-3 text-slate-300 font-medium text-sm focus:border-cyan-500/50 outline-none"
+                      className="w-full bg-slate-100/80 dark:bg-[#121c33]/85 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 px-3 text-slate-800 dark:text-slate-200 font-medium text-sm focus:border-cyan-500/50 outline-none"
                     >
-                      <option value="mixed">Mixed (Standard)</option>
-                      <option value="exam">Exam Mode</option>
-                      <option value="interview">Interview Mode</option>
-                      <option value="competitive">Competitive Exam (UPSC/GATE)</option>
-                      <option value="college">College Test</option>
-                      <option value="scenario">Scenario Based</option>
-                      <option value="case_study">Case Study</option>
-                      <option value="puzzle">Puzzle</option>
-                      <option value="logical_reasoning">Logical Reasoning</option>
+                      <option value="mixed" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Mixed (Standard)</option>
+                      <option value="exam" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Exam Mode</option>
+                      <option value="interview" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Interview Mode</option>
+                      <option value="competitive" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Competitive Exam (UPSC/GATE)</option>
+                      <option value="college" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">College Test</option>
+                      <option value="scenario" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Scenario Based</option>
+                      <option value="case_study" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Case Study</option>
+                      <option value="puzzle" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Puzzle</option>
+                      <option value="logical_reasoning" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Logical Reasoning</option>
                     </select>
                   </div>
 
                   {/* Quality Strategy */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-400">Generation Quality Mode</label>
+                    <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Generation Quality Mode</label>
                     <select
                       value={questionQuality}
                       onChange={(e) => setQuestionQuality(e.target.value as "fast" | "balanced" | "premium")}
-                      className="w-full bg-slate-900 border border-white/10 rounded-xl h-11 px-3 text-slate-300 font-medium text-sm focus:border-cyan-500/50 outline-none"
+                      className="w-full bg-slate-100/80 dark:bg-[#121c33]/85 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 px-3 text-slate-800 dark:text-slate-200 font-medium text-sm focus:border-cyan-500/50 outline-none"
                     >
-                      <option value="fast">Fast (Lower latency, simple questions)</option>
-                      <option value="balanced">Balanced (Standard reasoning)</option>
-                      <option value="premium">Premium (Double prompt validation checks)</option>
+                      <option value="fast" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Fast (Lower latency, simple questions)</option>
+                      <option value="balanced" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Balanced (Standard reasoning)</option>
+                      <option value="premium" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Premium (Double prompt validation checks)</option>
                     </select>
                   </div>
 
                   {/* Question Types Checkboxes */}
-                  <div className="space-y-2 pt-2 border-t border-white/5">
-                    <label className="text-xs font-bold text-slate-400 block">Question Formats</label>
+                  <div className="space-y-2 pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
+                    <label className="text-xs font-bold text-slate-600 dark:text-slate-400 block">Question Formats</label>
                     {[
                       { id: "multiple_choice", label: "Multiple Choice" },
                       { id: "multiple_select", label: "Multiple Select" },
@@ -2228,7 +2361,7 @@ function CreateQuizContent() {
                       { id: "short_answer", label: "Short Answer" }
                     ].map(type => (
                       <div key={type.id} className="flex items-center justify-between">
-                        <span className="text-xs text-slate-300">{type.label}</span>
+                        <span className="text-xs text-slate-700 dark:text-slate-300 font-medium">{type.label}</span>
                         <input
                           type="checkbox"
                           checked={questionTypes.includes(type.id)}
@@ -2243,18 +2376,18 @@ function CreateQuizContent() {
                               }
                             }
                           }}
-                          className="h-4 w-4 rounded text-cyan-600 focus:ring-cyan-500 cursor-pointer"
+                          className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-cyan-600 focus:ring-cyan-500 cursor-pointer"
                         />
                       </div>
                     ))}
                   </div>
 
                   {/* Bloom Taxonomy levels */}
-                  <div className="space-y-2 pt-2 border-t border-white/5">
-                    <label className="text-xs font-bold text-slate-400 block">Bloom&apos;s Taxonomy levels</label>
+                  <div className="space-y-2 pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
+                    <label className="text-xs font-bold text-slate-600 dark:text-slate-400 block">Bloom&apos;s Taxonomy levels</label>
                     {["Remember", "Understand", "Apply", "Analyze", "Evaluate", "Create"].map(level => (
                       <div key={level} className="flex items-center justify-between">
-                        <span className="text-xs text-slate-300">{level}</span>
+                        <span className="text-xs text-slate-700 dark:text-slate-300 font-medium">{level}</span>
                         <input
                           type="checkbox"
                           checked={bloomLevels.includes(level)}
@@ -2269,28 +2402,28 @@ function CreateQuizContent() {
                               }
                             }
                           }}
-                          className="h-4 w-4 rounded text-cyan-600 focus:ring-cyan-500 cursor-pointer"
+                          className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-cyan-600 focus:ring-cyan-500 cursor-pointer"
                         />
                       </div>
                     ))}
                   </div>
 
                   {/* Course Outcomes */}
-                  <div className="space-y-1.5 pt-2 border-t border-white/5">
-                    <label className="text-xs font-bold text-slate-400">Course / Learning Outcome mapping</label>
+                  <div className="space-y-1.5 pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
+                    <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Course / Learning Outcome mapping</label>
                     <Input
                       type="text"
                       value={courseOutcomes}
                       onChange={(e) => setCourseOutcomes(e.target.value)}
                       placeholder="e.g. CO1, CO2, LO3"
-                      className="bg-white/3 border-white/10 rounded-xl h-11 text-white font-medium text-sm focus:border-cyan-500/50"
+                      className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-cyan-500/50"
                     />
                   </div>
 
                   {/* Optional Quiz Metadata */}
-                  <div className="space-y-3 pt-3 border-t border-white/5">
-                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                      <FileText className="h-3.5 w-3.5 text-cyan-400" />
+                  <div className="space-y-3 pt-3 border-t border-slate-200/80 dark:border-slate-800/80">
+                    <h4 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <FileText className="h-3.5 w-3.5 text-cyan-500 dark:text-cyan-400" />
                       <span>Quiz Metadata (Optional)</span>
                     </h4>
                     <div className="space-y-1">
@@ -2300,7 +2433,7 @@ function CreateQuizContent() {
                         value={quiz.title}
                         onChange={(e) => setQuiz({ ...quiz, title: e.target.value })}
                         placeholder="Leave blank to generate automatically"
-                        className="bg-white/3 border-white/10 rounded-xl h-10 text-white font-medium text-xs focus:border-cyan-500/50"
+                        className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-10 text-slate-900 dark:text-white font-medium text-xs focus:border-cyan-500/50"
                       />
                     </div>
                     <div className="space-y-1">
@@ -2310,7 +2443,7 @@ function CreateQuizContent() {
                         value={quiz.subject}
                         onChange={(e) => setQuiz({ ...quiz, subject: e.target.value })}
                         placeholder="Leave blank to generate automatically"
-                        className="bg-white/3 border-white/10 rounded-xl h-10 text-white font-medium text-xs focus:border-cyan-500/50"
+                        className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-10 text-slate-900 dark:text-white font-medium text-xs focus:border-cyan-500/50"
                       />
                     </div>
                     <div className="space-y-1">
@@ -2320,7 +2453,7 @@ function CreateQuizContent() {
                         onChange={(e) => setQuiz({ ...quiz, description: e.target.value })}
                         placeholder="Leave blank to generate automatically"
                         rows={2}
-                        className="w-full bg-slate-900 border border-white/10 rounded-xl p-2 text-white font-medium text-xs focus:border-cyan-500/50 outline-none transition-colors resize-none"
+                        className="w-full bg-slate-100/80 dark:bg-[#121c33]/85 border border-slate-200 dark:border-slate-700/60 rounded-xl p-2.5 text-slate-900 dark:text-white font-medium text-xs focus:border-cyan-500/50 outline-none transition-colors resize-none"
                       />
                     </div>
                   </div>
@@ -2330,14 +2463,14 @@ function CreateQuizContent() {
 
             {/* Right Column: Source Material Configuration */}
             <div className="lg:col-span-2 space-y-6">
-              <div className="glass-panel border-white/5 rounded-2xl p-6 space-y-6">
-                <h3 className="text-base font-bold text-white flex items-center gap-2">
-                  <FileText className="h-4.5 w-4.5 text-indigo-400" />
+              <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-6 space-y-6">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <FileText className="h-4.5 w-4.5 text-indigo-500 dark:text-indigo-400" />
                   <span>Context Source Material</span>
                 </h3>
 
                 {/* Source Selection Tabs */}
-                <div className="flex border-b border-white/5 gap-6">
+                <div className="flex border-b border-slate-200/80 dark:border-slate-800/80 gap-6">
                   {[
                     { id: "topic", label: "Topic Prompt", icon: MessageSquare },
                     { id: "text", label: "Pasted Text", icon: FileText },
@@ -2349,8 +2482,8 @@ function CreateQuizContent() {
                       onClick={() => setSourceType(tab.id as "topic" | "text" | "file")}
                       className={`flex items-center gap-2 pb-3 text-xs font-bold border-b-2 transition-colors cursor-pointer ${
                         sourceType === tab.id
-                          ? "text-cyan-400 border-cyan-400"
-                          : "text-slate-400 border-transparent hover:text-slate-200"
+                          ? "text-cyan-600 dark:text-cyan-400 border-cyan-500 dark:border-cyan-400"
+                          : "text-slate-500 dark:text-slate-400 border-transparent hover:text-slate-800 dark:hover:text-slate-200"
                       }`}
                     >
                       <tab.icon className="h-4 w-4" />
@@ -2364,17 +2497,17 @@ function CreateQuizContent() {
                     <div className="space-y-6">
                       <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                          <label className="text-xs font-bold text-slate-400">AI Prompt Assistant</label>
+                          <label className="text-xs font-bold text-slate-700 dark:text-slate-300">AI Prompt Assistant</label>
                           <p className="text-[10px] text-slate-500 font-medium">Formulate your assessment request using natural language or voice.</p>
                         </div>
-                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[10px] font-bold uppercase tracking-wider select-none">
+                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400 text-[10px] font-bold uppercase tracking-wider select-none">
                           <Sparkles className="h-3 w-3 motion-safe:animate-pulse" />
                           <span>AI Powered</span>
                         </div>
                       </div>
 
                       {/* --- Premium Prompt Composer Container --- */}
-                      <div className="relative group rounded-2xl border border-white/10 bg-white/3 focus-within:border-purple-500/50 focus-within:ring-4 focus-within:ring-purple-500/15 transition-all duration-300 overflow-hidden">
+                      <div className="relative group rounded-2xl border border-slate-200 dark:border-slate-700/70 bg-slate-100/60 dark:bg-[#111a30]/80 focus-within:border-purple-500/60 focus-within:ring-4 focus-within:ring-purple-500/10 transition-all duration-300 overflow-hidden">
                         <textarea
                           ref={textareaRef}
                           value={topic}
@@ -2383,7 +2516,7 @@ function CreateQuizContent() {
                           disabled={enhancementLoading}
                           rows={3}
                           aria-label="AI Prompt Assistant Composer"
-                          className="w-full bg-transparent border-0 rounded-2xl p-4 text-white font-medium text-sm focus:ring-0 outline-none resize-none min-h-[96px] placeholder:text-slate-500 placeholder:font-medium leading-relaxed"
+                          className="w-full bg-transparent border-0 rounded-2xl p-4 text-slate-900 dark:text-white font-medium text-sm focus:ring-0 outline-none resize-none min-h-[96px] placeholder:text-slate-400 dark:placeholder:text-slate-500 placeholder:font-medium leading-relaxed"
                           onKeyDown={(e) => {
                             if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
                               e.preventDefault();
@@ -2409,12 +2542,12 @@ function CreateQuizContent() {
                       {/* Character Count & Shortcuts bar */}
                       <div className="flex items-center justify-between text-[10px] font-semibold text-slate-500 px-1 select-none">
                         <span>Characters: {topic.length}</span>
-                        <span>Press <kbd className="font-mono bg-white/5 px-1 py-0.5 rounded border border-white/5 text-[9px]">{osLabel}</kbd> + <kbd className="font-mono bg-white/5 px-1 py-0.5 rounded border border-white/5 text-[9px]">Enter</kbd> to preview</span>
+                        <span>Press <kbd className="font-mono bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded border border-slate-300 dark:border-slate-700 text-[9px] text-slate-700 dark:text-slate-300">{osLabel}</kbd> + <kbd className="font-mono bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded border border-slate-300 dark:border-slate-700 text-[9px] text-slate-700 dark:text-slate-300">Enter</kbd> to preview</span>
                       </div>
 
                       {/* Retry Option Banner if last call failed */}
                       {lastFailedPrompt && !enhancementLoading && (
-                        <div className="flex items-center justify-between p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs w-full">
+                        <div className="flex items-center justify-between p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-300 text-xs w-full">
                           <div className="flex items-center gap-2">
                             <AlertCircle className="h-4 w-4 text-amber-500 shrink-0" />
                             <span className="font-medium">The last AI prompt enhancement request encountered a network or API issue.</span>
@@ -2422,7 +2555,7 @@ function CreateQuizContent() {
                           <button
                             type="button"
                             onClick={handleEnhancePrompt}
-                            className="px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[10px] font-bold border border-amber-500/30 cursor-pointer transition-colors"
+                            className="px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-700 dark:text-amber-300 text-[10px] font-bold border border-amber-500/30 cursor-pointer transition-colors"
                           >
                             Retry Enhancement
                           </button>
@@ -2436,11 +2569,11 @@ function CreateQuizContent() {
                             type="button"
                             disabled={enhancementLoading || isRecording || !topic.trim()}
                             onClick={handleEnhancePrompt}
-                            className="h-10 px-4 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 font-semibold text-xs border border-purple-500/20 cursor-pointer flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="h-10 px-4 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-300 font-semibold text-xs border border-purple-500/20 cursor-pointer flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                           >
                             {enhancementLoading ? (
                               <>
-                                <svg className="animate-spin h-3.5 w-3.5 text-purple-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <svg className="animate-spin h-3.5 w-3.5 text-purple-500 dark:text-purple-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
@@ -2448,7 +2581,7 @@ function CreateQuizContent() {
                               </>
                             ) : (
                               <>
-                                <Sparkles className="h-3.5 w-3.5 text-purple-400" />
+                                <Sparkles className="h-3.5 w-3.5 text-purple-500 dark:text-purple-400" />
                                 <span>Enhance with AI</span>
                               </>
                             )}
@@ -2458,23 +2591,23 @@ function CreateQuizContent() {
                             type="button"
                             disabled={!topic.trim() || isRecording}
                             onClick={() => setIsPreviewOpen(true)}
-                            className="h-10 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/5 cursor-pointer flex items-center gap-2"
+                            className="h-10 px-4 rounded-xl bg-slate-100 dark:bg-[#121c33] hover:bg-slate-200 dark:hover:bg-[#182645] text-slate-700 dark:text-slate-300 font-semibold text-xs border border-slate-200 dark:border-slate-700/60 cursor-pointer flex items-center gap-2 transition-colors"
                           >
-                            <FileText className="h-3.5 w-3.5 text-indigo-400" />
+                            <FileText className="h-3.5 w-3.5 text-indigo-500 dark:text-indigo-400" />
                             <span>Preview Prompt</span>
                           </Button>
 
                           <Button
                             type="button"
                             onClick={isRecording ? stopRecording : startRecording}
-                            className={`h-10 px-4 rounded-xl font-semibold text-xs border border-white/5 cursor-pointer flex items-center gap-2 transition-all duration-200 ${
+                            className={`h-10 px-4 rounded-xl font-semibold text-xs border border-slate-200 dark:border-slate-700/60 cursor-pointer flex items-center gap-2 transition-all duration-200 ${
                               isRecording
                                 ? "bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-500/25"
-                                : "bg-white/5 hover:bg-white/10 text-slate-300"
+                                : "bg-slate-100 dark:bg-[#121c33] hover:bg-slate-200 dark:hover:bg-[#182645] text-slate-700 dark:text-slate-300"
                             }`}
                             title={isRecording ? "Stop voice input" : "Voice input (Speech-to-text)"}
                           >
-                            <Mic className={`h-3.5 w-3.5 ${isRecording ? "text-white motion-safe:animate-pulse" : "text-rose-400"}`} />
+                            <Mic className={`h-3.5 w-3.5 ${isRecording ? "text-white motion-safe:animate-pulse" : "text-rose-500 dark:text-rose-400"}`} />
                             <span>{isRecording ? "Stop Recording" : "Voice Input"}</span>
                           </Button>
 
@@ -2482,25 +2615,25 @@ function CreateQuizContent() {
                             type="button"
                             disabled={isRecording}
                             onClick={() => setSourceType("file")}
-                            className="h-10 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/5 cursor-pointer flex items-center gap-2"
+                            className="h-10 px-4 rounded-xl bg-slate-100 dark:bg-[#121c33] hover:bg-slate-200 dark:hover:bg-[#182645] text-slate-700 dark:text-slate-300 font-semibold text-xs border border-slate-200 dark:border-slate-700/60 cursor-pointer flex items-center gap-2 transition-colors"
                             title="Switch to document upload mode"
                           >
-                            <Plus className="h-3.5 w-3.5 text-cyan-400" />
+                            <Plus className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400" />
                             <span>Upload PDF / Slides</span>
                           </Button>
                         </div>
 
                         {/* Recommendations panel */}
                         {recommendation && (
-                          <div className="flex items-center gap-2 p-2 rounded-xl bg-purple-500/5 border border-purple-500/10 text-slate-300 text-xs w-full sm:w-auto">
-                            <div className="text-[10px] font-bold text-purple-400 uppercase shrink-0">Recommendation:</div>
-                            <div className="truncate font-semibold text-[11px] text-slate-400">
+                          <div className="flex items-center gap-2 p-2 rounded-xl bg-purple-500/5 dark:bg-purple-950/20 border border-purple-500/15 text-slate-700 dark:text-slate-300 text-xs w-full sm:w-auto">
+                            <div className="text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase shrink-0">Recommendation:</div>
+                            <div className="truncate font-semibold text-[11px] text-slate-600 dark:text-slate-400">
                               {recommendation.questionCount} Qs • {recommendation.difficulty} • {recommendation.duration} mins
                             </div>
                             <button
                               type="button"
                               onClick={applySuggestions}
-                              className="ml-auto px-2 py-1 rounded bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 text-[10px] font-bold border border-purple-500/35 cursor-pointer transition-colors"
+                              className="ml-auto px-2 py-1 rounded bg-purple-500/20 hover:bg-purple-500/30 text-purple-600 dark:text-purple-300 text-[10px] font-bold border border-purple-500/35 cursor-pointer transition-colors"
                             >
                               Apply
                             </button>
@@ -2509,20 +2642,20 @@ function CreateQuizContent() {
                       </div>
 
                       {/* --- AI Capability Cards --- */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-white/5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-slate-200/80 dark:border-slate-800/80">
                         {[
-                          { title: "🎤 Voice Input", desc: "Speak naturally", color: "hover:border-rose-500/20 hover:bg-rose-500/5 border-white/5 bg-white/3" },
-                          { title: "✨ AI Enhancement", desc: "Improve prompts automatically", color: "hover:border-purple-500/20 hover:bg-purple-500/5 border-white/5 bg-white/3" },
-                          { title: "⚡ Auto Fill", desc: "Suggest optimal quiz settings", color: "hover:border-cyan-500/20 hover:bg-cyan-500/5 border-white/5 bg-white/3" },
-                          { title: "🎯 Better Results", desc: "Higher quality AI-generated quizzes", color: "hover:border-emerald-500/20 hover:bg-emerald-500/5 border-white/5 bg-white/3" }
+                          { title: "🎤 Voice Input", desc: "Speak naturally", color: "hover:border-rose-500/30 hover:bg-rose-500/5 border-slate-200 dark:border-slate-800/80 bg-slate-100/50 dark:bg-[#111a30]/60" },
+                          { title: "✨ AI Enhancement", desc: "Improve prompts automatically", color: "hover:border-purple-500/30 hover:bg-purple-500/5 border-slate-200 dark:border-slate-800/80 bg-slate-100/50 dark:bg-[#111a30]/60" },
+                          { title: "⚡ Auto Fill", desc: "Suggest optimal quiz settings", color: "hover:border-cyan-500/30 hover:bg-cyan-500/5 border-slate-200 dark:border-slate-800/80 bg-slate-100/50 dark:bg-[#111a30]/60" },
+                          { title: "🎯 Better Results", desc: "Higher quality AI-generated quizzes", color: "hover:border-emerald-500/30 hover:bg-emerald-500/5 border-slate-200 dark:border-slate-800/80 bg-slate-100/50 dark:bg-[#111a30]/60" }
                         ].map((card, idx) => (
                           <motion.div
                             key={idx}
                             whileHover={{ scale: 1.02, translateY: -2 }}
                             className={`p-4 rounded-2xl border cursor-default select-none transition-all duration-200 flex flex-col space-y-1 ${card.color}`}
                           >
-                            <h4 className="text-xs font-extrabold text-white">{card.title}</h4>
-                            <p className="text-[10px] font-semibold text-slate-500 leading-normal">{card.desc}</p>
+                            <h4 className="text-xs font-extrabold text-slate-900 dark:text-white">{card.title}</h4>
+                            <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 leading-normal">{card.desc}</p>
                           </motion.div>
                         ))}
                       </div>
@@ -2531,13 +2664,13 @@ function CreateQuizContent() {
 
                   {sourceType === "text" && (
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-400">Pasted Reference Content</label>
+                      <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Pasted Reference Content</label>
                       <textarea
                         value={text}
                         onChange={(e) => setText(e.target.value)}
                         placeholder="Paste guidelines details, textbook excerpts, or notes here..."
                         rows={6}
-                        className="w-full bg-white/3 border border-white/10 rounded-xl p-3 text-white font-medium text-sm focus:border-cyan-500/50 outline-none"
+                        className="w-full bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl p-3 text-slate-900 dark:text-white font-medium text-sm focus:border-cyan-500/50 outline-none"
                       />
                     </div>
                   )}
@@ -2545,8 +2678,8 @@ function CreateQuizContent() {
                   {sourceType === "file" && (
                     <div className="space-y-6">
                       <div className="text-center max-w-md mx-auto space-y-2 select-none">
-                        <h3 className="text-base font-bold text-white font-display">Choose Document Source</h3>
-                        <p className="text-xs text-slate-400">
+                        <h3 className="text-base font-bold text-slate-900 dark:text-white font-display">Choose Document Source</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
                           Upload your reference material to let the AI analyze and generate contextually accurate questions.
                         </p>
                       </div>
@@ -2576,20 +2709,20 @@ function CreateQuizContent() {
                             }}
                             className={`border-2 border-dashed rounded-3xl p-10 text-center transition-all duration-300 flex flex-col items-center justify-center space-y-4 ${
                               aiLoading 
-                                ? "opacity-50 cursor-not-allowed border-white/5 bg-white/1" 
+                                ? "opacity-50 cursor-not-allowed border-slate-200 dark:border-slate-800 bg-slate-100/30 dark:bg-slate-900/20" 
                                 : isDragging
                                 ? "border-cyan-500 bg-cyan-500/10 scale-[1.01] shadow-[0_0_25px_rgba(6,182,212,0.15)] cursor-pointer"
-                                : "border-white/10 bg-white/1 hover:bg-white/2 hover:border-cyan-500/40 hover:scale-[1.005] cursor-pointer"
+                                : "border-slate-300 dark:border-slate-700/80 bg-slate-100/50 dark:bg-[#111a30]/50 hover:bg-slate-100 dark:hover:bg-[#15203c] hover:border-cyan-500/50 hover:scale-[1.005] cursor-pointer"
                             }`}
                           >
-                            <div className="h-14 w-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 shadow-lg shadow-cyan-500/5">
+                            <div className="h-14 w-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-600 dark:text-cyan-400 shadow-lg shadow-cyan-500/5">
                               <UploadCloud className="h-7 w-7" />
                             </div>
                             <div className="space-y-1">
-                              <h4 className="text-sm font-bold text-white">Drag & Drop Here</h4>
-                              <p className="text-xs text-slate-400 font-medium">or click this card to browse files</p>
+                              <h4 className="text-sm font-bold text-slate-900 dark:text-white">Drag & Drop Here</h4>
+                              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">or click this card to browse files</p>
                             </div>
-                            <div className="text-[10px] text-slate-500 font-semibold tracking-wider uppercase select-none pt-3 border-t border-white/5 w-full">
+                            <div className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold tracking-wider uppercase select-none pt-3 border-t border-slate-200/80 dark:border-slate-800/80 w-full">
                               Supported Formats: .pdf, .ppt, .pptx · Max size: 20 MB
                             </div>
                             
@@ -2609,8 +2742,8 @@ function CreateQuizContent() {
 
                           {/* Friendly Validation Error Message Inline */}
                           {validationError && (
-                            <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-semibold flex items-start gap-2.5 max-w-md mx-auto leading-normal">
-                              <AlertCircle className="h-4.5 w-4.5 shrink-0 text-rose-400 mt-0.5" />
+                            <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-300 text-xs font-semibold flex items-start gap-2.5 max-w-md mx-auto leading-normal">
+                              <AlertCircle className="h-4.5 w-4.5 shrink-0 text-rose-500 dark:text-rose-400 mt-0.5" />
                               <span>{validationError}</span>
                             </div>
                           )}
@@ -2621,9 +2754,9 @@ function CreateQuizContent() {
                               type="button"
                               disabled={aiLoading}
                               onClick={() => pdfFileInputRef.current?.click()}
-                              className="h-11 rounded-xl border border-white/10 bg-white/3 hover:bg-white/10 hover:border-cyan-500/30 text-slate-200 font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                              className="h-11 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-slate-100 dark:bg-[#121c33] hover:bg-slate-200 dark:hover:bg-[#182645] hover:border-cyan-500/30 text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                             >
-                              <FileText className="h-4 w-4 text-rose-400" />
+                              <FileText className="h-4 w-4 text-rose-500 dark:text-rose-400" />
                               <span>Upload PDF</span>
                               <input
                                 type="file"
@@ -2643,9 +2776,9 @@ function CreateQuizContent() {
                               type="button"
                               disabled={aiLoading}
                               onClick={() => pptFileInputRef.current?.click()}
-                              className="h-11 rounded-xl border border-white/10 bg-white/3 hover:bg-white/10 hover:border-cyan-500/30 text-slate-200 font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                              className="h-11 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-slate-100 dark:bg-[#121c33] hover:bg-slate-200 dark:hover:bg-[#182645] hover:border-cyan-500/30 text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                             >
-                              <Presentation className="h-4 w-4 text-amber-400" />
+                              <Presentation className="h-4 w-4 text-amber-500 dark:text-amber-400" />
                               <span>Upload PPT / PPTX</span>
                               <input
                                 type="file"
@@ -2664,29 +2797,29 @@ function CreateQuizContent() {
                         </div>
                       ) : (
                         /* Uploaded file preview card (Premium Styling) */
-                        <div className="max-w-md mx-auto p-5 rounded-2xl bg-white/3 border border-white/10 space-y-4 shadow-2xl relative overflow-hidden">
-                          <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+                        <div className="max-w-md mx-auto p-5 rounded-2xl bg-slate-100/80 dark:bg-[#121c33]/85 border border-slate-200 dark:border-slate-700/80 space-y-4 shadow-xl relative overflow-hidden">
+                          <div className="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80 pb-3">
+                            <span className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                               Uploaded Document
                             </span>
-                            <span className="flex items-center gap-1 text-[10px] font-extrabold text-emerald-400 uppercase tracking-wider bg-emerald-500/10 px-2.5 py-1 rounded-md select-none">
+                            <span className="flex items-center gap-1 text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider bg-emerald-500/10 px-2.5 py-1 rounded-md select-none">
                               <Check className="h-3.5 w-3.5" /> Ready
                             </span>
                           </div>
                           
                           <div className="flex items-center gap-4">
-                            <div className="h-12 w-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 shrink-0 select-none">
+                            <div className="h-12 w-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-600 dark:text-cyan-400 shrink-0 select-none">
                               {selectedFiles[0]?.name.toLowerCase().endsWith(".pdf") ? (
-                                <FileText className="h-6 w-6 text-rose-400 animate-pulse" />
+                                <FileText className="h-6 w-6 text-rose-500 dark:text-rose-400 animate-pulse" />
                               ) : (
-                                <Presentation className="h-6 w-6 text-amber-400 animate-pulse" />
+                                <Presentation className="h-6 w-6 text-amber-500 dark:text-amber-400 animate-pulse" />
                               )}
                             </div>
                             <div className="space-y-1 min-w-0 flex-1">
-                              <div className="text-sm font-extrabold text-white truncate">
+                              <div className="text-sm font-extrabold text-slate-900 dark:text-white truncate">
                                 {selectedFiles[0]?.name}
                               </div>
-                              <div className="text-xs font-semibold text-slate-400">
+                              <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                                 {selectedFiles[0] ? (selectedFiles[0].size / 1024 / 1024).toFixed(2) : 0} MB
                               </div>
                             </div>
@@ -2705,9 +2838,9 @@ function CreateQuizContent() {
                                   pptFileInputRef.current?.click();
                                 }
                               }}
-                              className="flex-1 h-9 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-cyan-500/30 text-slate-200 font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                              className="flex-1 h-9 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-200/60 dark:bg-slate-800/80 hover:bg-slate-300/60 dark:hover:bg-slate-700 hover:border-cyan-500/30 text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                             >
-                              <RotateCcw className="h-3.5 w-3.5 text-cyan-400" />
+                              <RotateCcw className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400" />
                               <span>Replace</span>
                             </Button>
                             <Button
@@ -2717,7 +2850,7 @@ function CreateQuizContent() {
                                 setSelectedFiles([]);
                                 setValidationError(null);
                               }}
-                              className="h-9 w-20 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                              className="h-9 w-20 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                               <Trash2 className="h-3.5 w-3.5" />
                               <span>Remove</span>
@@ -2730,27 +2863,27 @@ function CreateQuizContent() {
                 </div>
 
                 {/* Additional instructions */}
-                <div className="space-y-4 pt-4 border-t border-white/5">
+                <div className="space-y-4 pt-4 border-t border-slate-200/80 dark:border-slate-800/80">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-400">Custom Instructor Instructions (Optional)</label>
+                    <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Custom Instructor Instructions (Optional)</label>
                     <textarea
                       value={customPrompt}
                       onChange={(e) => setCustomPrompt(e.target.value)}
                       placeholder="e.g. 'Use scenario-based application questions', 'Avoid math calculation equations'..."
                       rows={2}
-                      className="w-full bg-white/3 border border-white/10 rounded-xl p-3 text-white font-medium text-xs focus:border-cyan-500/50 outline-none"
+                      className="w-full bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl p-3 text-slate-900 dark:text-white font-medium text-xs focus:border-cyan-500/50 outline-none"
                     />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-400">Specify Question Distribution (Optional)</label>
+                      <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Specify Question Distribution (Optional)</label>
                       <Input
                         type="text"
                         value={questionDistribution}
                         onChange={(e) => setQuestionDistribution(e.target.value)}
                         placeholder="e.g. 40% Easy, 60% Medium..."
-                        className="bg-white/3 border-white/10 rounded-xl h-11 text-white font-medium text-xs focus:border-cyan-500/50"
+                        className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-xs focus:border-cyan-500/50"
                       />
                     </div>
                   </div>
@@ -2760,7 +2893,7 @@ function CreateQuizContent() {
                   <Button
                     onClick={handleGenerateAI}
                     disabled={aiLoading || (sourceType === "file" && selectedFiles.length === 0)}
-                    className="h-11 px-8 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-semibold rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-cyan-500/10 border-none brand-button-glow disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="h-11 px-8 bg-gradient-to-r from-cyan-600 via-indigo-600 to-indigo-700 hover:from-cyan-500 hover:via-indigo-500 hover:to-indigo-600 text-white font-semibold rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-indigo-500/20 border-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {aiLoading ? (
                       <>
@@ -2777,8 +2910,8 @@ function CreateQuizContent() {
                 </div>
               </div>
             </div>
-        </motion.div>
-      )}
+          </motion.div>
+        )}
 
         {/* WORKSPACE UNIFIED EDITOR */}
         {view === "editor" && (
@@ -2803,101 +2936,101 @@ function CreateQuizContent() {
                   className="grid grid-cols-1 md:grid-cols-3 gap-6"
                 >
                   <div className="md:col-span-2 space-y-6">
-                    <div className="glass-panel border-white/5 rounded-2xl p-6 space-y-4">
-                      <h3 className="text-base font-bold text-white flex items-center gap-2">
-                        <FileText className="h-4.5 w-4.5 text-indigo-400" />
+                    <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-6 space-y-4">
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <FileText className="h-4.5 w-4.5 text-indigo-500 dark:text-indigo-400" />
                         <span>General Metadata</span>
                       </h3>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-1.5 col-span-2">
-                          <label className="text-xs font-bold text-slate-400">Quiz Title *</label>
+                          <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Quiz Title *</label>
                           <Input
                             type="text"
                             value={quiz.title}
                             onChange={(e) => setQuiz({ ...quiz, title: e.target.value })}
                             placeholder="Enter a descriptive quiz title..."
-                            className="bg-white/3 border-white/10 rounded-xl h-11 text-white font-medium text-sm focus:border-indigo-500/50"
+                            className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50"
                           />
                         </div>
 
                         <div className="space-y-1.5 col-span-2">
-                          <label className="text-xs font-bold text-slate-400">Description / Instructions</label>
+                          <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Description / Instructions</label>
                           <textarea
                             value={quiz.description}
                             onChange={(e) => setQuiz({ ...quiz, description: e.target.value })}
                             placeholder="Add guidelines, syllabus scope, or details..."
                             rows={3}
-                            className="w-full bg-white/3 border border-white/10 rounded-xl p-3 text-white font-medium text-sm focus:border-indigo-500/50 outline-none transition-colors"
+                            className="w-full bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl p-3 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50 outline-none transition-colors"
                           />
                         </div>
 
                         <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-slate-400">Subject *</label>
+                          <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Subject *</label>
                           <Input
                             type="text"
                             value={quiz.subject}
                             onChange={(e) => setQuiz({ ...quiz, subject: e.target.value })}
                             placeholder="e.g. Computer Science"
-                            className="bg-white/3 border-white/10 rounded-xl h-11 text-white font-medium text-sm focus:border-indigo-500/50"
+                            className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50"
                           />
                         </div>
 
                         <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-slate-400">Department</label>
+                          <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Department</label>
                           <Input
                             type="text"
                             value={quiz.department}
                             onChange={(e) => setQuiz({ ...quiz, department: e.target.value })}
                             placeholder="e.g. Software Engineering"
-                            className="bg-white/3 border-white/10 rounded-xl h-11 text-white font-medium text-sm focus:border-indigo-500/50"
+                            className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50"
                           />
                         </div>
 
                         <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-slate-400">Semester</label>
+                          <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Semester</label>
                           <Input
                             type="text"
                             value={quiz.semester}
                             onChange={(e) => setQuiz({ ...quiz, semester: e.target.value })}
                             placeholder="e.g. Fall 2026"
-                            className="bg-white/3 border-white/10 rounded-xl h-11 text-white font-medium text-sm focus:border-indigo-500/50"
+                            className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50"
                           />
                         </div>
 
                         <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-slate-400">Pass Percentage (%)</label>
+                          <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Pass Percentage (%)</label>
                           <Input
                             type="number"
                             value={quiz.pass_percentage}
                             onChange={(e) => setQuiz({ ...quiz, pass_percentage: Number(e.target.value) })}
                             min={0}
                             max={100}
-                            className="bg-white/3 border-white/10 rounded-xl h-11 text-white font-medium text-sm focus:border-indigo-500/50"
+                            className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50"
                           />
                         </div>
 
                         <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-slate-400">Marks Assignment Mode</label>
+                          <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Marks Assignment Mode</label>
                           <select
                             value={quiz.marks_mode || "default"}
                             onChange={(e) => handleToggleMarksMode(e.target.value as "default" | "auto")}
-                            className="w-full bg-slate-900 border border-white/10 rounded-xl h-11 px-3 text-white font-medium text-sm focus:border-indigo-500/50 outline-none"
+                            className="w-full bg-slate-100/80 dark:bg-[#121c33]/85 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 px-3 text-slate-800 dark:text-slate-200 font-medium text-sm focus:border-indigo-500/50 outline-none"
                           >
-                            <option value="default">Default Marks (Constant)</option>
-                            <option value="auto">Auto Marks (Scale by Difficulty)</option>
+                            <option value="default" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Default Marks (Constant)</option>
+                            <option value="auto" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Auto Marks (Scale by Difficulty)</option>
                           </select>
                         </div>
 
                         {(quiz.marks_mode === "default" || !quiz.marks_mode) && (
                           <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-400">Default Marks per Question</label>
+                            <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Default Marks per Question</label>
                             <Input
                               type="number"
                               value={quiz.default_marks || 1}
                               onChange={(e) => handleDefaultMarksChange(Math.max(1, Number(e.target.value)))}
                               min={1}
-                              className="bg-white/3 border-white/10 rounded-xl h-11 text-white font-medium text-sm focus:border-indigo-500/50"
+                              className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50"
                             />
                           </div>
                         )}
@@ -2910,19 +3043,19 @@ function CreateQuizContent() {
                     {(() => {
                       const { checks, score, isReady } = getPublishReadiness();
                       return (
-                        <div className="glass-panel border-white/5 rounded-2xl p-6 space-y-4">
+                        <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-6 space-y-4">
                           <div className="flex items-center justify-between">
-                            <h3 className="text-base font-bold text-white flex items-center gap-2">
-                              <ShieldAlert className="h-4.5 w-4.5 text-indigo-400" />
+                            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                              <ShieldAlert className="h-4.5 w-4.5 text-indigo-500 dark:text-indigo-400" />
                               <span>Publish Readiness</span>
                             </h3>
-                            <span className={`text-sm font-extrabold ${isReady ? "text-emerald-400" : "text-amber-400"}`}>
+                            <span className={`text-sm font-extrabold ${isReady ? "text-emerald-500 dark:text-emerald-400" : "text-amber-500 dark:text-amber-400"}`}>
                               {score}%
                             </span>
                           </div>
 
                           {/* Progress bar */}
-                          <div className="w-full bg-slate-900 rounded-full h-2 relative overflow-hidden">
+                          <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2 relative overflow-hidden">
                             <div 
                               className={`h-2 rounded-full transition-all duration-500 ${
                                 isReady ? "bg-gradient-to-r from-emerald-500 to-teal-500" : "bg-gradient-to-r from-amber-500 to-orange-500"
@@ -2935,86 +3068,86 @@ function CreateQuizContent() {
                           <div className="space-y-2 pt-2 text-xs font-semibold select-none">
                             <div className="flex items-center gap-2">
                               {checks.hasTitle ? (
-                                <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                                <Check className="h-4 w-4 text-emerald-500 dark:text-emerald-400 shrink-0" />
                               ) : (
                                 <span className="text-rose-500 font-bold shrink-0 w-4 text-center">✖</span>
                               )}
-                              <span className={checks.hasTitle ? "text-slate-300" : "text-slate-500"}>
-                                Quiz Title {!checks.hasTitle && <span className="text-rose-400 font-bold">(Required)</span>}
+                              <span className={checks.hasTitle ? "text-slate-700 dark:text-slate-300" : "text-slate-400 dark:text-slate-500"}>
+                                Quiz Title {!checks.hasTitle && <span className="text-rose-500 dark:text-rose-400 font-bold">(Required)</span>}
                               </span>
                             </div>
 
                             <div className="flex items-center gap-2">
                               {checks.hasSubject ? (
-                                <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                                <Check className="h-4 w-4 text-emerald-500 dark:text-emerald-400 shrink-0" />
                               ) : (
                                 <span className="text-rose-500 font-bold shrink-0 w-4 text-center">✖</span>
                               )}
-                              <span className={checks.hasSubject ? "text-slate-300" : "text-slate-500"}>
-                                Subject / Category {!checks.hasSubject && <span className="text-rose-400 font-bold">(Required)</span>}
+                              <span className={checks.hasSubject ? "text-slate-700 dark:text-slate-300" : "text-slate-400 dark:text-slate-500"}>
+                                Subject / Category {!checks.hasSubject && <span className="text-rose-500 dark:text-rose-400 font-bold">(Required)</span>}
                               </span>
                             </div>
 
                             <div className="flex items-center gap-2">
                               {checks.hasQuestions ? (
-                                <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                                <Check className="h-4 w-4 text-emerald-500 dark:text-emerald-400 shrink-0" />
                               ) : (
                                 <span className="text-rose-500 font-bold shrink-0 w-4 text-center">✖</span>
                               )}
-                              <span className={checks.hasQuestions ? "text-slate-300" : "text-slate-500"}>
-                                At least one question {!checks.hasQuestions && <span className="text-rose-400 font-bold">(Required)</span>}
+                              <span className={checks.hasQuestions ? "text-slate-700 dark:text-slate-300" : "text-slate-400 dark:text-slate-500"}>
+                                At least one question {!checks.hasQuestions && <span className="text-rose-500 dark:text-rose-400 font-bold">(Required)</span>}
                               </span>
                             </div>
 
                             <div className="flex items-center gap-2">
                               {checks.hasCorrectAnswers ? (
-                                <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                                <Check className="h-4 w-4 text-emerald-500 dark:text-emerald-400 shrink-0" />
                               ) : (
                                 <span className="text-rose-500 font-bold shrink-0 w-4 text-center">✖</span>
                               )}
-                              <span className={checks.hasCorrectAnswers ? "text-slate-300" : "text-slate-500"}>
-                                Correct answers selected {!checks.hasCorrectAnswers && <span className="text-rose-400 font-bold">(Required)</span>}
+                              <span className={checks.hasCorrectAnswers ? "text-slate-700 dark:text-slate-300" : "text-slate-400 dark:text-slate-500"}>
+                                Correct answers selected {!checks.hasCorrectAnswers && <span className="text-rose-500 dark:text-rose-400 font-bold">(Required)</span>}
                               </span>
                             </div>
 
                             <div className="flex items-center gap-2">
                               {checks.hasSchedule ? (
-                                <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                                <Check className="h-4 w-4 text-emerald-500 dark:text-emerald-400 shrink-0" />
                               ) : (
-                                <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0" />
+                                <AlertTriangle className="h-4 w-4 text-amber-500 dark:text-amber-400 shrink-0" />
                               )}
-                              <span className={checks.hasSchedule ? "text-slate-300" : "text-slate-500"}>
-                                Schedule & Availability {!checks.hasSchedule && <span className="text-amber-400">(Warning: unscheduled)</span>}
+                              <span className={checks.hasSchedule ? "text-slate-700 dark:text-slate-300" : "text-slate-400 dark:text-slate-500"}>
+                                Schedule & Availability {!checks.hasSchedule && <span className="text-amber-500 dark:text-amber-400">(Warning: unscheduled)</span>}
                               </span>
                             </div>
 
                             <div className="flex items-center gap-2">
                               {checks.hasTimeLimit ? (
-                                <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                                <Check className="h-4 w-4 text-emerald-500 dark:text-emerald-400 shrink-0" />
                               ) : (
-                                <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0" />
+                                <AlertTriangle className="h-4 w-4 text-amber-500 dark:text-amber-400 shrink-0" />
                               )}
-                              <span className={checks.hasTimeLimit ? "text-slate-300" : "text-slate-500"}>
-                                Time Limit configured {!checks.hasTimeLimit && <span className="text-amber-400">(Warning: no timer)</span>}
+                              <span className={checks.hasTimeLimit ? "text-slate-700 dark:text-slate-300" : "text-slate-400 dark:text-slate-500"}>
+                                Time Limit configured {!checks.hasTimeLimit && <span className="text-amber-500 dark:text-amber-400">(Warning: no timer)</span>}
                               </span>
                             </div>
 
                             <div className="flex items-center gap-2">
                               {checks.missingExplanationsCount === 0 ? (
-                                <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                                <Check className="h-4 w-4 text-emerald-500 dark:text-emerald-400 shrink-0" />
                               ) : (
-                                <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0" />
+                                <AlertTriangle className="h-4 w-4 text-amber-500 dark:text-amber-400 shrink-0" />
                               )}
-                              <span className={checks.missingExplanationsCount === 0 ? "text-slate-300" : "text-slate-500"}>
+                              <span className={checks.missingExplanationsCount === 0 ? "text-slate-700 dark:text-slate-300" : "text-slate-400 dark:text-slate-500"}>
                                 Explanation feedback {checks.missingExplanationsCount > 0 && (
-                                  <span className="text-amber-400">({checks.missingExplanationsCount} missing explanation{checks.missingExplanationsCount > 1 ? "s" : ""})</span>
+                                  <span className="text-amber-500 dark:text-amber-400">({checks.missingExplanationsCount} missing explanation{checks.missingExplanationsCount > 1 ? "s" : ""})</span>
                                 )}
                               </span>
                             </div>
                           </div>
 
                           {!isReady && (
-                            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-[10px] text-rose-300 leading-relaxed font-semibold">
+                            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-[10px] text-rose-600 dark:text-rose-300 leading-relaxed font-semibold">
                               Please fill out all required fields marked with ✖ to enable publishing.
                             </div>
                           )}
@@ -3022,27 +3155,27 @@ function CreateQuizContent() {
                       );
                     })()}
 
-                    <div className="glass-panel border-white/5 rounded-2xl p-6 space-y-4">
-                      <h3 className="text-base font-bold text-white flex items-center gap-2">
-                        <Settings className="h-4.5 w-4.5 text-indigo-400" />
+                    <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-6 space-y-4">
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <Settings className="h-4.5 w-4.5 text-indigo-500 dark:text-indigo-400" />
                         <span>Security & Access</span>
                       </h3>
 
                       <div className="space-y-4">
                         <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-slate-400">Quiz Reference Code</label>
+                          <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Quiz Reference Code</label>
                           <div className="flex gap-2">
                             <Input
                               type="text"
                               value={quiz.quiz_code}
                               onChange={(e) => setQuiz({ ...quiz, quiz_code: e.target.value })}
                               placeholder="e.g. MATH-101"
-                              className="bg-white/3 border-white/10 rounded-xl h-11 text-white font-medium text-sm focus:border-indigo-500/50"
+                              className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50"
                             />
                             <button
                               type="button"
                               onClick={() => setQuiz({ ...quiz, quiz_code: `QZ-${Math.floor(100000 + Math.random() * 900000)}` })}
-                              className="px-3 rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:text-white cursor-pointer"
+                              className="px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer font-semibold text-xs"
                             >
                               Reset
                             </button>
@@ -3050,34 +3183,34 @@ function CreateQuizContent() {
                         </div>
 
                         <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-slate-400">Visibility</label>
+                          <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Visibility</label>
                           <select
                             value={quiz.visibility}
                             onChange={(e) => setQuiz({ ...quiz, visibility: e.target.value as "public" | "private" })}
-                            className="w-full bg-white/3 border border-white/10 rounded-xl h-11 px-3 text-slate-300 font-medium text-sm focus:border-indigo-500/50 outline-none"
+                            className="w-full bg-slate-100/80 dark:bg-[#121c33]/85 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 px-3 text-slate-800 dark:text-slate-200 font-medium text-sm focus:border-indigo-500/50 outline-none"
                           >
-                            <option value="public" className="bg-slate-950">Public (All Classroom)</option>
-                            <option value="private" className="bg-slate-950">Private (Invite Only)</option>
+                            <option value="public" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Public (All Classroom)</option>
+                            <option value="private" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Private (Invite Only)</option>
                           </select>
                         </div>
 
                         <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-slate-400">Max Attempts Allowed</label>
+                          <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Max Attempts Allowed</label>
                           <Input
                             type="number"
                             value={quiz.max_attempts}
                             onChange={(e) => setQuiz({ ...quiz, max_attempts: Number(e.target.value) })}
                             min={1}
-                            className="bg-white/3 border-white/10 rounded-xl h-11 text-white font-medium text-sm focus:border-indigo-500/50"
+                            className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50"
                           />
                         </div>
 
                         {/* Interactive toggles */}
-                        <div className="space-y-3 pt-2 border-t border-white/5">
+                        <div className="space-y-3 pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
                           <div className="flex items-center justify-between">
                             <div className="space-y-0.5">
-                              <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                                <Shuffle className="h-3.5 w-3.5 text-indigo-400" />
+                              <div className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                                <Shuffle className="h-3.5 w-3.5 text-indigo-500 dark:text-indigo-400" />
                                 <span>Shuffle Questions</span>
                               </div>
                             </div>
@@ -3085,14 +3218,14 @@ function CreateQuizContent() {
                               type="checkbox"
                               checked={quiz.randomize_questions}
                               onChange={(e) => setQuiz({ ...quiz, randomize_questions: e.target.checked })}
-                              className="h-4 w-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                              className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                             />
                           </div>
 
                           <div className="flex items-center justify-between">
                             <div className="space-y-0.5">
-                              <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                                <Shuffle className="h-3.5 w-3.5 text-indigo-400" />
+                              <div className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                                <Shuffle className="h-3.5 w-3.5 text-indigo-500 dark:text-indigo-400" />
                                 <span>Shuffle Options</span>
                               </div>
                             </div>
@@ -3100,14 +3233,14 @@ function CreateQuizContent() {
                               type="checkbox"
                               checked={quiz.randomize_options}
                               onChange={(e) => setQuiz({ ...quiz, randomize_options: e.target.checked })}
-                              className="h-4 w-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                              className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                             />
                           </div>
 
                           <div className="flex items-center justify-between">
                             <div className="space-y-0.5">
-                              <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                                <Shield className="h-3.5 w-3.5 text-rose-400" />
+                              <div className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                                <Shield className="h-3.5 w-3.5 text-rose-500 dark:text-rose-400" />
                                 <span>Anti-Cheating Safeguards</span>
                               </div>
                             </div>
@@ -3115,14 +3248,14 @@ function CreateQuizContent() {
                               type="checkbox"
                               checked={quiz.anti_cheating_enabled}
                               onChange={(e) => setQuiz({ ...quiz, anti_cheating_enabled: e.target.checked })}
-                              className="h-4 w-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                              className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                             />
                           </div>
 
                           <div className="flex items-center justify-between">
                             <div className="space-y-0.5">
-                              <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                                <Activity className="h-3.5 w-3.5 text-cyan-400" />
+                              <div className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                                <Activity className="h-3.5 w-3.5 text-cyan-500 dark:text-cyan-400" />
                                 <span>AI Evaluation Feedback</span>
                               </div>
                             </div>
@@ -3130,7 +3263,7 @@ function CreateQuizContent() {
                               type="checkbox"
                               checked={quiz.ai_feedback_enabled}
                               onChange={(e) => setQuiz({ ...quiz, ai_feedback_enabled: e.target.checked })}
-                              className="h-4 w-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                              className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                             />
                           </div>
                         </div>
@@ -3149,9 +3282,9 @@ function CreateQuizContent() {
                 >
                   <div className="md:col-span-2 space-y-6">
                     {/* TIMING CONFIGURATION */}
-                    <div className="glass-panel border-white/5 rounded-2xl p-6 space-y-4">
-                      <h3 className="text-base font-bold text-white flex items-center gap-2">
-                        <Clock className="h-4.5 w-4.5 text-indigo-400" />
+                    <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-6 space-y-4">
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <Clock className="h-4.5 w-4.5 text-indigo-500 dark:text-indigo-400" />
                         <span>Flexible Timer Configuration</span>
                       </h3>
 
@@ -3170,23 +3303,23 @@ function CreateQuizContent() {
                               onClick={() => handleTimerModeChange(mode.id as any)}
                               className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
                                 quiz.timer_mode === mode.id
-                                  ? "bg-indigo-500/10 border-indigo-500/40 shadow-[0_0_15px_rgba(99,102,241,0.1)] text-indigo-300"
-                                  : "bg-white/3 border-white/5 text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                                  ? "bg-indigo-500/10 dark:bg-indigo-500/15 border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.1)] text-indigo-700 dark:text-indigo-300 font-bold"
+                                  : "bg-slate-100/70 dark:bg-[#121c33]/70 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200/70 dark:hover:bg-[#182645] hover:text-slate-900 dark:hover:text-slate-200"
                               }`}
                             >
                               <div className="text-xs font-bold">{mode.label}</div>
-                              <div className="text-[10px] text-slate-500 mt-1">{mode.desc}</div>
+                              <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">{mode.desc}</div>
                             </button>
                           ))}
                         </div>
 
                         {/* Overall Timer Settings */}
                         {(quiz.timer_mode === "overall" || quiz.timer_mode === "both") && (
-                          <div className="p-4 rounded-xl bg-white/2 border border-white/5 space-y-4">
+                          <div className="p-4 rounded-xl bg-slate-100/60 dark:bg-[#111a30]/80 border border-slate-200 dark:border-slate-700/60 space-y-4">
                             <div className="flex flex-wrap items-center justify-between gap-4">
                               <div className="space-y-1">
-                                <h4 className="text-xs font-bold text-white">Overall Quiz Time Limit</h4>
-                                <p className="text-[10px] text-slate-500">Choose a predefined countdown limit or enter a custom amount.</p>
+                                <h4 className="text-xs font-bold text-slate-900 dark:text-white">Overall Quiz Time Limit</h4>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400">Choose a predefined countdown limit or enter a custom amount.</p>
                               </div>
                               <div className="flex gap-2">
                                 {PREDEFINED_OVERALL_TIMERS.map(preset => (
@@ -3196,8 +3329,8 @@ function CreateQuizContent() {
                                     onClick={() => setQuiz({ ...quiz, overall_time_limit_seconds: preset.value })}
                                     className={`px-3 py-1 rounded-lg text-xs font-semibold border cursor-pointer transition-all ${
                                       quiz.overall_time_limit_seconds === preset.value
-                                        ? "bg-indigo-500 text-white border-indigo-500"
-                                        : "bg-white/3 border-white/5 text-slate-400 hover:bg-white/5"
+                                        ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                                        : "bg-slate-200/70 dark:bg-slate-800/80 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300/70 dark:hover:bg-slate-700"
                                     }`}
                                   >
                                     {preset.label}
@@ -3205,28 +3338,28 @@ function CreateQuizContent() {
                                 ))}
                               </div>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-white/5">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
                               <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-slate-400 font-display">Custom Limit (seconds)</label>
+                                <label className="text-xs font-bold text-slate-600 dark:text-slate-400 font-display">Custom Limit (seconds)</label>
                                 <Input
                                   type="number"
                                   value={quiz.overall_time_limit_seconds || ""}
                                   onChange={(e) => setQuiz({ ...quiz, overall_time_limit_seconds: e.target.value ? Number(e.target.value) : null })}
                                   placeholder="Enter custom seconds..."
-                                  className="bg-white/3 border-white/10 rounded-xl h-11 text-white font-medium text-sm focus:border-indigo-500/50"
+                                  className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50"
                                 />
                               </div>
                               {/* Auto submit toggler */}
-                              <div className="flex items-center justify-between p-3 rounded-xl bg-white/2 border border-white/5 mt-6">
+                              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-200/50 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800/80 mt-6">
                                 <div className="space-y-0.5">
-                                  <div className="text-xs font-bold text-white">Auto-Submit on Expiry</div>
-                                  <div className="text-[10px] text-slate-500">Instantly submits draft once time expires.</div>
+                                  <div className="text-xs font-bold text-slate-900 dark:text-white">Auto-Submit on Expiry</div>
+                                  <div className="text-[10px] text-slate-500 dark:text-slate-400">Instantly submits draft once time expires.</div>
                                 </div>
                                 <input
                                   type="checkbox"
                                   checked={quiz.auto_submit_on_expiry}
                                   onChange={(e) => setQuiz({ ...quiz, auto_submit_on_expiry: e.target.checked })}
-                                  className="h-4.5 w-4.5 rounded text-indigo-600 border-white/10 focus:ring-indigo-500 cursor-pointer"
+                                  className="h-4.5 w-4.5 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                                 />
                               </div>
                             </div>
@@ -3235,11 +3368,11 @@ function CreateQuizContent() {
 
                         {/* Per Question info */}
                         {(quiz.timer_mode === "per_question" || quiz.timer_mode === "both") && (
-                          <div className="p-4 rounded-xl bg-cyan-500/5 border border-cyan-500/10 flex items-start gap-3">
-                            <AlertCircle className="h-5 w-5 text-cyan-400 shrink-0 mt-0.5" />
+                          <div className="p-4 rounded-xl bg-cyan-500/10 dark:bg-cyan-950/20 border border-cyan-500/25 flex items-start gap-3">
+                            <AlertCircle className="h-5 w-5 text-cyan-600 dark:text-cyan-400 shrink-0 mt-0.5" />
                             <div className="space-y-1">
-                              <h4 className="text-xs font-bold text-cyan-300">Per-Question timing enabled!</h4>
-                              <p className="text-[10px] text-slate-400 leading-normal">
+                              <h4 className="text-xs font-bold text-cyan-700 dark:text-cyan-300">Per-Question timing enabled!</h4>
+                              <p className="text-[10px] text-slate-600 dark:text-slate-400 leading-normal">
                                 Instructors can define specific timers for each question inside the Canvas. Once time runs out on a question, the client automatically forwards the student to the next question.
                               </p>
                             </div>
@@ -3248,128 +3381,128 @@ function CreateQuizContent() {
                       </div>
                     </div>
                       {/* Assessment Windows & Instructions Panel */}
-                      <div className="glass-panel border-white/5 rounded-2xl p-6 space-y-4">
-                        <h3 className="text-base font-bold text-white flex items-center gap-2">
-                          <Clock className="h-4.5 w-4.5 text-cyan-400" />
+                      <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-6 space-y-4">
+                        <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                          <Clock className="h-4.5 w-4.5 text-cyan-500 dark:text-cyan-400" />
                           <span>Schedule & Guidelines</span>
                         </h3>
 
                         <div className="space-y-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                              <label className="text-xs font-bold text-slate-400">Available From</label>
+                              <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Available From</label>
                               <Input
                                 type="datetime-local"
                                 value={quiz.available_from || ""}
                                 onChange={(e) => setQuiz({ ...quiz, available_from: e.target.value || null })}
-                                className="bg-slate-900 border border-white/10 rounded-xl h-11 text-white text-xs focus:border-indigo-500/50 outline-none"
+                                className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white text-xs focus:border-indigo-500/50 outline-none"
                               />
                             </div>
                             <div className="space-y-1.5">
-                              <label className="text-xs font-bold text-slate-400">Available Until</label>
+                              <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Available Until</label>
                               <Input
                                 type="datetime-local"
                                 value={quiz.available_until || ""}
                                 onChange={(e) => setQuiz({ ...quiz, available_until: e.target.value || null })}
-                                className="bg-slate-900 border border-white/10 rounded-xl h-11 text-white text-xs focus:border-indigo-500/50 outline-none"
+                                className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white text-xs focus:border-indigo-500/50 outline-none"
                               />
                             </div>
                           </div>
 
                           <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-400">Access Passcode (Optional)</label>
+                            <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Access Passcode (Optional)</label>
                             <Input
                               type="text"
                               value={quiz.access_code || ""}
                               onChange={(e) => setQuiz({ ...quiz, access_code: e.target.value })}
                               placeholder="e.g. SECURE123"
-                              className="bg-slate-900 border border-white/10 rounded-xl h-11 text-white font-medium text-sm focus:border-indigo-500/50"
+                              className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50"
                             />
                           </div>
 
                           <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-400">Custom Instructor Instructions</label>
+                            <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Custom Instructor Instructions</label>
                             <textarea
                               value={quiz.custom_instructions || ""}
                               onChange={(e) => setQuiz({ ...quiz, custom_instructions: e.target.value })}
                               placeholder="Provide custom instructions to display before starting..."
                               rows={3}
-                              className="w-full bg-slate-900 border border-white/10 rounded-xl p-3 text-white font-medium text-xs focus:border-indigo-500/50 outline-none transition-colors"
+                              className="w-full bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl p-3 text-slate-900 dark:text-white font-medium text-xs focus:border-indigo-500/50 outline-none transition-colors"
                             />
                           </div>
                         </div>
                       </div>
 
                       {/* Result Visibility & Review Permissions Panel */}
-                      <div className="glass-panel border-white/5 rounded-2xl p-6 space-y-4">
-                        <h3 className="text-base font-bold text-white flex items-center gap-2">
-                          <FileText className="h-4.5 w-4.5 text-indigo-400" />
+                      <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-6 space-y-4">
+                        <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                          <FileText className="h-4.5 w-4.5 text-indigo-500 dark:text-indigo-400" />
                           <span>Result Visibility & Permissions</span>
                         </h3>
 
                         <div className="space-y-4">
                           <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-400">Release Mode</label>
+                            <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Release Mode</label>
                             <select
                               value={quiz.result_visibility}
                               onChange={(e) => setQuiz({ ...quiz, result_visibility: e.target.value as any })}
-                              className="w-full bg-slate-900 border border-white/10 rounded-xl h-11 px-3 text-slate-300 font-medium text-sm focus:border-indigo-500/50 outline-none"
+                              className="w-full bg-slate-100/80 dark:bg-[#121c33]/85 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 px-3 text-slate-800 dark:text-slate-200 font-medium text-sm focus:border-indigo-500/50 outline-none"
                             >
-                              <option value="immediate">Immediate Release (Upon Submission)</option>
-                              <option value="after_due_date">After Due Date (Requires End Date)</option>
-                              <option value="manual_release">Manual Release (Instructor Triggered)</option>
-                              <option value="never">Never (Keep Private)</option>
+                              <option value="immediate" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Immediate Release (Upon Submission)</option>
+                              <option value="after_due_date" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">After Due Date (Requires End Date)</option>
+                              <option value="manual_release" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Manual Release (Instructor Triggered)</option>
+                              <option value="never" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Never (Keep Private)</option>
                             </select>
                           </div>
 
-                          <div className="space-y-3 pt-2 border-t border-white/5">
+                          <div className="space-y-3 pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-bold text-slate-300">Show Score & Percentage</span>
+                              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Show Score & Percentage</span>
                               <input
                                 type="checkbox"
                                 checked={quiz.show_score}
                                 onChange={(e) => setQuiz({ ...quiz, show_score: e.target.checked })}
-                                className="h-4 w-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                               />
                             </div>
 
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-bold text-slate-300">Show Correct/Incorrect Answers</span>
+                              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Show Correct/Incorrect Answers</span>
                               <input
                                 type="checkbox"
                                 checked={quiz.show_answers}
                                 onChange={(e) => setQuiz({ ...quiz, show_answers: e.target.checked })}
-                                className="h-4 w-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                               />
                             </div>
 
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-bold text-slate-300">Show Answer Explanations</span>
+                              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Show Answer Explanations</span>
                               <input
                                 type="checkbox"
                                 checked={quiz.show_explanations}
                                 onChange={(e) => setQuiz({ ...quiz, show_explanations: e.target.checked })}
-                                className="h-4 w-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                               />
                             </div>
 
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-bold text-slate-300">Show Grading Solutions</span>
+                              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Show Grading Solutions</span>
                               <input
                                 type="checkbox"
                                 checked={quiz.show_solutions}
                                 onChange={(e) => setQuiz({ ...quiz, show_solutions: e.target.checked })}
-                                className="h-4 w-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                               />
                             </div>
 
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-bold text-slate-300">Show Marks per Question</span>
+                              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Show Marks per Question</span>
                               <input
                                 type="checkbox"
                                 checked={quiz.show_marks}
                                 onChange={(e) => setQuiz({ ...quiz, show_marks: e.target.checked })}
-                                className="h-4 w-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                               />
                             </div>
                           </div>
@@ -3388,10 +3521,10 @@ function CreateQuizContent() {
                 >
                   {/* Sidebar list */}
                   <div className="lg:col-span-1 space-y-4">
-                    <div className="glass-panel border-white/5 rounded-2xl p-4 space-y-3">
+                    <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-4 space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-white uppercase tracking-wider">Questions List</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 font-bold">
+                        <span className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Questions List</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold">
                           {quiz.questions.length} Items
                         </span>
                       </div>
@@ -3403,15 +3536,15 @@ function CreateQuizContent() {
                             onClick={() => setSelectedQuestionIndex(idx)}
                             className={`p-3 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between group relative ${
                               selectedQuestionIndex === idx
-                                ? "bg-indigo-500/10 border-indigo-500/35 text-white"
-                                : "bg-white/3 border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                                ? "bg-indigo-500/15 dark:bg-indigo-500/20 border-indigo-500/40 text-slate-900 dark:text-white shadow-sm"
+                                : "bg-slate-100/60 dark:bg-[#10192e]/60 border-slate-200/60 dark:border-slate-800/60 text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-[#14203a] hover:text-slate-900 dark:hover:text-slate-200"
                             }`}
                           >
                             {duplicateWarnings[idx] && (
                               <div className="absolute top-1 right-1 h-2 w-2 rounded-full bg-amber-500 animate-pulse" title="Similarity warning" />
                             )}
                             <div className="space-y-1 truncate pr-2">
-                              <div className="text-[10px] font-bold text-slate-500">
+                              <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
                                 Question {idx + 1} • {q.question_type.replace("_", " ")}
                               </div>
                               <div className="text-xs font-semibold truncate">
@@ -3424,7 +3557,7 @@ function CreateQuizContent() {
                                 type="button"
                                 disabled={idx === 0}
                                 onClick={(e) => { e.stopPropagation(); moveQuestion(idx, "up"); }}
-                                className="p-1 rounded hover:bg-white/10 text-slate-400 disabled:opacity-30 cursor-pointer"
+                                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 disabled:opacity-30 cursor-pointer"
                                 title="Move up"
                               >
                                 <ChevronUp className="h-3 w-3" />
@@ -3433,7 +3566,7 @@ function CreateQuizContent() {
                                 type="button"
                                 disabled={idx === quiz.questions.length - 1}
                                 onClick={(e) => { e.stopPropagation(); moveQuestion(idx, "down"); }}
-                                className="p-1 rounded hover:bg-white/10 text-slate-400 disabled:opacity-30 cursor-pointer"
+                                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 disabled:opacity-30 cursor-pointer"
                                 title="Move down"
                               >
                                 <ChevronDown className="h-3 w-3" />
@@ -3448,7 +3581,7 @@ function CreateQuizContent() {
                                     setSelectedQuestionIndex(idx);
                                     handleRegenerateQuestion(idx);
                                   }}
-                                  className="p-1 rounded hover:bg-cyan-500/20 text-cyan-400 disabled:opacity-30 cursor-pointer transition-colors"
+                                  className="p-1 rounded hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 disabled:opacity-30 cursor-pointer transition-colors"
                                   title="Regenerate this AI question"
                                 >
                                   {regeneratingIndex === idx
@@ -3459,7 +3592,7 @@ function CreateQuizContent() {
                               <button
                                 type="button"
                                 onClick={(e) => { e.stopPropagation(); deleteQuestion(idx); }}
-                                className="p-1 rounded hover:bg-rose-500/20 text-rose-400 cursor-pointer"
+                                className="p-1 rounded hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 cursor-pointer"
                                 title="Delete question"
                               >
                                 <Trash2 className="h-3 w-3" />
@@ -3471,7 +3604,7 @@ function CreateQuizContent() {
 
                       <Button
                         onClick={addQuestion}
-                        className="w-full h-10 border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/25 text-indigo-400 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 cursor-pointer"
+                        className="w-full h-10 border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-colors"
                       >
                         <Plus className="h-3.5 w-3.5" />
                         <span>Add Question</span>
@@ -3482,17 +3615,17 @@ function CreateQuizContent() {
                   {/* Main editing area */}
                   <div className="lg:col-span-3 space-y-6">
                     {quiz.questions[selectedQuestionIndex] ? (
-                      <div className="relative glass-panel border-white/5 rounded-2xl p-6 space-y-6">
+                      <div className="relative bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-6 space-y-6">
 
                         {/* Targeted Regeneration Loading Overlay */}
                         {regeneratingIndex === selectedQuestionIndex && (
-                          <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-[2px] rounded-2xl z-20 flex flex-col items-center justify-center space-y-3">
-                            <div className="h-10 w-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-lg shadow-cyan-500/10">
-                              <RefreshCw className="h-5 w-5 animate-spin text-cyan-400" />
+                          <div className="absolute inset-0 bg-slate-100/90 dark:bg-[#060b18]/90 backdrop-blur-[2px] rounded-2xl z-20 flex flex-col items-center justify-center space-y-3">
+                            <div className="h-10 w-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-500 dark:text-cyan-400 shadow-lg shadow-cyan-500/10">
+                              <RefreshCw className="h-5 w-5 animate-spin text-cyan-500 dark:text-cyan-400" />
                             </div>
                             <div className="space-y-1 text-center">
-                              <p className="text-xs font-bold text-white">Regenerating Question with AI</p>
-                              <p className="text-[10px] font-semibold text-cyan-400/80 animate-pulse">Applying pedagogical constraints & variations...</p>
+                              <p className="text-xs font-bold text-slate-900 dark:text-white">Regenerating Question with AI</p>
+                              <p className="text-[10px] font-semibold text-cyan-600 dark:text-cyan-400/80 animate-pulse">Applying pedagogical constraints & variations...</p>
                             </div>
                           </div>
                         )}
@@ -3500,22 +3633,22 @@ function CreateQuizContent() {
                         {/* ── Editing Panel Header: Question number + AI badge + Regenerate button ── */}
                         <div className="flex flex-wrap items-center justify-between gap-3">
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                               Question {selectedQuestionIndex + 1} of {quiz.questions.length}
                             </span>
                             {quiz.questions[selectedQuestionIndex].generated_by_ai && (
-                              <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold">
+                              <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 text-[10px] font-bold">
                                 <Sparkles className="h-2.5 w-2.5" />
                                 AI Generated
                               </span>
                             )}
                             {quiz.questions[selectedQuestionIndex].is_user_modified && (
-                              <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-bold">
+                              <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-bold">
                                 Edited
                               </span>
                             )}
                             {recentlyRegeneratedIndex === selectedQuestionIndex && (
-                              <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold animate-pulse">
+                              <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold animate-pulse">
                                 <Check className="h-2.5 w-2.5" />
                                 Replaced with New Question
                               </span>
@@ -3531,10 +3664,10 @@ function CreateQuizContent() {
                               onClick={() => handleRegenerateQuestion(selectedQuestionIndex)}
                               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-sm ${
                                 regeneratingIndex === selectedQuestionIndex
-                                  ? "bg-cyan-500/20 border-cyan-500/40 text-cyan-300 cursor-wait"
+                                  ? "bg-cyan-500/20 border-cyan-500/40 text-cyan-700 dark:text-cyan-300 cursor-wait"
                                   : regeneratingIndex !== null
-                                  ? "bg-white/3 border-white/10 text-slate-500 cursor-not-allowed opacity-50"
-                                  : "bg-cyan-500/10 border-cyan-500/25 text-cyan-400 hover:bg-cyan-500/20 hover:border-cyan-500/40 hover:text-cyan-300"
+                                  ? "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 cursor-not-allowed opacity-50"
+                                  : "bg-cyan-500/10 border-cyan-500/25 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/20 hover:border-cyan-500/40 hover:text-cyan-500 dark:hover:text-cyan-300"
                               }`}
                               title={regeneratingIndex !== null ? "Regenerating another question…" : "Regenerate this question using AI"}
                             >
@@ -3557,11 +3690,11 @@ function CreateQuizContent() {
                         {duplicateWarnings[selectedQuestionIndex] && (
                           <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                             <div className="space-y-1">
-                              <h5 className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                              <h5 className="text-xs font-bold text-amber-500 dark:text-amber-400 flex items-center gap-1.5">
                                 <AlertCircle className="h-4 w-4" />
                                 <span>Question Overlap Warning (Similarity {Math.floor(duplicateWarnings[selectedQuestionIndex].similarity * 100)}%)</span>
                               </h5>
-                              <p className="text-[10px] text-slate-400 max-w-xl leading-normal">
+                              <p className="text-[10px] text-slate-600 dark:text-slate-400 max-w-xl leading-normal">
                                 This question overlaps closely with: &quot;{duplicateWarnings[selectedQuestionIndex].existing_text.substring(0, 120)}...&quot; in the Question Bank.
                               </p>
                             </div>
@@ -3574,7 +3707,7 @@ function CreateQuizContent() {
                                   setDuplicateWarnings(updated);
                                   toast.info("Warning dismissed.");
                                 }}
-                                className="px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/35 text-[10px] font-semibold cursor-pointer border-none"
+                                className="px-2.5 py-1 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 hover:bg-amber-500/35 text-[10px] font-semibold cursor-pointer border-none"
                               >
                                 Keep
                               </button>
@@ -3595,11 +3728,11 @@ function CreateQuizContent() {
                          quiz.questions[selectedQuestionIndex].ai_original_json && (
                           <div className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                             <div className="space-y-1">
-                              <h5 className="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
+                              <h5 className="text-xs font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
                                 <Sparkles className="h-4 w-4" />
                                 <span>Teacher Edited Question</span>
                               </h5>
-                              <p className="text-[10px] text-slate-400 max-w-xl leading-normal">
+                              <p className="text-[10px] text-slate-600 dark:text-slate-400 max-w-xl leading-normal">
                                 This question was modified by the teacher. You can restore the original AI version to undo these changes.
                               </p>
                             </div>
@@ -3619,10 +3752,10 @@ function CreateQuizContent() {
                         {/* Header: Type, Difficulty, Marks */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                           <div className="space-y-1.5 col-span-2">
-                            <label className="text-xs font-bold text-slate-400 flex items-center gap-1.5">
+                            <label className="text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
                               Question Type
                               {quiz.questions[selectedQuestionIndex].generated_by_ai && regeneratingIndex === selectedQuestionIndex && (
-                                <span className="text-[10px] text-cyan-400 font-bold animate-pulse">Regenerating…</span>
+                                <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold animate-pulse">Regenerating…</span>
                               )}
                             </label>
                             <div className="relative">
@@ -3638,22 +3771,22 @@ function CreateQuizContent() {
                                     updateQuestionField("question_type", newType);
                                   }
                                 }}
-                                className="w-full bg-slate-900 border border-white/10 rounded-xl h-11 px-3 text-slate-300 font-medium text-sm focus:border-indigo-500/50 outline-none disabled:opacity-60 disabled:cursor-not-allowed"
+                                className="w-full bg-slate-100/80 dark:bg-[#121c33]/85 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 px-3 text-slate-800 dark:text-slate-200 font-medium text-sm focus:border-indigo-500/50 outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                               >
-                                <option value="multiple_choice">Multiple Choice (Single Correct Choice)</option>
-                                <option value="multiple_select">Multiple Select (Multiple Correct Choices)</option>
-                                <option value="true_false">True / False</option>
-                                <option value="fill_in_the_blank">Fill in the Blank</option>
-                                <option value="short_answer">Short Answer (Manual / Keyword graded)</option>
+                                <option value="multiple_choice" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Multiple Choice (Single Correct Choice)</option>
+                                <option value="multiple_select" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Multiple Select (Multiple Correct Choices)</option>
+                                <option value="true_false" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">True / False</option>
+                                <option value="fill_in_the_blank" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Fill in the Blank</option>
+                                <option value="short_answer" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Short Answer (Manual / Keyword graded)</option>
                               </select>
                             </div>
                           </div>
 
                           <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-400 flex items-center gap-1.5">
+                            <label className="text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
                               Difficulty
                               {quiz.questions[selectedQuestionIndex].generated_by_ai && regeneratingIndex === selectedQuestionIndex && (
-                                <span className="text-[10px] text-cyan-400 font-bold animate-pulse">Regenerating…</span>
+                                <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold animate-pulse">Regenerating…</span>
                               )}
                             </label>
                             <div className="relative">
@@ -3669,27 +3802,27 @@ function CreateQuizContent() {
                                     updateQuestionField("difficulty", newDiff);
                                   }
                                 }}
-                                className="w-full bg-slate-900 border border-white/10 rounded-xl h-11 px-3 text-slate-300 font-medium text-sm focus:border-indigo-500/50 outline-none disabled:opacity-60 disabled:cursor-not-allowed"
+                                className="w-full bg-slate-100/80 dark:bg-[#121c33]/85 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 px-3 text-slate-800 dark:text-slate-200 font-medium text-sm focus:border-indigo-500/50 outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                               >
-                                <option value="easy">Easy</option>
-                                <option value="medium">Medium</option>
-                                <option value="hard">Hard</option>
+                                <option value="easy" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Easy</option>
+                                <option value="medium" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Medium</option>
+                                <option value="hard" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Hard</option>
                               </select>
                             </div>
                           </div>
 
                           <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-400">Marks / Points</label>
+                            <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Marks / Points</label>
                             <Input
                               type="number"
                               value={quiz.questions[selectedQuestionIndex].marks}
                               onChange={(e) => updateQuestionField("marks", Number(e.target.value))}
                               min={1}
                               disabled={quiz.marks_mode === "auto"}
-                              className="bg-white/3 border-white/10 rounded-xl h-11 text-white font-medium text-sm focus:border-indigo-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                             {quiz.marks_mode === "auto" && (
-                              <span className="text-[10px] font-bold text-indigo-400">Auto Marks Enabled</span>
+                              <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">Auto Marks Enabled</span>
                             )}
                           </div>
                         </div>
@@ -3697,20 +3830,20 @@ function CreateQuizContent() {
                         {/* Text and Time limit */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                           <div className="space-y-1.5 col-span-3">
-                            <label className="text-xs font-bold text-slate-400">Question Content *</label>
+                            <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Question Content *</label>
                             <textarea
                               value={quiz.questions[selectedQuestionIndex].text}
                               onChange={(e) => updateQuestionField("text", e.target.value)}
                               placeholder="Type the question content here..."
                               rows={3}
-                              className="w-full bg-white/3 border border-white/10 rounded-xl p-3.5 text-white font-medium text-sm focus:border-indigo-500/50 outline-none transition-colors leading-relaxed"
+                              className="w-full bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl p-3.5 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50 outline-none transition-colors leading-relaxed"
                             />
                           </div>
 
                           {/* Time Limit (Shows if Per-Question timing is active) */}
                           <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-400 flex items-center gap-1">
-                              <Clock className="h-3.5 w-3.5 text-indigo-400" />
+                            <label className="text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                              <Clock className="h-3.5 w-3.5 text-indigo-500 dark:text-indigo-400" />
                               <span>Time Limit</span>
                             </label>
                             {(quiz.timer_mode === "per_question" || quiz.timer_mode === "both") ? (
@@ -3718,12 +3851,12 @@ function CreateQuizContent() {
                                 <select
                                   value={quiz.questions[selectedQuestionIndex].time_limit_seconds || 30}
                                   onChange={(e) => updateQuestionField("time_limit_seconds", Number(e.target.value))}
-                                  className="w-full bg-slate-900 border border-white/10 rounded-xl h-11 px-3 text-slate-300 font-medium text-sm focus:border-indigo-500/50 outline-none"
+                                  className="w-full bg-slate-100/80 dark:bg-[#121c33]/85 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 px-3 text-slate-800 dark:text-slate-200 font-medium text-sm focus:border-indigo-500/50 outline-none"
                                 >
                                   {PREDEFINED_QUESTION_TIMERS.map(p => (
-                                    <option key={p.value} value={p.value}>{p.label}</option>
+                                    <option key={p.value} value={p.value} className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">{p.label}</option>
                                   ))}
-                                  <option value="custom">Custom seconds</option>
+                                  <option value="custom" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Custom seconds</option>
                                 </select>
                                 <Input
                                   type="number"
@@ -3731,11 +3864,11 @@ function CreateQuizContent() {
                                   onChange={(e) => updateQuestionField("time_limit_seconds", e.target.value ? Number(e.target.value) : null)}
                                   placeholder="Seconds..."
                                   min={1}
-                                  className="bg-white/3 border-white/10 rounded-xl h-9 text-white font-medium text-sm focus:border-indigo-500/50"
+                                  className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-9 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50"
                                 />
                               </div>
                             ) : (
-                              <div className="p-3 text-[10px] text-slate-500 rounded-xl bg-white/1 border border-white/5 leading-normal">
+                              <div className="p-3 text-[10px] text-slate-500 dark:text-slate-400 rounded-xl bg-slate-100/60 dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800/80 leading-normal">
                                 Disabled. Select &apos;Per-Question&apos; timer mode in Settings tab to enable timers.
                               </div>
                             )}
@@ -3743,9 +3876,9 @@ function CreateQuizContent() {
                         </div>
 
                         {/* OPTIONS BUILDER */}
-                        <div className="space-y-3 pt-4 border-t border-white/5">
+                        <div className="space-y-3 pt-4 border-t border-slate-200/80 dark:border-slate-800/80">
                           <div className="flex items-center justify-between">
-                            <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+                            <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
                               {quiz.questions[selectedQuestionIndex].question_type === "fill_in_the_blank" || 
                                quiz.questions[selectedQuestionIndex].question_type === "short_answer"
                                 ? "Acceptable Answer Keys"
@@ -3760,7 +3893,7 @@ function CreateQuizContent() {
                               <button
                                 type="button"
                                 onClick={addOption}
-                                className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-bold cursor-pointer transition-colors"
+                                className="flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-bold cursor-pointer transition-colors"
                               >
                                 <Plus className="h-4 w-4" />
                                 <span>Add Choice Option</span>
@@ -3773,7 +3906,7 @@ function CreateQuizContent() {
                               <button
                                 type="button"
                                 onClick={addOption}
-                                className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-bold cursor-pointer transition-colors"
+                                className="flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-bold cursor-pointer transition-colors"
                               >
                                 <Plus className="h-4 w-4" />
                                 <span>Add Alternative Phrase</span>
@@ -3792,8 +3925,8 @@ function CreateQuizContent() {
                                     onClick={() => toggleOptionCorrectness(optIdx)}
                                     className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 flex items-center justify-between ${
                                       opt.is_correct
-                                        ? "bg-emerald-500/15 border-emerald-500/40 shadow-sm shadow-emerald-500/10 text-white"
-                                        : "bg-white/3 border-white/5 text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                                        ? "bg-emerald-500/15 dark:bg-emerald-950/30 border-emerald-500/50 shadow-sm shadow-emerald-500/10 text-slate-900 dark:text-white"
+                                        : "bg-slate-100/70 dark:bg-[#121c33]/70 border-slate-200 dark:border-slate-700/60 text-slate-600 dark:text-slate-400 hover:bg-slate-200/70 dark:hover:bg-[#182645] hover:text-slate-900 dark:hover:text-slate-200"
                                     }`}
                                   >
                                     <div className="flex items-center gap-3">
@@ -3801,20 +3934,20 @@ function CreateQuizContent() {
                                         opt.is_correct
                                           ? "bg-emerald-500 text-white"
                                           : isTrueOption
-                                          ? "bg-emerald-500/10 text-emerald-400"
-                                          : "bg-rose-500/10 text-rose-400"
+                                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                                          : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
                                       }`}>
                                         {isTrueOption ? "T" : "F"}
                                       </div>
                                       <div>
-                                        <div className="text-sm font-bold text-white">{opt.text}</div>
-                                        <div className="text-[10px] text-slate-500">Click to set as correct answer</div>
+                                        <div className="text-sm font-bold text-slate-900 dark:text-white">{opt.text}</div>
+                                        <div className="text-[10px] text-slate-500 dark:text-slate-400">Click to set as correct answer</div>
                                       </div>
                                     </div>
                                     <div className={`h-6 w-6 rounded-full flex items-center justify-center border ${
                                       opt.is_correct
                                         ? "bg-emerald-500 border-emerald-500 text-white"
-                                        : "border-slate-700 bg-slate-900"
+                                        : "border-slate-300 dark:border-slate-700 bg-slate-200/60 dark:bg-slate-900"
                                     }`}>
                                       {opt.is_correct && <Check className="h-3.5 w-3.5 stroke-[3]" />}
                                     </div>
@@ -3837,16 +3970,16 @@ function CreateQuizContent() {
                                     key={opt.id}
                                     className={`flex items-center gap-3 p-3 rounded-2xl border transition-all duration-200 ${
                                       opt.is_correct && !isTextBased
-                                        ? "bg-emerald-500/10 border-emerald-500/30 shadow-sm"
-                                        : "bg-white/3 border-white/5 hover:border-white/10"
+                                        ? "bg-emerald-500/10 dark:bg-emerald-950/25 border-emerald-500/40 dark:border-emerald-500/30 shadow-sm"
+                                        : "bg-slate-100/70 dark:bg-[#121c33]/70 border-slate-200 dark:border-slate-700/60 hover:border-slate-300 dark:hover:border-slate-600"
                                     }`}
                                   >
                                     {/* Option Letter Indicator */}
                                     {!isTextBased && (
                                       <div className={`h-7 w-7 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
                                         opt.is_correct
-                                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                                          : "bg-white/5 text-slate-400 border border-white/5"
+                                          ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
+                                          : "bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700"
                                       }`}>
                                         {optionLetter}
                                       </div>
@@ -3859,7 +3992,7 @@ function CreateQuizContent() {
                                         name={`q-${quiz.questions[selectedQuestionIndex].id}-correct`}
                                         checked={opt.is_correct}
                                         onChange={() => toggleOptionCorrectness(optIdx)}
-                                        className="h-4.5 w-4.5 text-emerald-600 border-white/10 focus:ring-emerald-500 cursor-pointer"
+                                        className="h-4.5 w-4.5 text-emerald-600 border-slate-300 dark:border-slate-700 focus:ring-emerald-500 cursor-pointer"
                                         title="Mark as correct answer"
                                       />
                                     )}
@@ -3868,7 +4001,7 @@ function CreateQuizContent() {
                                         type="checkbox"
                                         checked={opt.is_correct}
                                         onChange={() => toggleOptionCorrectness(optIdx)}
-                                        className="h-4.5 w-4.5 rounded text-emerald-600 border-white/10 focus:ring-emerald-500 cursor-pointer"
+                                        className="h-4.5 w-4.5 rounded border-slate-300 dark:border-slate-700 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
                                         title="Mark as correct answer"
                                       />
                                     )}
@@ -3883,14 +4016,14 @@ function CreateQuizContent() {
                                           ? `Acceptable answer key phrase ${optIdx + 1} (case-insensitive grading)...`
                                           : `Choice ${optionLetter} content...`
                                       }
-                                      className="bg-transparent border-none text-white text-sm font-semibold h-9 placeholder:text-slate-600 focus:bg-white/3 focus:ring-0"
+                                      className="bg-transparent border-none text-slate-900 dark:text-white text-sm font-semibold h-9 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-slate-200/40 dark:focus:bg-white/3 focus:ring-0"
                                     />
 
                                     {/* Delete option */}
                                     <button
                                       type="button"
                                       onClick={() => removeOption(optIdx)}
-                                      className="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 shrink-0 cursor-pointer transition-colors"
+                                      className="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 shrink-0 cursor-pointer transition-colors"
                                       title="Remove option"
                                     >
                                       <Trash2 className="h-4 w-4" />
@@ -3905,7 +4038,7 @@ function CreateQuizContent() {
                                 <button
                                   type="button"
                                   onClick={addOption}
-                                  className="w-full py-2.5 rounded-2xl border border-dashed border-indigo-500/30 hover:border-indigo-500/50 bg-indigo-500/5 hover:bg-indigo-500/10 text-indigo-400 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                                  className="w-full py-2.5 rounded-2xl border border-dashed border-indigo-500/30 hover:border-indigo-500/50 bg-indigo-500/5 hover:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                                 >
                                   <Plus className="h-3.5 w-3.5" />
                                   <span>Add Another Option Choice</span>
@@ -3916,32 +4049,32 @@ function CreateQuizContent() {
                         </div>
 
                         {/* EXPLANATION / HINTS */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-white/5">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-200/80 dark:border-slate-800/80">
                           <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-400">Correct Answer Explanation</label>
+                            <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Correct Answer Explanation</label>
                             <textarea
                               value={quiz.questions[selectedQuestionIndex].explanation}
                               onChange={(e) => updateQuestionField("explanation", e.target.value)}
                               placeholder="Provide feedback details on why answer choice is correct..."
                               rows={2}
-                              className="w-full bg-white/3 border border-white/10 rounded-xl p-2.5 text-white font-medium text-xs focus:border-indigo-500/50 outline-none transition-colors"
+                              className="w-full bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl p-2.5 text-slate-900 dark:text-white font-medium text-xs focus:border-indigo-500/50 outline-none transition-colors"
                             />
                           </div>
 
                           <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-400">Hints</label>
+                            <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Hints</label>
                             <textarea
                               value={quiz.questions[selectedQuestionIndex].hint}
                               onChange={(e) => updateQuestionField("hint", e.target.value)}
                               placeholder="Add help/hints hints for students..."
                               rows={2}
-                              className="w-full bg-white/3 border border-white/10 rounded-xl p-2.5 text-white font-medium text-xs focus:border-indigo-500/50 outline-none transition-colors"
+                              className="w-full bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl p-2.5 text-slate-900 dark:text-white font-medium text-xs focus:border-indigo-500/50 outline-none transition-colors"
                             />
                           </div>
                         </div>
                       </div>
                     ) : (
-                      <div className="glass-panel border-white/5 rounded-2xl p-12 text-center text-slate-500">
+                      <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-12 text-center text-slate-500">
                         No questions in this quiz. Click &apos;Add Question&apos; to start.
                       </div>
                     )}
@@ -3957,28 +4090,28 @@ function CreateQuizContent() {
                   className="max-w-3xl mx-auto"
                 >
                   {!simStarted ? (
-                    <div className="glass-panel border-white/5 rounded-3xl p-12 text-center space-y-6">
-                      <div className="h-16 w-16 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mx-auto shadow-lg shadow-indigo-500/5">
+                    <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-12 text-center space-y-6 shadow-xl">
+                      <div className="h-16 w-16 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mx-auto shadow-lg shadow-indigo-500/5">
                         <Play className="h-8 w-8" />
                       </div>
                       <div className="space-y-2">
-                        <h3 className="text-xl font-extrabold text-white">Student View Simulator</h3>
-                        <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                        <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">Student View Simulator</h3>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
                           Test-drive the assessment flow just like a student. Check how the timers behave, toggle question transitions, and audit submissions.
                         </p>
                       </div>
 
                       {/* Summary rules */}
-                      <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto text-left py-2.5 border-y border-white/5 text-xs text-slate-400">
-                        <div>Timer Mode: <strong className="text-slate-200 uppercase">{quiz.timer_mode}</strong></div>
-                        <div>Total Marks: <strong className="text-slate-200">{quiz.total_marks} pts</strong></div>
-                        <div>Questions: <strong className="text-slate-200">{quiz.questions.length} Items</strong></div>
-                        <div>Attempts: <strong className="text-slate-200">{quiz.max_attempts} Allowed</strong></div>
+                      <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto text-left py-2.5 border-y border-slate-200/80 dark:border-slate-800/80 text-xs text-slate-600 dark:text-slate-400">
+                        <div>Timer Mode: <strong className="text-slate-900 dark:text-slate-200 uppercase">{quiz.timer_mode}</strong></div>
+                        <div>Total Marks: <strong className="text-slate-900 dark:text-slate-200">{quiz.total_marks} pts</strong></div>
+                        <div>Questions: <strong className="text-slate-900 dark:text-slate-200">{quiz.questions.length} Items</strong></div>
+                        <div>Attempts: <strong className="text-slate-900 dark:text-slate-200">{quiz.max_attempts} Allowed</strong></div>
                       </div>
 
                       <Button
                         onClick={startSimulation}
-                        className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl px-6 h-11 flex items-center gap-2 mx-auto cursor-pointer border-none shadow-lg shadow-indigo-500/15"
+                        className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl px-6 h-11 flex items-center gap-2 mx-auto cursor-pointer border-none shadow-lg shadow-indigo-500/20 transition-colors"
                       >
                         <span>Start Test Simulation</span>
                         <ArrowRight className="h-4.5 w-4.5" />
@@ -3986,25 +4119,25 @@ function CreateQuizContent() {
                     </div>
                   ) : simFinished ? (
                     /* SIMULATION FINISHED SUMMARY SCREEN */
-                    <div className="glass-panel border-white/5 rounded-3xl p-12 text-center space-y-6">
-                      <div className="h-16 w-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mx-auto">
+                    <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-12 text-center space-y-6 shadow-xl">
+                      <div className="h-16 w-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mx-auto">
                         <Check className="h-8 w-8" />
                       </div>
                       <div className="space-y-2">
-                        <h3 className="text-2xl font-extrabold text-white">Quiz Submitted!</h3>
-                        <p className="text-xs text-slate-400">Assessment simulation complete. Here are the grades.</p>
+                        <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white">Quiz Submitted!</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Assessment simulation complete. Here are the grades.</p>
                       </div>
 
-                      <div className="inline-block p-6 rounded-2xl bg-white/2 border border-white/5 space-y-2">
-                        <div className="text-sm text-slate-400">Graded Marks</div>
-                        <div className="text-4xl font-extrabold text-white">
-                          {simScore} <span className="text-lg text-slate-500">/ {quiz.total_marks}</span>
+                      <div className="inline-block p-6 rounded-2xl bg-slate-100/70 dark:bg-[#121c33]/70 border border-slate-200 dark:border-slate-700/60 space-y-2">
+                        <div className="text-sm text-slate-500 dark:text-slate-400">Graded Marks</div>
+                        <div className="text-4xl font-extrabold text-slate-900 dark:text-white">
+                          {simScore} <span className="text-lg text-slate-400 dark:text-slate-500">/ {quiz.total_marks}</span>
                         </div>
                         <div className="text-xs font-semibold mt-2">
                           {simScore >= (quiz.total_marks * quiz.pass_percentage / 100) ? (
-                            <span className="text-emerald-400">PASS ({(simScore / (quiz.total_marks || 1) * 100).toFixed(0)}%)</span>
+                            <span className="text-emerald-600 dark:text-emerald-400">PASS ({(simScore / (quiz.total_marks || 1) * 100).toFixed(0)}%)</span>
                           ) : (
-                            <span className="text-rose-400">FAIL ({(simScore / (quiz.total_marks || 1) * 100).toFixed(0)}%)</span>
+                            <span className="text-rose-600 dark:text-rose-400">FAIL ({(simScore / (quiz.total_marks || 1) * 100).toFixed(0)}%)</span>
                           )}
                         </div>
                       </div>
@@ -4013,14 +4146,14 @@ function CreateQuizContent() {
                         <Button
                           variant="outline"
                           onClick={startSimulation}
-                          className="rounded-xl border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 font-semibold px-4 cursor-pointer h-10 border flex items-center gap-2"
+                          className="rounded-xl border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold px-4 cursor-pointer h-10 border flex items-center gap-2 transition-colors"
                         >
                           <RotateCcw className="h-4 w-4" />
                           <span>Retake Simulation</span>
                         </Button>
                         <Button
                           onClick={() => setSimStarted(false)}
-                          className="rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 h-10 border-none cursor-pointer"
+                          className="rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 h-10 border-none cursor-pointer transition-colors"
                         >
                           Exit Simulation
                         </Button>
@@ -4028,13 +4161,13 @@ function CreateQuizContent() {
                     </div>
                   ) : (
                     /* ACTIVE SIMULATION PLAY SCREEN */
-                    <div className="glass-panel border-white/5 rounded-3xl p-6 md:p-8 space-y-6 relative overflow-hidden">
+                    <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-6 md:p-8 space-y-6 relative overflow-hidden shadow-xl">
                       
                       {/* Active header with timers */}
-                      <div className="flex justify-between items-center pb-4 border-b border-white/5">
+                      <div className="flex justify-between items-center pb-4 border-b border-slate-200/80 dark:border-slate-800/80">
                         <div className="space-y-1">
-                          <h4 className="text-base font-bold text-white">{quiz.title}</h4>
-                          <div className="text-[10px] text-slate-400">
+                          <h4 className="text-base font-bold text-slate-900 dark:text-white">{quiz.title}</h4>
+                          <div className="text-[10px] text-slate-500 dark:text-slate-400">
                             Question {simCurrentIdx + 1} of {quiz.questions.length}
                           </div>
                         </div>
@@ -4042,8 +4175,8 @@ function CreateQuizContent() {
                         {/* Overall timer ticking countdown */}
                         {(quiz.timer_mode === "overall" || quiz.timer_mode === "both") && (
                           <div className="flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1.5 rounded-xl">
-                            <Clock className="h-4 w-4 text-indigo-400" />
-                            <div className="text-xs font-bold text-indigo-300 font-mono">
+                            <Clock className="h-4 w-4 text-indigo-500 dark:text-indigo-400" />
+                            <div className="text-xs font-bold text-indigo-700 dark:text-indigo-300 font-mono">
                               Overall: {Math.floor(simOverallTimer / 60)}:{(simOverallTimer % 60).toString().padStart(2, "0")}
                             </div>
                           </div>
@@ -4057,17 +4190,17 @@ function CreateQuizContent() {
                           {/* Question header metadata */}
                           <div className="flex items-center justify-between">
                             <div className="flex gap-2">
-                              <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-white/10 text-slate-300 border border-white/5">
+                              <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
                                 {quiz.questions[simCurrentIdx].difficulty}
                               </span>
-                              <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-400 border border-indigo-500/10">
+                              <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
                                 {quiz.questions[simCurrentIdx].marks} pts
                               </span>
                             </div>
 
                             {/* Question specific timer ticking countdown */}
                             {(quiz.timer_mode === "per_question" || quiz.timer_mode === "both") && (
-                              <div className="text-xs font-bold text-cyan-400 font-mono flex items-center gap-1 bg-cyan-500/5 px-2.5 py-1 rounded-lg border border-cyan-500/10">
+                              <div className="text-xs font-bold text-cyan-600 dark:text-cyan-400 font-mono flex items-center gap-1 bg-cyan-500/10 px-2.5 py-1 rounded-lg border border-cyan-500/20">
                                 <Clock className="h-3 w-3 shrink-0 animate-pulse" />
                                 <span>Time Left: {simQuestionTimer}s</span>
                               </div>
@@ -4076,7 +4209,7 @@ function CreateQuizContent() {
 
                           {/* Question specific visual progress bar */}
                           {(quiz.timer_mode === "per_question" || quiz.timer_mode === "both") && (
-                            <div className="w-full bg-slate-900 rounded-full h-1">
+                            <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1">
                               <div 
                                 className="bg-cyan-500 h-1 rounded-full transition-all duration-1000 ease-linear"
                                 style={{ width: `${(simQuestionTimer / (quiz.questions[simCurrentIdx].time_limit_seconds || 30)) * 100}%` }}
@@ -4085,24 +4218,24 @@ function CreateQuizContent() {
                           )}
 
                           {/* Text */}
-                          <div className="text-base font-extrabold text-white tracking-tight leading-relaxed">
+                          <div className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight leading-relaxed">
                             <span>{quiz.questions[simCurrentIdx].text || "Blank question text content..."}</span>
                             <button
                               type="button"
                               onClick={() => speakQuestion(quiz.questions[simCurrentIdx].text || "")}
                               className={`inline-flex items-center gap-1.5 align-middle ml-2.5 px-2.5 py-1.5 rounded-xl border transition-all cursor-pointer duration-200 ${
                                 isSpeaking 
-                                  ? "bg-indigo-500/20 border-indigo-500/35 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.15)] scale-105" 
-                                  : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white"
+                                  ? "bg-indigo-500/20 border-indigo-500/35 text-indigo-600 dark:text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.15)] scale-105" 
+                                  : "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white"
                               }`}
                               title={isSpeaking ? "Stop reading" : "Read question aloud"}
                             >
                               <Volume2 className="h-3.5 w-3.5 shrink-0" />
                               {isSpeaking && (
                                 <div className="flex items-end gap-[2px] h-3 px-0.5 select-none shrink-0">
-                                  <span className="w-[2px] h-2.5 bg-indigo-400 rounded-full animate-[sound-wave-bar_0.4s_ease-in-out_infinite_alternate]" style={{ animationDelay: '0.1s' }} />
-                                  <span className="w-[2px] h-2.5 bg-indigo-400 rounded-full animate-[sound-wave-bar_0.4s_ease-in-out_infinite_alternate]" style={{ animationDelay: '0.3s' }} />
-                                  <span className="w-[2px] h-2.5 bg-indigo-400 rounded-full animate-[sound-wave-bar_0.4s_ease-in-out_infinite_alternate]" style={{ animationDelay: '0.2s' }} />
+                                  <span className="w-[2px] h-2.5 bg-indigo-500 dark:bg-indigo-400 rounded-full animate-[sound-wave-bar_0.4s_ease-in-out_infinite_alternate]" style={{ animationDelay: '0.1s' }} />
+                                  <span className="w-[2px] h-2.5 bg-indigo-500 dark:bg-indigo-400 rounded-full animate-[sound-wave-bar_0.4s_ease-in-out_infinite_alternate]" style={{ animationDelay: '0.3s' }} />
+                                  <span className="w-[2px] h-2.5 bg-indigo-500 dark:bg-indigo-400 rounded-full animate-[sound-wave-bar_0.4s_ease-in-out_infinite_alternate]" style={{ animationDelay: '0.2s' }} />
                                 </div>
                               )}
                             </button>
@@ -4121,14 +4254,14 @@ function CreateQuizContent() {
                                       onClick={() => handleSimSelectAnswer(quiz.questions[simCurrentIdx].id, opt.text, false)}
                                       className={`w-full p-4 rounded-xl border text-left font-semibold text-xs transition-all cursor-pointer flex items-center gap-3 ${
                                         isSelected
-                                          ? "bg-indigo-500/10 border-indigo-500 text-white shadow-md"
-                                          : "bg-white/3 border-white/5 text-slate-300 hover:bg-white/6 hover:text-white"
+                                          ? "bg-indigo-500/15 dark:bg-indigo-500/20 border-indigo-500 text-slate-900 dark:text-white shadow-md"
+                                          : "bg-slate-100/70 dark:bg-[#121c33]/70 border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-[#172442] hover:text-slate-900 dark:hover:text-white"
                                       }`}
                                     >
                                       <div className={`h-4.5 w-4.5 rounded-full border flex items-center justify-center shrink-0 ${
-                                        isSelected ? "border-indigo-400" : "border-slate-500"
+                                        isSelected ? "border-indigo-500" : "border-slate-400 dark:border-slate-600"
                                       }`}>
-                                        {isSelected && <div className="h-2 w-2 rounded-full bg-indigo-400" />}
+                                        {isSelected && <div className="h-2 w-2 rounded-full bg-indigo-500" />}
                                       </div>
                                       <span>{opt.text}</span>
                                     </button>
@@ -4147,14 +4280,14 @@ function CreateQuizContent() {
                                       onClick={() => handleSimSelectAnswer(quiz.questions[simCurrentIdx].id, opt.text, true)}
                                       className={`w-full p-4 rounded-xl border text-left font-semibold text-xs transition-all cursor-pointer flex items-center gap-3 ${
                                         isSelected
-                                          ? "bg-indigo-500/10 border-indigo-500 text-white shadow-md"
-                                          : "bg-white/3 border-white/5 text-slate-300 hover:bg-white/6"
+                                          ? "bg-indigo-500/15 dark:bg-indigo-500/20 border-indigo-500 text-slate-900 dark:text-white shadow-md"
+                                          : "bg-slate-100/70 dark:bg-[#121c33]/70 border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-[#172442]"
                                       }`}
                                     >
                                       <div className={`h-4.5 w-4.5 rounded border flex items-center justify-center shrink-0 ${
-                                        isSelected ? "border-indigo-400 bg-indigo-500/20" : "border-slate-500"
+                                        isSelected ? "border-indigo-500 bg-indigo-500/20" : "border-slate-400 dark:border-slate-600"
                                       }`}>
-                                        {isSelected && <Check className="h-3 w-3 text-indigo-400" />}
+                                        {isSelected && <Check className="h-3 w-3 text-indigo-500" />}
                                       </div>
                                       <span>{opt.text}</span>
                                     </button>
@@ -4166,20 +4299,20 @@ function CreateQuizContent() {
                             {(quiz.questions[simCurrentIdx].question_type === "fill_in_the_blank" || 
                               quiz.questions[simCurrentIdx].question_type === "short_answer") && (
                               <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-400">Your Answer</label>
+                                <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Your Answer</label>
                                 <Input
                                   type="text"
                                   value={simAnswers[quiz.questions[simCurrentIdx].id]?.[0] || ""}
                                   onChange={(e) => setSimAnswers({ ...simAnswers, [quiz.questions[simCurrentIdx].id]: [e.target.value] })}
                                   placeholder="Type your answer text here..."
-                                  className="bg-white/3 border-white/10 rounded-xl h-11 text-white font-medium text-sm focus:border-indigo-500/50"
+                                  className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50"
                                 />
                               </div>
                             )}
                           </div>
 
                           {/* Navigation buttons */}
-                          <div className="flex justify-between pt-6 border-t border-white/5">
+                          <div className="flex justify-between pt-6 border-t border-slate-200/80 dark:border-slate-800/80">
                             <Button
                               variant="outline"
                               disabled={simCurrentIdx === 0}
@@ -4189,7 +4322,7 @@ function CreateQuizContent() {
                                   setSimQuestionTimer(quiz.questions[simCurrentIdx - 1]?.time_limit_seconds || 30);
                                 }
                               }}
-                              className="rounded-xl border-white/10 bg-white/5 text-slate-300 hover:text-white disabled:opacity-30 px-4 h-10 border flex items-center gap-2 cursor-pointer"
+                              className="rounded-xl border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white disabled:opacity-30 px-4 h-10 border flex items-center gap-2 cursor-pointer transition-colors"
                             >
                               <ArrowLeft className="h-4 w-4" />
                               <span>Previous</span>
@@ -4198,7 +4331,7 @@ function CreateQuizContent() {
                             {simCurrentIdx < quiz.questions.length - 1 ? (
                               <Button
                                 onClick={moveToNextQuestionOrSubmit}
-                                className="rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 h-10 border-none cursor-pointer flex items-center gap-2"
+                                className="rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 h-10 border-none cursor-pointer flex items-center gap-2 transition-colors"
                               >
                                 <span>Next Question</span>
                                 <ArrowRight className="h-4 w-4" />
@@ -4206,7 +4339,7 @@ function CreateQuizContent() {
                             ) : (
                               <Button
                                 onClick={finishSimulation}
-                                className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold px-5 h-10 border-none cursor-pointer flex items-center gap-2 brand-button-glow"
+                                className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold px-5 h-10 border-none cursor-pointer flex items-center gap-2 shadow-md shadow-emerald-500/20"
                               >
                                 <Check className="h-4.5 w-4.5" />
                                 <span>Submit Simulation</span>
@@ -4232,29 +4365,29 @@ function CreateQuizContent() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="glass-panel border-white/5 rounded-3xl p-8 md:p-12 text-center max-w-xl mx-auto space-y-8 shadow-2xl relative overflow-hidden"
+            className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-8 md:p-12 text-center max-w-xl mx-auto space-y-8 shadow-2xl relative overflow-hidden"
           >
             <div className="absolute -right-32 -top-32 h-64 w-64 rounded-full bg-cyan-500/10 blur-[100px] pointer-events-none" />
             <div className="absolute -left-32 -bottom-32 h-64 w-64 rounded-full bg-indigo-500/10 blur-[100px] pointer-events-none" />
 
             <div className="space-y-4 relative z-10">
-              <div className="h-16 w-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mx-auto shadow-lg shadow-emerald-500/5">
-                <Check className="h-8 w-8 text-emerald-400 animate-bounce" />
+              <div className="h-16 w-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mx-auto shadow-lg shadow-emerald-500/5">
+                <Check className="h-8 w-8 text-emerald-600 dark:text-emerald-400 animate-bounce" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+                <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                   {savedQuiz.status === "published" ? "Assessment Published!" : "Draft Saved!"}
                 </h2>
-                <p className="text-slate-400 text-xs font-semibold truncate max-w-md mx-auto">
+                <p className="text-slate-500 dark:text-slate-400 text-xs font-semibold truncate max-w-md mx-auto">
                   {savedQuiz.title}
                 </p>
               </div>
             </div>
 
             {/* Game PIN Box */}
-            <div className="p-6 bg-slate-950/40 border border-white/5 rounded-2xl space-y-3 relative z-10 max-w-sm mx-auto">
-              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Access Game PIN</div>
-              <div className="text-3xl font-black text-cyan-400 font-mono tracking-wider select-all">
+            <div className="p-6 bg-slate-100/80 dark:bg-[#121c33]/85 border border-slate-200 dark:border-slate-700/60 rounded-2xl space-y-3 relative z-10 max-w-sm mx-auto shadow-inner">
+              <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Access Game PIN</div>
+              <div className="text-3xl font-black text-cyan-600 dark:text-cyan-400 font-mono tracking-wider select-all">
                 {savedQuiz.quiz_code}
               </div>
               <Button
@@ -4262,7 +4395,7 @@ function CreateQuizContent() {
                   navigator.clipboard.writeText(savedQuiz.quiz_code);
                   toast.success("Game PIN copied to clipboard!");
                 }}
-                className="h-8 px-4 text-[10px] font-bold rounded-lg border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 cursor-pointer"
+                className="h-8 px-4 text-[10px] font-bold rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-300/80 dark:hover:bg-slate-700 cursor-pointer transition-colors"
               >
                 Copy PIN Code
               </Button>
@@ -4274,7 +4407,7 @@ function CreateQuizContent() {
                 <Button
                   onClick={handleStartLiveSession}
                   disabled={sessionCreating}
-                  className="w-full h-11 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer border-none shadow-lg shadow-indigo-500/15 text-xs"
+                  className="w-full h-11 bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer border-none shadow-lg shadow-indigo-500/20 text-xs transition-all"
                 >
                   {sessionCreating ? (
                     <>
@@ -4290,7 +4423,7 @@ function CreateQuizContent() {
                 </Button>
               )}
               <Link href="/dashboard" className="w-full">
-                <Button className="w-full h-11 border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 font-semibold rounded-xl flex items-center justify-center gap-2 cursor-pointer text-xs">
+                <Button className="w-full h-11 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold rounded-xl flex items-center justify-center gap-2 cursor-pointer text-xs transition-colors">
                   <span>Go to Dashboard</span>
                 </Button>
               </Link>
@@ -4302,22 +4435,22 @@ function CreateQuizContent() {
       {/* --- Better Prompt Preview Modal --- */}
       <AnimatePresence>
         {isPreviewOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-2xl bg-[#090f1e] border border-white/10 rounded-2xl shadow-2xl p-6 overflow-hidden flex flex-col max-h-[85vh]"
+              className="w-full max-w-2xl bg-slate-50 dark:bg-[#0a1124] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-6 overflow-hidden flex flex-col max-h-[85vh]"
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-4 select-none">
+              <div className="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80 pb-4 mb-4 select-none">
                 <div className="space-y-1">
-                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-purple-400" />
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-purple-500 dark:text-purple-400" />
                     <span>Quiz Generation Prompt Preview</span>
                   </h3>
-                  <p className="text-xs text-slate-400 font-medium">Review, edit, and fine-tune your configuration before sending it to the AI engine.</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Review, edit, and fine-tune your configuration before sending it to the AI engine.</p>
                 </div>
               </div>
 
@@ -4326,55 +4459,55 @@ function CreateQuizContent() {
                 
                 {/* Prompt Textarea */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-400 block">Edit Instructions Prompt</label>
+                  <label className="text-xs font-bold text-slate-600 dark:text-slate-400 block">Edit Instructions Prompt</label>
                   <textarea
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
                     rows={6}
-                    className="w-full bg-white/3 border border-white/10 rounded-xl p-4 text-white font-medium text-sm focus:border-purple-500/50 outline-none leading-relaxed"
+                    className="w-full bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl p-4 text-slate-900 dark:text-white font-medium text-sm focus:border-purple-500/50 outline-none leading-relaxed"
                   />
                 </div>
 
                 {/* Config settings recap */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white/2 border border-white/5 rounded-xl p-3.5 text-xs select-none">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-100/80 dark:bg-[#121c33]/70 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 text-xs select-none">
                   <div>
                     <span className="text-[10px] font-bold text-slate-500 block uppercase tracking-wider">Difficulty</span>
-                    <span className="font-semibold text-slate-200 capitalize">{difficulty}</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 capitalize">{difficulty}</span>
                   </div>
                   <div>
                     <span className="text-[10px] font-bold text-slate-500 block uppercase tracking-wider">Question Count</span>
-                    <span className="font-semibold text-slate-200">{questionCount} questions</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">{questionCount} questions</span>
                   </div>
                   <div>
                     <span className="text-[10px] font-bold text-slate-500 block uppercase tracking-wider">Quality Mode</span>
-                    <span className="font-semibold text-slate-200 capitalize">{questionQuality}</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 capitalize">{questionQuality}</span>
                   </div>
                   <div>
                     <span className="text-[10px] font-bold text-slate-500 block uppercase tracking-wider">Provider</span>
-                    <span className="font-semibold text-slate-200 capitalize">{aiProvider}</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 capitalize">{aiProvider}</span>
                   </div>
                 </div>
 
                 {/* Estimation Metrics */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 select-none">
                   <div className="p-3.5 rounded-xl bg-purple-500/5 border border-purple-500/10 flex items-start gap-3">
-                    <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 shrink-0">
+                    <div className="p-2 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 shrink-0">
                       <Activity className="h-4.5 w-4.5 animate-pulse" />
                     </div>
                     <div className="space-y-1">
-                      <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Estimated Context Tokens</span>
-                      <h4 className="text-sm font-bold text-white">~{((topic.length / 4) + 200).toFixed(0)} Tokens</h4>
+                      <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Estimated Context Tokens</span>
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">~{((topic.length / 4) + 200).toFixed(0)} Tokens</h4>
                       <p className="text-[9px] text-slate-500">Calculated based on standard character-to-token ratio.</p>
                     </div>
                   </div>
 
                   <div className="p-3.5 rounded-xl bg-cyan-500/5 border border-cyan-500/10 flex items-start gap-3">
-                    <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 shrink-0">
+                    <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 shrink-0">
                       <Clock className="h-4.5 w-4.5" />
                     </div>
                     <div className="space-y-1">
-                      <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">Estimated Generation Time</span>
-                      <h4 className="text-sm font-bold text-white">~{(questionCount * (questionQuality === "premium" ? 1.5 : 0.8) + 3).toFixed(0)} Seconds</h4>
+                      <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider">Estimated Generation Time</span>
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">~{(questionCount * (questionQuality === "premium" ? 1.5 : 0.8) + 3).toFixed(0)} Seconds</h4>
                       <p className="text-[9px] text-slate-500 font-medium">Based on active model speed metrics & constraints.</p>
                     </div>
                   </div>
@@ -4382,12 +4515,12 @@ function CreateQuizContent() {
               </div>
 
               {/* Modal Footer */}
-              <div className="flex justify-end gap-3 border-t border-white/5 pt-4 mt-4 select-none">
+              <div className="flex justify-end gap-3 border-t border-slate-200/80 dark:border-slate-800/80 pt-4 mt-4 select-none">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setIsPreviewOpen(false)}
-                  className="rounded-xl border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 font-semibold px-4 cursor-pointer h-10 border"
+                  className="rounded-xl border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold px-4 cursor-pointer h-10 border transition-colors"
                 >
                   Cancel
                 </Button>
@@ -4397,7 +4530,7 @@ function CreateQuizContent() {
                     setIsPreviewOpen(false);
                     handleGenerateAI();
                   }}
-                  className="rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold px-5 h-10 flex items-center gap-2 border-none cursor-pointer brand-button-glow animate-pulse"
+                  className="rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold px-5 h-10 flex items-center gap-2 border-none cursor-pointer shadow-md shadow-indigo-500/20"
                 >
                   <Sparkles className="h-4.5 w-4.5 animate-pulse" />
                   <span>Generate Quiz</span>
@@ -4411,42 +4544,42 @@ function CreateQuizContent() {
       {/* --- Mismatch Warning Modal --- */}
       <AnimatePresence>
         {mismatchData && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-md bg-[#090f1e] border border-white/10 rounded-2xl shadow-2xl p-6 overflow-hidden flex flex-col"
+              className="w-full max-w-md bg-slate-50 dark:bg-[#0a1124] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-6 overflow-hidden flex flex-col"
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-4 select-none">
+              <div className="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80 pb-4 mb-4 select-none">
                 <div className="space-y-1">
-                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <AlertCircle className="h-5 w-5 text-amber-400" />
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <AlertCircle className="h-5 w-5 text-amber-500 dark:text-amber-400" />
                     <span>Question Count Mismatch</span>
                   </h3>
-                  <p className="text-xs text-slate-400 font-medium">We detected a mismatch between your prompt and settings.</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">We detected a mismatch between your prompt and settings.</p>
                 </div>
               </div>
 
               {/* Modal Body */}
-              <div className="flex-1 space-y-4 pr-1 leading-normal py-2 text-slate-300 text-sm">
+              <div className="flex-1 space-y-4 pr-1 leading-normal py-2 text-slate-700 dark:text-slate-300 text-sm">
                 <p>
-                  Your prompt requests <span className="font-bold text-white">{mismatchData.parsedCount}</span> questions, but the Question Count setting is set to <span className="font-bold text-white">{mismatchData.currentCount}</span>.
+                  Your prompt requests <span className="font-bold text-slate-900 dark:text-white">{mismatchData.parsedCount}</span> questions, but the Question Count setting is set to <span className="font-bold text-slate-900 dark:text-white">{mismatchData.currentCount}</span>.
                 </p>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   Which value would you like to use for generation?
                 </p>
               </div>
 
               {/* Modal Footer */}
-              <div className="flex justify-end gap-3 border-t border-white/5 pt-4 mt-4 select-none">
+              <div className="flex justify-end gap-3 border-t border-slate-200/80 dark:border-slate-800/80 pt-4 mt-4 select-none">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setMismatchData(null)}
-                  className="rounded-xl border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 font-semibold px-4 cursor-pointer h-10 border text-xs"
+                  className="rounded-xl border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold px-4 cursor-pointer h-10 border text-xs transition-colors"
                 >
                   Cancel
                 </Button>
@@ -4458,7 +4591,7 @@ function CreateQuizContent() {
                     setMismatchData(null);
                     await executeGenerateAI(count);
                   }}
-                  className="rounded-xl border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 font-semibold px-4 cursor-pointer h-10 border text-xs"
+                  className="rounded-xl border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold px-4 cursor-pointer h-10 border text-xs transition-colors"
                 >
                   Keep {mismatchData.currentCount}
                 </Button>
@@ -4470,7 +4603,7 @@ function CreateQuizContent() {
                     setMismatchData(null);
                     await executeGenerateAI(count);
                   }}
-                  className="rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold px-5 h-10 flex items-center gap-2 border-none cursor-pointer brand-button-glow text-xs"
+                  className="rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold px-5 h-10 flex items-center gap-2 border-none cursor-pointer text-xs shadow-md shadow-indigo-500/20"
                 >
                   Use {mismatchData.parsedCount}
                 </Button>
@@ -4487,8 +4620,8 @@ export default function CreateQuizPage() {
   return (
     <ProtectedRoute allowedRoles={["teacher", "admin"]}>
       <Suspense fallback={
-        <div className="glass-panel border-white/5 rounded-3xl p-12 flex flex-col items-center justify-center min-h-[400px] shadow-2xl">
-          <div className="text-white text-sm font-semibold animate-pulse">Loading Quiz Workspace...</div>
+        <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-12 flex flex-col items-center justify-center min-h-[400px] shadow-2xl">
+          <div className="text-slate-800 dark:text-white text-sm font-semibold animate-pulse">Loading Quiz Workspace...</div>
         </div>
       }>
         <CreateQuizContent />

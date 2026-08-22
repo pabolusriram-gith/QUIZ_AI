@@ -184,10 +184,10 @@ function AssessmentContent() {
     if (!isLiveMode || !attempt) return;
 
     const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-    const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+    const wsBaseUrl = apiBaseUrl.replace(/^https:\/\//i, "wss://").replace(/^http:\/\//i, "ws://");
     const token = tokenStorage.getAccessToken();
     const connToken = sessionStorage.getItem(`connection_token:${pin}:${nickname}`);
-    let wsUrl = apiBaseUrl.replace(/^http/, wsScheme) + `/sessions/ws/session/${pin}?role=student&nickname=${encodeURIComponent(nickname)}`;
+    let wsUrl = `${wsBaseUrl}/sessions/ws/session/${pin}?role=student&nickname=${encodeURIComponent(nickname)}`;
     if (connToken) {
       wsUrl += `&connection_token=${encodeURIComponent(connToken)}`;
     }
@@ -305,8 +305,10 @@ function AssessmentContent() {
           }
         } else if (data.type === "pause_game") {
           isTimerPausedRef.current = true;
+          toast.info("Host paused the quiz timer.");
         } else if (data.type === "resume_game") {
           isTimerPausedRef.current = false;
+          toast.info("Quiz resumed.");
         } else if (data.type === "session_update" && payload) {
           if (payload.answered_count !== undefined) setAnsweredCount(payload.answered_count);
           if (payload.total_players !== undefined) setTotalPlayers(payload.total_players);
@@ -327,11 +329,36 @@ function AssessmentContent() {
             setQuestionTimeLeft(remaining);
           }
         } else if (data.type === "next_question" && payload) {
-          setCurrentIdx(payload.current_question_index);
-          setTimerStarted(false);
-          setIsSubmitted(false);
-          setQuestionTimeLeft(null);
+          const nextIdx = payload.current_question_index;
+          setCurrentIdx(nextIdx);
+          currentIdxRef.current = nextIdx;
+          setIsSubmitted(payload.answers_locked || false);
           setShowLeaderboard(false);
+          isTimerPausedRef.current = payload.is_paused || false;
+
+          if (payload.question_end_time) {
+            setTimerStarted(true);
+            const serverTime = payload.server_time ? new Date(payload.server_time).getTime() : Date.now();
+            const clientNow = Date.now();
+            clockOffsetRef.current = serverTime - clientNow;
+            
+            const endTime = new Date(payload.question_end_time).getTime();
+            endTimeRef.current = endTime;
+            durationRef.current = payload.duration;
+            
+            const synchronizedNow = clientNow + clockOffsetRef.current;
+            const remaining = Math.max(0, Math.round((endTime - synchronizedNow) / 1000));
+            setQuestionTimeLeft(remaining);
+          } else {
+            const nextQId = attemptRef.current?.randomized_question_ids?.[nextIdx];
+            const qMeta = nextQId ? questionsMap[nextQId] : null;
+            const duration = qMeta?.time_limit_seconds || 30;
+            durationRef.current = duration;
+            endTimeRef.current = null;
+            setTimerStarted(true);
+            setQuestionTimeLeft(duration);
+          }
+
           if (ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({
               type: "question_loaded",
@@ -532,6 +559,15 @@ function AssessmentContent() {
   const fetchInstructions = async () => {
     try {
       setLoading(true);
+      if (isLiveMode && nickname && !tokenStorage.getAccessToken()) {
+        try {
+          const guestRes = await api.post("/auth/guest-login", { nickname });
+          tokenStorage.setAccessToken(guestRes.data.access_token, false);
+          tokenStorage.setRefreshToken(guestRes.data.refresh_token, false);
+        } catch (authErr) {
+          console.warn("Guest auth initialization in live assessment:", authErr);
+        }
+      }
       const res = await api.get(`/quizzes/${id}/instructions`);
       setInstructions(res.data);
       if (res.data.has_active_attempt && res.data.active_attempt_id) {
@@ -544,7 +580,11 @@ function AssessmentContent() {
       }
     } catch (err: any) {
       toast.error(err.response?.data?.detail || "Failed to load quiz instructions.");
-      router.push("/dashboard");
+      if (isLiveMode && pin) {
+        router.push(`/waiting/${pin}?nickname=${encodeURIComponent(nickname)}`);
+      } else {
+        router.push("/dashboard");
+      }
     }
   };
 
@@ -672,15 +712,26 @@ function AssessmentContent() {
         });
       }
 
-      if (quiz.timer_mode === "per_question" || quiz.timer_mode === "both") {
+      if (quiz.timer_mode === "per_question" || quiz.timer_mode === "both" || isLiveMode) {
         if (isLiveMode) {
-          if (!isTimerPausedRef.current && endTimeRef.current !== null) {
-            const clientNow = Date.now();
-            const synchronizedNow = clientNow + clockOffsetRef.current;
-            const remaining = Math.max(0, Math.round((endTimeRef.current - synchronizedNow) / 1000));
-            setQuestionTimeLeft(remaining);
-            if (remaining <= 0) {
-              setIsSubmitted(true);
+          if (!isTimerPausedRef.current) {
+            if (endTimeRef.current !== null) {
+              const clientNow = Date.now();
+              const synchronizedNow = clientNow + clockOffsetRef.current;
+              const remaining = Math.max(0, Math.round((endTimeRef.current - synchronizedNow) / 1000));
+              setQuestionTimeLeft(remaining);
+              if (remaining <= 0) {
+                setIsSubmitted(true);
+              }
+            } else {
+              setQuestionTimeLeft(prev => {
+                if (prev === null) return null;
+                if (prev <= 1) {
+                  setIsSubmitted(true);
+                  return 0;
+                }
+                return prev - 1;
+              });
             }
           }
         } else {
@@ -1005,51 +1056,51 @@ function AssessmentContent() {
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-panel border-white/5 rounded-2xl p-6 md:p-8 space-y-6"
+          className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl"
         >
           <div className="space-y-2">
-            <h2 className="text-2xl font-extrabold text-white tracking-tight">{instructions?.title}</h2>
-            <p className="text-slate-400 text-sm">{instructions?.description || "No description provided."}</p>
+            <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">{instructions?.title}</h2>
+            <p className="text-slate-600 dark:text-slate-400 text-sm">{instructions?.description || "No description provided."}</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-y border-white/5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-y border-slate-200/80 dark:border-slate-800/80">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+              <div className="h-10 w-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
                 <Clock className="h-5 w-5" />
               </div>
               <div>
-                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Duration</div>
-                <div className="text-sm font-bold text-white">{instructions?.duration} Minutes</div>
+                <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Duration</div>
+                <div className="text-sm font-bold text-slate-900 dark:text-white">{instructions?.duration} Minutes</div>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+              <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                 <Award className="h-5 w-5" />
               </div>
               <div>
-                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Total Marks</div>
-                <div className="text-sm font-bold text-white">{instructions?.total_marks} Marks</div>
+                <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Total Marks</div>
+                <div className="text-sm font-bold text-slate-900 dark:text-white">{instructions?.total_marks} Marks</div>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+              <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                 <CheckCircle className="h-5 w-5" />
               </div>
               <div>
-                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Pass Mark</div>
-                <div className="text-sm font-bold text-white">{instructions?.pass_percentage || 40}% Pass Rate</div>
+                <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Pass Mark</div>
+                <div className="text-sm font-bold text-slate-900 dark:text-white">{instructions?.pass_percentage || 40}% Pass Rate</div>
               </div>
             </div>
           </div>
 
           {instructions?.fullscreen_required && (
-            <div className="p-4 bg-amber-500/5 border border-amber-500/15 rounded-xl flex gap-3 text-xs text-amber-400">
+            <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex gap-3 text-xs text-amber-600 dark:text-amber-400">
               <ShieldAlert className="h-5 w-5 shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <span className="font-bold">Security Mode Active</span>
-                <p className="text-slate-400 text-[10px] font-semibold leading-relaxed">
+                <p className="text-slate-600 dark:text-slate-400 text-[10px] font-semibold leading-relaxed">
                   This test requires Fullscreen Mode and has anti-cheat tab-switching guards. Exiting fullscreen or navigating away will log violations.
                 </p>
               </div>
@@ -1060,7 +1111,7 @@ function AssessmentContent() {
             <Button
               variant="outline"
               onClick={() => router.push("/dashboard")}
-              className="rounded-xl border-white/10 bg-white/5 text-slate-300 hover:text-white px-4.5 h-11 border cursor-pointer"
+              className="rounded-xl border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 px-4.5 h-11 border cursor-pointer transition-colors"
             >
               Cancel
             </Button>
@@ -1068,7 +1119,7 @@ function AssessmentContent() {
             <Button
               disabled={isSubmittingCode}
               onClick={handleStartQuiz}
-              className="rounded-xl bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-550 hover:to-indigo-550 text-white font-bold px-6 h-11 flex items-center gap-2 border-none cursor-pointer brand-button-glow"
+              className="rounded-xl bg-gradient-to-r from-cyan-600 via-indigo-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-bold px-6 h-11 flex items-center gap-2 border-none cursor-pointer shadow-md shadow-indigo-500/20 transition-all"
             >
               <span>{isSubmittingCode ? "Verifying..." : "Start Attempt"}</span>
               <Play className="h-4 w-4 fill-current" />
@@ -1122,11 +1173,11 @@ function AssessmentContent() {
         )}
 
         {/* Accessibility Widgets */}
-        <div className="fixed bottom-4 right-4 z-40 bg-slate-950/80 border border-white/5 backdrop-blur-md rounded-2xl p-2 flex items-center gap-1.5 shadow-2xl">
+        <div className="fixed bottom-4 right-4 z-40 bg-slate-100/90 dark:bg-[#0a1124]/90 border border-slate-200/80 dark:border-slate-800/80 backdrop-blur-md rounded-2xl p-2 flex items-center gap-1.5 shadow-2xl">
           <button
             onClick={() => setHighContrast(!highContrast)}
             className={`px-3 py-1.5 rounded-xl text-[10px] font-bold cursor-pointer transition ${
-              highContrast ? "bg-indigo-600 text-white" : "bg-white/3 text-slate-400 hover:text-white"
+              highContrast ? "bg-indigo-600 text-white" : "bg-slate-200/80 dark:bg-white/5 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
             }`}
             title="Toggle High Contrast"
           >
@@ -1135,7 +1186,7 @@ function AssessmentContent() {
           <button
             onClick={() => setLargeText(!largeText)}
             className={`px-3 py-1.5 rounded-xl text-[10px] font-bold cursor-pointer transition ${
-              largeText ? "bg-indigo-600 text-white" : "bg-white/3 text-slate-400 hover:text-white"
+              largeText ? "bg-indigo-600 text-white" : "bg-slate-200/80 dark:bg-white/5 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
             }`}
             title="Toggle Large Fonts"
           >
@@ -1144,24 +1195,24 @@ function AssessmentContent() {
         </div>
 
         {/* Playback Header bar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 bg-slate-950/40 border border-white/5 rounded-2xl p-4.5 backdrop-blur-md">
+        <div className="flex flex-wrap items-center justify-between gap-4 bg-slate-50/80 dark:bg-[#0c1427]/85 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-4.5 backdrop-blur-md shadow-sm">
           <div className="flex items-center gap-3">
-            <span className="text-xs font-bold text-slate-400 bg-white/3 border border-white/5 px-3 py-1.5 rounded-xl">
+            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-200/70 dark:bg-slate-800/70 border border-slate-300/70 dark:border-slate-700/70 px-3 py-1.5 rounded-xl">
               Question {currentIdx + 1} of {attempt?.randomized_question_ids?.length}
             </span>
             {saveStatus === "saving" && (
-              <span className="text-[10px] text-cyan-400 font-bold animate-pulse flex items-center gap-1.5 px-2.5 py-1 bg-cyan-500/8 border border-cyan-500/20 rounded-full">
+              <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold animate-pulse flex items-center gap-1.5 px-2.5 py-1 bg-cyan-500/10 border border-cyan-500/20 rounded-full">
                 <span>↻ Saving...</span>
               </span>
             )}
             {saveStatus === "saved" && (
-              <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/8 border border-emerald-500/20 rounded-full">
+              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
                 <CheckCircle className="h-3 w-3" />
                 <span>✓ Saved</span>
               </span>
             )}
             {isOffline && (
-              <span className="text-[10px] text-rose-400 font-bold flex items-center gap-1.5">
+              <span className="text-[10px] text-rose-600 dark:text-rose-400 font-bold flex items-center gap-1.5">
                 <AlertTriangle className="h-3.5 w-3.5" />
                 <span>Offline Mode (Saved Locally)</span>
               </span>
@@ -1170,7 +1221,7 @@ function AssessmentContent() {
 
           <div className="flex items-center gap-4">
             {overallTimeLeft !== null && (
-              <div className="flex items-center gap-2 text-rose-400 font-mono font-bold text-sm bg-rose-500/10 border border-rose-500/20 px-3 py-1.5 rounded-xl">
+              <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-mono font-bold text-sm bg-rose-500/10 border border-rose-500/20 px-3 py-1.5 rounded-xl">
                 <Clock className="h-4 w-4 animate-spin" />
                 <span>Overall: {formatTime(overallTimeLeft)}</span>
               </div>
@@ -1179,7 +1230,7 @@ function AssessmentContent() {
               <Button
                 variant="outline"
                 onClick={handleSaveAndExit}
-                className="rounded-xl border-white/10 bg-white/5 text-slate-350 hover:text-white px-3.5 h-9 border flex items-center gap-1.5 cursor-pointer"
+                className="rounded-xl border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 px-3.5 h-9 border flex items-center gap-1.5 cursor-pointer transition-colors"
               >
                 <Save className="h-3.5 w-3.5" />
                 <span>Save & Exit</span>
@@ -1238,28 +1289,28 @@ function AssessmentContent() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="glass-panel border-white/5 rounded-2xl p-6 md:p-8 space-y-6 text-center"
+          className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-6 md:p-8 space-y-6 text-center shadow-xl"
         >
-          <div className="h-14 w-14 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mx-auto">
+          <div className="h-14 w-14 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mx-auto">
             <Info className="h-6 w-6" />
           </div>
 
           <div className="space-y-2">
-            <h3 className="text-xl font-bold text-white tracking-tight">Ready to Submit?</h3>
-            <p className="text-slate-400 text-xs font-semibold px-4 leading-relaxed">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Ready to Submit?</h3>
+            <p className="text-slate-600 dark:text-slate-400 text-xs font-semibold px-4 leading-relaxed">
               Once submitted, you will not be able to change your choices or resume the attempt.
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4 py-2">
-            <div className="p-4 bg-emerald-500/5 border border-emerald-500/15 rounded-xl">
-              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Answered</span>
-              <span className="text-xl font-black text-emerald-400 block mt-1">{answeredCount}</span>
+            <div className="p-4 bg-slate-100/70 dark:bg-[#121c33]/70 border border-slate-200 dark:border-slate-700/60 rounded-xl">
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider block">Answered</span>
+              <span className="text-xl font-black text-emerald-600 dark:text-emerald-400 block mt-1">{answeredCount}</span>
             </div>
             <div className={`p-4 rounded-xl border ${
               unansweredCount > 0 
-                ? "bg-rose-500/5 border-rose-500/15 text-rose-400" 
-                : "bg-white/2 border-white/5 text-slate-450"
+                ? "bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400" 
+                : "bg-slate-100/70 dark:bg-[#121c33]/70 border-slate-200 dark:border-slate-700/60 text-slate-500 dark:text-slate-400"
             }`}>
               <span className="text-[10px] font-bold uppercase tracking-wider block">Unanswered</span>
               <span className="text-xl font-black block mt-1">{unansweredCount}</span>
@@ -1269,7 +1320,7 @@ function AssessmentContent() {
           <div className="flex flex-col gap-2.5 pt-2">
             <Button
               onClick={() => submitAssessment(false)}
-              className="w-full h-11 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-550 hover:to-cyan-550 text-white font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer border-none shadow-lg brand-button-glow"
+              className="w-full h-11 bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer border-none shadow-md shadow-indigo-500/20 transition-all"
             >
               <Check className="h-4.5 w-4.5" />
               <span>Finalize & Submit</span>
@@ -1278,7 +1329,7 @@ function AssessmentContent() {
             <Button
               variant="outline"
               onClick={() => setView("playing")}
-              className="w-full h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold rounded-xl cursor-pointer"
+              className="w-full h-11 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold rounded-xl cursor-pointer transition-colors"
             >
               Back to Assessment
             </Button>
@@ -1298,7 +1349,7 @@ function AssessmentContent() {
           pin={pin || "000000"}
           nickname={nickname}
           results={results}
-          onGoHome={() => router.push("/dashboard")}
+          onGoHome={() => router.push(isLiveMode ? "/" : "/dashboard")}
         />
       </div>
     );
@@ -1307,16 +1358,30 @@ function AssessmentContent() {
   return null;
 }
 
-export default function AssessmentPage() {
+function AssessmentPageWrapper() {
+  const searchParams = useSearchParams();
+  const pin = searchParams ? searchParams.get("pin") : null;
+
+  if (pin) {
+    // Live mode assessment: Allow anonymous guest students without requiring account login
+    return <AssessmentContent />;
+  }
+
   return (
     <ProtectedRoute allowedRoles={["student", "teacher", "admin"]}>
-      <Suspense fallback={
-        <div className="min-h-screen bg-[#02050c] flex items-center justify-center text-white">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
-        </div>
-      }>
-        <AssessmentContent />
-      </Suspense>
+      <AssessmentContent />
     </ProtectedRoute>
+  );
+}
+
+export default function AssessmentPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-50 dark:bg-[#060b18] flex items-center justify-center text-slate-800 dark:text-white">
+        <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+      </div>
+    }>
+      <AssessmentPageWrapper />
+    </Suspense>
   );
 }

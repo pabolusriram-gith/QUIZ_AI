@@ -12,9 +12,9 @@ import {
   ChevronDown, 
   BrainCircuit, 
   Sun, 
-  Moon 
+  Moon,
+  PlayCircle
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
 export default function Home() {
   const router = useRouter();
@@ -51,85 +51,33 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-[#f1f5f9] dark:bg-[#060e22] text-slate-900 dark:text-slate-100 font-sans flex flex-col justify-between transition-colors duration-300">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-b from-[#f8fafc] via-[#eef2ff] to-[#e0e7ff] dark:bg-gradient-to-b dark:from-[#081028] dark:via-[#070e22] dark:to-[#040816] text-slate-900 dark:text-slate-100 font-sans flex flex-col justify-between transition-colors duration-300">
       
-      {/* --- Ambient Visual Background Layers (Refined AI SaaS Atmosphere) --- */}
+      {/* --- Ambient Visual Background Layers (Rich Atmospheric AI Mesh) --- */}
       <div className="pointer-events-none select-none absolute inset-0 overflow-hidden z-0" aria-hidden="true">
-        {/* Layer 1: Multi-tier heavily blurred ambient radial glows */}
+        {/* Layer 1: Subtle Tech Dot Matrix Grid */}
+        <div className="absolute inset-0 bg-[radial-gradient(#818cf835_1.2px,transparent_1.2px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_80%_65%_at_50%_35%,#000_70%,transparent_100%)] opacity-70" />
         
-        {/* Hero Top-Center Blue/Indigo Ambient Core */}
-        <div className="absolute -top-[80px] left-1/2 -translate-x-1/2 w-[900px] h-[480px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.12),rgba(59,130,246,0.06),transparent_70%)] dark:bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.22),rgba(59,130,246,0.10),transparent_70%)] blur-[125px]" />
+        {/* Layer 2: Overhead Aurora Glow Beam */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[420px] bg-gradient-to-b from-indigo-500/28 via-cyan-400/16 to-transparent blur-[115px]" />
 
-        {/* Hero Upper-Side Soft Indigo Accent */}
-        <div className="absolute top-[8%] left-[10%] w-[500px] h-[400px] rounded-full bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.08),transparent_70%)] dark:bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.14),transparent_70%)] blur-[110px]" />
-
-        {/* Lower-Left Subtle Violet/Indigo Atmosphere */}
-        <div className="absolute top-[50%] -left-[10%] w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.06),transparent_70%)] dark:bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.12),transparent_70%)] blur-[140px]" />
-
-        {/* Lower-Right Subtle Cyan Atmosphere */}
-        <div className="absolute top-[45%] -right-[10%] w-[650px] h-[650px] rounded-full bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.06),transparent_70%)] dark:bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.11),transparent_70%)] blur-[140px]" />
-
-        {/* Layer 2: Extremely Subtle Technological Dot Texture with Smooth Radial Mask */}
-        <div 
-          className="absolute inset-0 opacity-[0.20] dark:opacity-[0.16]" 
-          style={{
-            backgroundImage: "radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.25) 1px, transparent 0)",
-            backgroundSize: "40px 40px",
-            maskImage: "radial-gradient(ellipse 70% 60% at 50% 30%, black 15%, transparent 80%)",
-            WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 30%, black 15%, transparent 80%)"
-          }}
-        />
-
-        {/* Layer 3: Barely Visible Flowing Light / Orbit Arcs & Sparse Ambient Accents */}
-        <svg
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[750px] opacity-[0.16] dark:opacity-[0.22]"
-          viewBox="0 0 1200 750"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            <linearGradient id="orbit-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#6366f1" stopOpacity="0" />
-              <stop offset="35%" stopColor="#6366f1" stopOpacity="0.5" />
-              <stop offset="70%" stopColor="#06b6d4" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#06b6d4" stopOpacity="0" />
-            </linearGradient>
-            <linearGradient id="orbit-grad-2" x1="100%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0" />
-              <stop offset="50%" stopColor="#6366f1" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#06b6d4" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-
-          {/* Faint flowing orbital arcs */}
-          <path
-            d="M -80 300 C 320 140, 880 460, 1280 300"
-            stroke="url(#orbit-grad-1)"
-            strokeWidth="1"
-            strokeDasharray="4 6"
-          />
-          <path
-            d="M -30 400 C 370 530, 830 190, 1230 250"
-            stroke="url(#orbit-grad-2)"
-            strokeWidth="0.75"
-          />
-
-          {/* Sparse particle nodes */}
-          <circle cx="280" cy="190" r="2" fill="#6366f1" opacity="0.4" />
-          <circle cx="920" cy="240" r="2" fill="#06b6d4" opacity="0.45" />
-          <circle cx="620" cy="380" r="1.5" fill="#8b5cf6" opacity="0.3" />
-        </svg>
+        {/* Layer 3: Floating Animated Nebula Orbs */}
+        <div className="absolute -top-24 -left-16 h-[580px] w-[580px] rounded-full bg-gradient-to-tr from-indigo-600/30 via-blue-600/22 to-violet-500/20 blur-[135px] animate-nebula-1" />
+        <div className="absolute -bottom-24 -right-16 h-[580px] w-[580px] rounded-full bg-gradient-to-bl from-cyan-400/25 via-sky-500/22 to-blue-600/20 blur-[135px] animate-nebula-2" />
+        
+        {/* Layer 4: Soft Subtle Center Atmosphere */}
+        <div className="absolute top-[38%] left-1/2 -translate-x-1/2 -translate-y-1/2 h-[650px] w-[650px] rounded-full bg-indigo-500/14 blur-[160px]" />
       </div>
 
       {/* Top Navbar */}
-      <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 dark:border-slate-800/80 bg-[#f1f5f9]/85 dark:bg-[#060e22]/85 backdrop-blur-md">
+      <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 dark:border-indigo-400/15 bg-[#f8fafc]/85 dark:bg-[#081028]/85 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="h-8 w-8 rounded-xl bg-indigo-600/10 dark:bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition-transform">
+            <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-blue-500 via-indigo-500 to-cyan-400 border border-indigo-400/40 flex items-center justify-center text-white shadow-md shadow-indigo-500/30 group-hover:scale-105 transition-transform">
               <BrainCircuit className="h-4.5 w-4.5" />
             </div>
             <span className="text-base font-extrabold font-display tracking-tight text-slate-900 dark:text-white">
-              QuizVerse <span className="text-indigo-600 dark:text-indigo-400">AI</span>
+              QuizVerse <span className="bg-gradient-to-r from-indigo-400 via-cyan-400 to-sky-300 bg-clip-text text-transparent">AI</span>
             </span>
           </Link>
 
@@ -173,14 +121,10 @@ export default function Home() {
         
         {/* Header Content */}
         <div className="text-center space-y-6 max-w-3xl">
-          <motion.div 
-            initial={{ opacity: 0, y: -8 }} 
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-300 text-xs font-bold"
-          >
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-300 text-xs font-bold">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Next-Generation Educational Assessment Platform</span>
-          </motion.div>
+          </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold font-display tracking-tight text-slate-900 dark:text-white leading-[1.15]">
             Transform Learning with <br />
@@ -202,7 +146,7 @@ export default function Home() {
                   router.push(`/join?pin=${encodeURIComponent(gamePin.trim())}`);
                 }
               }}
-              className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-1.5 shadow-sm focus-within:border-indigo-500 transition-all w-full"
+              className="flex items-center gap-2 bg-white dark:bg-[#0d1633] border border-slate-200 dark:border-indigo-400/25 rounded-2xl p-1.5 shadow-sm focus-within:border-indigo-400 transition-all w-full"
             >
               <input
                 type="text"
@@ -213,15 +157,16 @@ export default function Home() {
               />
               <button 
                 type="submit" 
-                className="px-4 h-9 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-sm cursor-pointer border-none transition-all flex items-center gap-1 shrink-0"
+                className="px-4 h-9 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-500/25 cursor-pointer border-none transition-all flex items-center gap-1 shrink-0"
               >
                 <span>Submit</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </form>
-            <Link href="/dashboard" className="shrink-0 w-full sm:w-auto">
-              <button className="w-full sm:w-auto px-5 h-12 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold text-xs flex items-center justify-center cursor-pointer transition-all shadow-xs">
-                Host a Quiz
+            <Link href="/dashboard" className="shrink-0 w-full sm:w-auto group">
+              <button className="w-full sm:w-auto px-6 h-12 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:via-indigo-400 hover:to-cyan-400 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all duration-300 shadow-[0_4px_22px_rgba(99,102,241,0.45)] hover:shadow-[0_6px_30px_rgba(99,102,241,0.65)] border border-indigo-300/40 hover:border-indigo-200/60 active:scale-[0.98]">
+                <PlayCircle className="h-4.5 w-4.5 text-cyan-200 group-hover:text-white transition-colors" />
+                <span className="tracking-wide">Host a Quiz</span>
               </button>
             </Link>
           </div>
@@ -366,20 +311,11 @@ export default function Home() {
                     <span>{faq.question}</span>
                     <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${isOpen ? "rotate-180 text-indigo-600" : ""}`} />
                   </button>
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div 
-                        initial={{ height: 0, opacity: 0 }} 
-                        animate={{ height: "auto", opacity: 1 }} 
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <p className="px-5 pb-4 text-xs text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-200 dark:border-slate-800 pt-3">
-                          {faq.answer}
-                        </p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  {isOpen && (
+                    <div className="px-5 pb-4 text-xs text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-200 dark:border-slate-800 pt-3 transition-all duration-200">
+                      {faq.answer}
+                    </div>
+                  )}
                 </div>
               );
             })}
