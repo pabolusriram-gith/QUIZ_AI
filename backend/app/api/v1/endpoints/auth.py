@@ -863,7 +863,7 @@ async def google_callback(
                 email=email_clean,
                 full_name=full_name,
                 hashed_password=hash_password(secrets.token_urlsafe(32)),
-                role="student",
+                role="teacher",
                 token_version=1,
                 is_active=True
             )
@@ -1020,7 +1020,7 @@ async def github_callback(
             email=email_clean,
             full_name=full_name,
             hashed_password=hash_password(secrets.token_urlsafe(32)),
-            role="student",
+            role="teacher",
             token_version=1,
             is_active=True
         )
