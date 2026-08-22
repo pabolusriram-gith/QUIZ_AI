@@ -76,8 +76,13 @@ export default function UserMenu() {
           >
             {/* Header info */}
             <div className="px-3 py-2.5 border-b border-border mb-1">
-              <p className="text-xs text-muted-foreground font-medium">Signed in as</p>
-              <p className="text-sm font-semibold text-foreground truncate mt-0.5">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-muted-foreground font-medium">Signed in as</p>
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500 dark:text-cyan-400 border border-indigo-500/20">
+                  {currentUser.role || "User"}
+                </span>
+              </div>
+              <p className="text-sm font-semibold text-foreground truncate mt-1">
                 {currentUser.full_name || "User"}
               </p>
               <p className="text-xs text-muted-foreground truncate mt-0.5">
