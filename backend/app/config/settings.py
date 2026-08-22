@@ -70,7 +70,8 @@ class Settings(BaseSettings):
     @classmethod
     def strip_oauth_secrets(cls, v):
         if isinstance(v, str):
-            return v.strip()
+            import re
+            return re.sub(r'\s+', '', v)
         return v
 
     # SMTP Settings (For Password Recovery Emails)
