@@ -758,7 +758,7 @@ async def google_login(request: Request) -> Any:
         print(f"[OAUTH DEBUG] WARNING: Redirect URI does NOT match exact Google Console callback string: http://localhost:8000/api/v1/auth/google/callback")
         
     params = {
-        "client_id": settings.GOOGLE_CLIENT_ID,
+        "client_id": settings.GOOGLE_CLIENT_ID.strip() if settings.GOOGLE_CLIENT_ID else "",
         "redirect_uri": redirect_uri,
         "response_type": "code",
         "scope": "openid email profile",
@@ -809,8 +809,8 @@ async def google_callback(
             token_res = await client.post(
                 "https://oauth2.googleapis.com/token",
                 data={
-                    "client_id": settings.GOOGLE_CLIENT_ID,
-                    "client_secret": settings.GOOGLE_CLIENT_SECRET,
+                    "client_id": settings.GOOGLE_CLIENT_ID.strip() if settings.GOOGLE_CLIENT_ID else "",
+                    "client_secret": settings.GOOGLE_CLIENT_SECRET.strip() if settings.GOOGLE_CLIENT_SECRET else "",
                     "code": code,
                     "redirect_uri": redirect_uri,
                     "grant_type": "authorization_code",

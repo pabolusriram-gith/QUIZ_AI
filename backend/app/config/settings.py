@@ -66,6 +66,13 @@ class Settings(BaseSettings):
     GITHUB_CLIENT_SECRET: Optional[str] = None
     FRONTEND_URL: str = "http://localhost:3000"
 
+    @field_validator("GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GITHUB_CLIENT_ID", "GITHUB_CLIENT_SECRET", mode="before")
+    @classmethod
+    def strip_oauth_secrets(cls, v):
+        if isinstance(v, str):
+            return v.strip()
+        return v
+
     # SMTP Settings (For Password Recovery Emails)
     SMTP_HOST: Optional[str] = None
     SMTP_PORT: Optional[int] = 587
