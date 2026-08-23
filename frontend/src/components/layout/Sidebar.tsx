@@ -50,7 +50,7 @@ export default function Sidebar({
   const { currentUser } = useAuth();
 
   // Paths where we want EXACT match only (no startsWith for children)
-  const exactMatchPaths = ["/dashboard/analytics"];
+  const exactMatchPaths: string[] = [];
 
   const renderNavItems = () => {
     const filteredConfig = sidebarConfig.filter((item: SidebarItem) => {
