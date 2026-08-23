@@ -50,7 +50,7 @@ export default function Sidebar({
   const { currentUser } = useAuth();
 
   // Paths where we want EXACT match only (no startsWith for children)
-  const exactMatchPaths: string[] = [];
+  const exactMatchPaths: string[] = ["/dashboard"];
 
   const renderNavItems = () => {
     const filteredConfig = sidebarConfig.filter((item: SidebarItem) => {
@@ -101,19 +101,19 @@ export default function Sidebar({
           onClick={() => setIsMobileOpen(false)}
           className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
             isActive
-              ? "bg-indigo-500/10 dark:bg-indigo-500/12 text-indigo-600 dark:text-indigo-300 font-semibold border border-indigo-500/15 dark:border-indigo-500/20 shadow-sm"
-              : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-black/5 dark:hover:bg-white/5 border border-transparent"
+              ? "bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 font-semibold border border-indigo-100 dark:border-indigo-500/20 shadow-xs"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent"
           }`}
         >
           {/* Active indicator bar */}
           {isActive && (
-            <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-full bg-indigo-500 dark:bg-indigo-400" />
+            <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-full bg-indigo-600 dark:bg-indigo-400" />
           )}
           <Icon
             className={`h-[18px] w-[18px] shrink-0 transition-colors ${
               isActive
-                ? "text-indigo-500 dark:text-indigo-400"
-                : "text-slate-400 dark:text-slate-500 group-hover:text-indigo-500 dark:group-hover:text-cyan-400"
+                ? "text-indigo-600 dark:text-indigo-400"
+                : "text-slate-400 dark:text-slate-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
             }`}
           />
           {!isCollapsed && <span className="truncate">{item.name}</span>}
@@ -133,14 +133,14 @@ export default function Sidebar({
       {isMobileOpen && (
         <div
           onClick={() => setIsMobileOpen(false)}
-          className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
+          className="fixed inset-0 bg-slate-900/60 dark:bg-black/70 backdrop-blur-xs z-40 lg:hidden transition-opacity duration-300"
           aria-hidden="true"
         />
       )}
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 bg-sidebar/60 backdrop-blur-xl border-r border-sidebar-border flex flex-col z-40 transition-all duration-300 ease-in-out ${
+        className={`fixed top-0 bottom-0 left-0 bg-white dark:bg-[#120b24] border-r border-slate-200 dark:border-purple-500/15 flex flex-col z-50 transition-all duration-300 ease-in-out shadow-2xl lg:shadow-none ${
           isMobileOpen
             ? "translate-x-0 w-64"
             : "-translate-x-full lg:translate-x-0"
@@ -148,7 +148,7 @@ export default function Sidebar({
       >
         {/* Header / Branding */}
         <div
-          className={`flex h-16 items-center justify-between border-b border-sidebar-border px-4 ${
+          className={`flex h-16 items-center justify-between border-b border-slate-200 dark:border-purple-500/15 px-4 ${
             isCollapsed ? "lg:justify-center lg:px-2" : ""
           }`}
         >
@@ -167,7 +167,7 @@ export default function Sidebar({
           {/* Mobile close */}
           <button
             onClick={() => setIsMobileOpen(false)}
-            className="p-1.5 rounded-lg text-slate-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-slate-700 dark:hover:text-white lg:hidden cursor-pointer transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-700 dark:hover:text-white lg:hidden cursor-pointer transition-colors"
             aria-label="Close sidebar"
           >
             <X className="h-4.5 w-4.5" />
@@ -180,7 +180,7 @@ export default function Sidebar({
         </nav>
 
         {/* Collapse toggle — desktop only */}
-        <div className="p-3 border-t border-sidebar-border hidden lg:block">
+        <div className="p-3 border-t border-slate-200 dark:border-purple-500/15 hidden lg:block">
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer text-sm font-medium"
