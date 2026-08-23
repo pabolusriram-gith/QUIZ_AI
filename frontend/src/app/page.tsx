@@ -51,7 +51,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-b from-[#f8fafc] via-[#eef2ff] to-[#e0e7ff] dark:from-[#09090f] dark:via-[#09090f] dark:to-[#0d0a14] text-slate-900 dark:text-slate-100 font-sans flex flex-col justify-between transition-colors duration-300">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-b from-[#f8fafc] via-[#eef2ff] to-[#e0e7ff] dark:from-[#1e143c] dark:via-[#170f2e] dark:to-[#120b24] text-slate-900 dark:text-slate-100 font-sans flex flex-col justify-between transition-colors duration-300">
       
       {/* --- Ambient Visual Background Layers --- */}
       <div className="pointer-events-none select-none absolute inset-0 overflow-hidden z-0" aria-hidden="true">
@@ -70,7 +70,7 @@ export default function Home() {
       </div>
 
       {/* Top Navbar */}
-      <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 dark:border-violet-500/10 bg-[#f8fafc]/85 dark:bg-[#09090f]/85 backdrop-blur-md">
+      <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 dark:border-violet-500/10 bg-[#f8fafc]/85 dark:bg-[#120b24]/85 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-blue-500 via-indigo-500 to-cyan-400 border border-indigo-400/40 flex items-center justify-center text-white shadow-md shadow-indigo-500/30 group-hover:scale-105 transition-transform">
@@ -351,7 +351,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full border-t border-slate-200/80 dark:border-violet-500/10 bg-[#eef2f7]/70 dark:bg-[#09090f]">
+      <footer className="w-full border-t border-slate-200/80 dark:border-violet-500/10 bg-[#eef2f7]/70 dark:bg-[#120b24]">
         <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-500 font-medium">
           <div className="flex items-center gap-2">
             <BrainCircuit className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />

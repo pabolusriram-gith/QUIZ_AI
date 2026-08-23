@@ -139,7 +139,7 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-b from-[#f8fafc] via-[#eef2ff] to-[#e0e7ff] dark:bg-gradient-to-b dark:from-[#09090f] dark:via-[#09090f] dark:to-[#0d0a14] text-foreground flex flex-col justify-between items-center py-10 px-4">
+    <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-b from-[#f8fafc] via-[#eef2ff] to-[#e0e7ff] dark:bg-gradient-to-b dark:from-[#1e143c] dark:via-[#170f2e] dark:to-[#120b24] text-foreground flex flex-col justify-between items-center py-10 px-4">
  
       {/* Background Design */}
       <div
