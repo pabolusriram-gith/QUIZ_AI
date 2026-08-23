@@ -51,26 +51,26 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-b from-[#f8fafc] via-[#eef2ff] to-[#e0e7ff] dark:bg-gradient-to-b dark:from-[#081028] dark:via-[#070e22] dark:to-[#040816] text-slate-900 dark:text-slate-100 font-sans flex flex-col justify-between transition-colors duration-300">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-b from-[#f8fafc] via-[#eef2ff] to-[#e0e7ff] dark:from-[#09090f] dark:via-[#09090f] dark:to-[#0d0a14] text-slate-900 dark:text-slate-100 font-sans flex flex-col justify-between transition-colors duration-300">
       
-      {/* --- Ambient Visual Background Layers (Rich Atmospheric AI Mesh) --- */}
+      {/* --- Ambient Visual Background Layers --- */}
       <div className="pointer-events-none select-none absolute inset-0 overflow-hidden z-0" aria-hidden="true">
-        {/* Layer 1: Subtle Tech Dot Matrix Grid */}
-        <div className="absolute inset-0 bg-[radial-gradient(#818cf835_1.2px,transparent_1.2px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_80%_65%_at_50%_35%,#000_70%,transparent_100%)] opacity-70" />
+        {/* Layer 1: Dot Matrix Grid — violet tinted in dark */}
+        <div className="absolute inset-0 bg-[radial-gradient(#818cf835_1.2px,transparent_1.2px)] dark:bg-[radial-gradient(rgba(139,92,246,0.12)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_80%_65%_at_50%_35%,#000_70%,transparent_100%)] opacity-70" />
         
-        {/* Layer 2: Overhead Aurora Glow Beam */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[420px] bg-gradient-to-b from-indigo-500/28 via-cyan-400/16 to-transparent blur-[115px]" />
+        {/* Layer 2: Overhead Aurora Beam — rich violet-cyan in dark */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[500px] bg-gradient-to-b from-indigo-500/28 via-cyan-400/16 to-transparent dark:from-violet-600/35 dark:via-cyan-500/18 dark:to-transparent blur-[115px]" />
 
-        {/* Layer 3: Floating Animated Nebula Orbs */}
-        <div className="absolute -top-24 -left-16 h-[580px] w-[580px] rounded-full bg-gradient-to-tr from-indigo-600/30 via-blue-600/22 to-violet-500/20 blur-[135px] animate-nebula-1" />
-        <div className="absolute -bottom-24 -right-16 h-[580px] w-[580px] rounded-full bg-gradient-to-bl from-cyan-400/25 via-sky-500/22 to-blue-600/20 blur-[135px] animate-nebula-2" />
+        {/* Layer 3: Floating Nebula Orbs — vivid in dark */}
+        <div className="absolute -top-24 -left-16 h-[580px] w-[580px] rounded-full bg-gradient-to-tr from-indigo-600/30 via-blue-600/22 to-violet-500/20 dark:from-violet-700/35 dark:via-purple-700/22 dark:to-transparent blur-[135px] animate-nebula-1" />
+        <div className="absolute -bottom-24 -right-16 h-[580px] w-[580px] rounded-full bg-gradient-to-bl from-cyan-400/25 via-sky-500/22 to-blue-600/20 dark:from-cyan-500/28 dark:via-sky-600/18 dark:to-transparent blur-[135px] animate-nebula-2" />
         
-        {/* Layer 4: Soft Subtle Center Atmosphere */}
-        <div className="absolute top-[38%] left-1/2 -translate-x-1/2 -translate-y-1/2 h-[650px] w-[650px] rounded-full bg-indigo-500/14 blur-[160px]" />
+        {/* Layer 4: Center atmosphere */}
+        <div className="absolute top-[38%] left-1/2 -translate-x-1/2 -translate-y-1/2 h-[650px] w-[650px] rounded-full bg-indigo-500/14 dark:bg-violet-900/12 blur-[160px]" />
       </div>
 
       {/* Top Navbar */}
-      <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 dark:border-indigo-400/15 bg-[#f8fafc]/85 dark:bg-[#081028]/85 backdrop-blur-md">
+      <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 dark:border-violet-500/10 bg-[#f8fafc]/85 dark:bg-[#09090f]/85 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-blue-500 via-indigo-500 to-cyan-400 border border-indigo-400/40 flex items-center justify-center text-white shadow-md shadow-indigo-500/30 group-hover:scale-105 transition-transform">
@@ -184,9 +184,9 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="glass-panel border-slate-200 dark:border-slate-800 rounded-3xl p-6 flex flex-col justify-between space-y-4 shadow-sm hover:border-indigo-500/40 transition-colors">
+            <div className="glass-panel dark-card-hover border-slate-200 dark:border-violet-500/14 rounded-3xl p-6 flex flex-col justify-between space-y-4 shadow-sm hover:border-indigo-500/40 dark:hover:border-violet-400/30 transition-colors">
               <div className="space-y-3.5">
-                <div className="h-11 w-11 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                <div className="h-11 w-11 rounded-2xl bg-indigo-500/10 dark:bg-violet-500/10 border border-indigo-500/20 dark:border-violet-500/25 flex items-center justify-center text-indigo-600 dark:text-violet-400">
                   <Sparkles className="h-5 w-5" />
                 </div>
                 <div>
@@ -198,12 +198,12 @@ export default function Home() {
                   </p>
                 </div>
               </div>
-              <div className="h-1 w-12 rounded-full bg-indigo-500" />
+              <div className="h-1 w-12 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500" />
             </div>
 
-            <div className="glass-panel border-slate-200 dark:border-slate-800 rounded-3xl p-6 flex flex-col justify-between space-y-4 shadow-sm hover:border-cyan-500/40 transition-colors">
+            <div className="glass-panel dark-card-hover border-slate-200 dark:border-cyan-500/14 rounded-3xl p-6 flex flex-col justify-between space-y-4 shadow-sm hover:border-cyan-500/40 dark:hover:border-cyan-400/30 transition-colors">
               <div className="space-y-3.5">
-                <div className="h-11 w-11 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
+                <div className="h-11 w-11 rounded-2xl bg-cyan-500/10 dark:bg-cyan-500/10 border border-cyan-500/20 dark:border-cyan-500/25 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
                   <Shield className="h-5 w-5" />
                 </div>
                 <div>
@@ -215,12 +215,12 @@ export default function Home() {
                   </p>
                 </div>
               </div>
-              <div className="h-1 w-12 rounded-full bg-cyan-500" />
+              <div className="h-1 w-12 rounded-full bg-gradient-to-r from-cyan-500 to-sky-400" />
             </div>
 
-            <div className="glass-panel border-slate-200 dark:border-slate-800 rounded-3xl p-6 flex flex-col justify-between space-y-4 shadow-sm hover:border-emerald-500/40 transition-colors">
+            <div className="glass-panel dark-card-hover border-slate-200 dark:border-emerald-500/14 rounded-3xl p-6 flex flex-col justify-between space-y-4 shadow-sm hover:border-emerald-500/40 dark:hover:border-emerald-400/30 transition-colors">
               <div className="space-y-3.5">
-                <div className="h-11 w-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                <div className="h-11 w-11 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/10 border border-emerald-500/20 dark:border-emerald-500/25 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                   <LineChart className="h-5 w-5" />
                 </div>
                 <div>
@@ -232,7 +232,7 @@ export default function Home() {
                   </p>
                 </div>
               </div>
-              <div className="h-1 w-12 rounded-full bg-emerald-500" />
+              <div className="h-1 w-12 rounded-full bg-gradient-to-r from-emerald-500 to-teal-400" />
             </div>
           </div>
         </div>
@@ -254,32 +254,36 @@ export default function Home() {
                 step: "01",
                 title: "Draft or AI Generate",
                 desc: "Compose questions manually or prompt our multi-model AI engine to formulate questions from any topic.",
+                accent: "from-violet-500 to-indigo-500",
               },
               {
                 step: "02",
                 title: "Conduct Secure Tests",
                 desc: "Share your unique Quiz PIN with participants. Students join instantly on desktop or mobile.",
+                accent: "from-cyan-500 to-sky-400",
               },
               {
                 step: "03",
                 title: "Analyze & Export",
                 desc: "Review automated grading, individual student answer breakdowns, and export reports for academic records.",
+                accent: "from-emerald-500 to-teal-400",
               },
             ].map((s) => (
               <div
                 key={s.step}
-                className="glass-panel border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm relative overflow-hidden"
+                className="glass-panel dark-card-hover border-slate-200 dark:border-violet-500/14 rounded-3xl p-6 space-y-4 shadow-sm relative overflow-hidden"
               >
-                <span className="text-4xl font-extrabold text-slate-200 dark:text-slate-800 font-display absolute top-4 right-5 select-none pointer-events-none">
+                <span className="text-4xl font-extrabold text-slate-200 dark:text-white/5 font-display absolute top-4 right-5 select-none pointer-events-none">
                   {s.step}
                 </span>
-                <div className="h-8 w-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-xs">
-                  {s.step}
+                <div className={`h-8 w-8 rounded-xl bg-gradient-to-br ${s.accent} bg-opacity-10 border border-violet-500/20 dark:border-violet-500/20 flex items-center justify-center text-white font-bold text-xs shadow-sm`} style={{background: 'rgba(124,58,237,0.15)'}}>
+                  <span className="bg-gradient-to-br from-violet-400 to-cyan-400 bg-clip-text text-transparent font-extrabold">{s.step}</span>
                 </div>
                 <div className="space-y-1">
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white font-display">{s.title}</h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">{s.desc}</p>
                 </div>
+                <div className={`h-0.5 w-10 rounded-full bg-gradient-to-r ${s.accent}`} />
               </div>
             ))}
           </div>
@@ -324,16 +328,18 @@ export default function Home() {
 
         {/* CTA Card */}
         <div className="w-full">
-          <div className="glass-panel border-slate-200 dark:border-slate-800 rounded-3xl p-8 md:p-12 text-center space-y-5 shadow-sm">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-display tracking-tight">
+          <div className="relative overflow-hidden glass-panel-glow border-slate-200 dark:border-violet-500/25 rounded-3xl p-8 md:p-12 text-center space-y-5 shadow-sm">
+            {/* CTA ambient glow (dark only) */}
+            <div className="absolute inset-0 dark:bg-gradient-to-br dark:from-violet-900/20 dark:via-transparent dark:to-cyan-900/15 pointer-events-none" />
+            <h2 className="relative text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-display tracking-tight">
               Ready to Upgrade Your Classroom Tests?
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed font-medium">
+            <p className="relative text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed font-medium">
               Join educators worldwide delivering AI-assisted, proctored assessments with QuizVerse AI.
             </p>
-            <div className="pt-2 flex justify-center">
+            <div className="relative pt-2 flex justify-center">
               <Link href="/dashboard">
-                <button className="px-7 h-11 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/20 cursor-pointer transition-all flex items-center gap-1.5">
+                <button className="px-7 h-11 rounded-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-600 dark:from-violet-500 dark:via-indigo-500 dark:to-cyan-500 hover:from-violet-500 hover:via-indigo-500 hover:to-cyan-400 text-white font-bold text-xs shadow-md shadow-indigo-600/20 dark:shadow-violet-600/30 cursor-pointer transition-all flex items-center gap-1.5 dark:shadow-[0_4px_20px_rgba(124,58,237,0.4)] hover:dark:shadow-[0_6px_28px_rgba(124,58,237,0.6)]">
                   <span>Open Workspace</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </button>
@@ -345,8 +351,8 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full border-t border-slate-200/80 dark:border-slate-800/80 bg-[#eef2f7]/70 dark:bg-[#060e22]">
-        <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400 font-medium">
+      <footer className="w-full border-t border-slate-200/80 dark:border-violet-500/10 bg-[#eef2f7]/70 dark:bg-[#09090f]">
+        <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-500 font-medium">
           <div className="flex items-center gap-2">
             <BrainCircuit className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
             <span className="font-bold text-slate-900 dark:text-white">QuizVerse AI</span>

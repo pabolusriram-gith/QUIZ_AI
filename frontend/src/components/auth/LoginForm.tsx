@@ -155,7 +155,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-b from-[#f8fafc] via-[#eef2ff] to-[#e0e7ff] dark:bg-gradient-to-b dark:from-[#0d1e57] dark:via-[#091745] dark:to-[#061033] text-foreground flex flex-col justify-between items-center py-10 px-4">
+    <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-b from-[#f8fafc] via-[#eef2ff] to-[#e0e7ff] dark:bg-gradient-to-b dark:from-[#09090f] dark:via-[#09090f] dark:to-[#0d0a14] text-foreground flex flex-col justify-between items-center py-10 px-4">
       
       {/* ----------------- Background Design ----------------- */}
       
@@ -166,35 +166,19 @@ export default function LoginForm() {
       />
 
       {/* Overhead Aurora Glow Beam */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[850px] h-[380px] bg-gradient-to-b from-indigo-400/40 via-cyan-400/20 to-transparent blur-[90px] -z-15 pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[850px] h-[380px] bg-gradient-to-b from-indigo-400/40 via-cyan-400/20 to-transparent dark:from-violet-600/35 dark:via-cyan-500/18 dark:to-transparent blur-[90px] -z-15 pointer-events-none" />
  
       {/* Animated soft ambient gradient mesh */}
       <div className="absolute inset-0 -z-20 overflow-hidden pointer-events-none" aria-hidden="true">
-        <motion.div
-          animate={{
-            scale: [1, 1.15, 1],
-            x: [0, 35, 0],
-            y: [0, -25, 0],
-          }}
-          transition={{
-            duration: 13,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute -top-24 -left-16 h-[580px] w-[580px] rounded-full bg-gradient-to-tr from-indigo-500/45 via-blue-600/35 to-violet-500/30 blur-[120px]"
+        <motion.div 
+          animate={{ x: [0, 25, 0], y: [0, -25, 0], scale: [1, 1.05, 1] }} 
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-24 -left-16 h-[580px] w-[580px] rounded-full bg-gradient-to-tr from-indigo-600/40 via-blue-600/30 to-violet-500/25 dark:from-violet-700/35 dark:via-purple-700/22 dark:to-transparent blur-[130px]"
         />
-        <motion.div
-          animate={{
-            scale: [1, 1.18, 1],
-            x: [0, -30, 0],
-            y: [0, 30, 0],
-          }}
-          transition={{
-            duration: 16,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute -bottom-24 -right-16 h-[580px] w-[580px] rounded-full bg-gradient-to-bl from-cyan-400/40 via-sky-500/35 to-blue-600/30 blur-[130px]"
+        <motion.div 
+          animate={{ x: [0, -25, 0], y: [0, 25, 0], scale: [1, 1.05, 1] }} 
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          className="absolute -bottom-24 -right-16 h-[580px] w-[580px] rounded-full bg-gradient-to-bl from-cyan-400/40 via-sky-500/35 to-blue-600/30 dark:from-cyan-500/28 dark:via-sky-600/18 dark:to-transparent blur-[130px]"
         />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[520px] w-[520px] rounded-full bg-indigo-500/25 blur-[100px] pointer-events-none" />
       </div>

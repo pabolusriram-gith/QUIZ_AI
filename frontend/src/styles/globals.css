@@ -80,9 +80,15 @@ body {
 }
 
 .dark .glass-panel {
-  background: rgba(10, 20, 48, 0.50);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: none;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(139, 92, 246, 0.14);
+  box-shadow: 0 4px 24px -4px rgba(109, 40, 217, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.dark .glass-panel:hover {
+  border-color: rgba(139, 92, 246, 0.28);
+  box-shadow: 0 8px 32px -6px rgba(109, 40, 217, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .glass-panel-glow {
@@ -93,9 +99,12 @@ body {
 }
 
 .dark .glass-panel-glow {
-  background: rgba(10, 20, 48, 0.60);
-  border: 1px solid rgba(99, 102, 241, 0.15);
-  box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(124, 58, 237, 0.28);
+  box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.06) inset,
+              0 12px 40px -10px rgba(109, 40, 217, 0.20),
+              0 0 60px -20px rgba(34, 211, 238, 0.08);
 }
 
 /* Solid card utility for pages that need hard white/navy surfaces */
@@ -107,9 +116,20 @@ body {
 }
 
 .dark .page-card {
-  background: rgba(10, 18, 38, 0.80);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  box-shadow: none;
+  background: rgba(15, 14, 25, 0.90);
+  border: 1px solid rgba(139, 92, 246, 0.14);
+  box-shadow: 0 4px 24px -4px rgba(109, 40, 217, 0.08);
+}
+
+/* Dark theme card with hover glow (for interactive cards in dark mode) */
+.dark-card-hover {
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.dark .dark-card-hover:hover {
+  border-color: rgba(34, 211, 238, 0.30) !important;
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.06) inset,
+              0 8px 32px -6px rgba(34, 211, 238, 0.12),
+              0 0 40px -12px rgba(124, 58, 237, 0.10);
 }
 
 .brand-text-gradient {
@@ -176,44 +196,44 @@ body {
     --sidebar-ring: #4f46e5;
   }
 
-  /* Support toggles or explicit overrides cleanly */
+  /* ===== DARK THEME — DEEP SPACE INTELLIGENCE ===== */
   .dark {
-    --background: #060f23; /* deep navy, not pure black */
-    --foreground: #f1f5f9;
+    --background: #09090f; /* true deep space — near-black with cool undertone */
+    --foreground: #e8e8f0; /* slightly warm white for readability */
     
-    --card: rgba(10, 18, 38, 0.70);
-    --card-foreground: #f1f5f9;
+    --card: rgba(255, 255, 255, 0.034); /* ultra-thin glass card */
+    --card-foreground: #e8e8f0;
     
-    --popover: #0a1226;
-    --popover-foreground: #f1f5f9;
+    --popover: #111118; /* popovers are slightly elevated from bg */
+    --popover-foreground: #e8e8f0;
     
-    --primary: #6366f1; /* Indigo 500 */
+    --primary: #7c3aed; /* rich violet — vivid, AI-grade */
     --primary-foreground: #ffffff;
     
-    --secondary: #0f1e3a; /* slightly lighter than bg */
-    --secondary-foreground: #cbd5e1;
+    --secondary: rgba(124, 58, 237, 0.12); /* translucent violet chip */
+    --secondary-foreground: #c4b5fd;
     
-    --muted: #0c1530;
-    --muted-foreground: #94a3b8;
+    --muted: rgba(255, 255, 255, 0.05);
+    --muted-foreground: #8b8ba8; /* softer slate-purple */
     
-    --accent: #06b6d4;
-    --accent-foreground: #ffffff;
+    --accent: #22d3ee; /* electric cyan */
+    --accent-foreground: #030712;
     
     --destructive: #f43f5e;
     --destructive-foreground: #ffffff;
     
-    --border: rgba(255, 255, 255, 0.09);
+    --border: rgba(139, 92, 246, 0.16); /* violet-tinted border */
     --input: rgba(255, 255, 255, 0.05);
-    --ring: #6366f1;
+    --ring: #7c3aed;
     
-    --sidebar: #050d1f; /* slightly darker than page bg */
-    --sidebar-foreground: #94a3b8;
-    --sidebar-primary: #6366f1;
+    --sidebar: #07070d; /* darkest layer — sidebar feels separated */
+    --sidebar-foreground: #8b8ba8;
+    --sidebar-primary: #7c3aed;
     --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: rgba(255, 255, 255, 0.04);
-    --sidebar-accent-foreground: #f1f5f9;
-    --sidebar-border: rgba(255, 255, 255, 0.07);
-    --sidebar-ring: #6366f1;
+    --sidebar-accent: rgba(124, 58, 237, 0.08);
+    --sidebar-accent-foreground: #e8e8f0;
+    --sidebar-border: rgba(139, 92, 246, 0.10);
+    --sidebar-ring: #7c3aed;
   }
   
   * {

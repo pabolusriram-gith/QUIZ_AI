@@ -39,7 +39,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
 
   if (loading) {
     return (
-      <div className="min-h-screen w-full bg-gradient-to-b from-[#0a1538] via-[#07102a] to-[#050b1e] text-slate-100 flex items-center justify-center">
+      <div className="min-h-screen w-full bg-gradient-to-b from-[#09090f] via-[#0d0a14] to-[#07070d] text-slate-100 flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
           <div className="animate-spin rounded-full h-9 w-9 border-3 border-indigo-500 border-t-transparent shadow-lg shadow-indigo-500/20" />
           <p className="text-xs font-bold text-slate-300 tracking-wide font-sans">Checking authorization...</p>
