@@ -16,7 +16,8 @@ import {
   Award, 
   TrendingUp, 
   Sparkles, 
-  CheckCircle2 
+  CheckCircle2,
+  Zap
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -127,27 +128,23 @@ export default function StudentDashboard() {
             </p>
           </div>
 
-          <div className="shrink-0 p-4 rounded-2xl bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-cyan-500/10 border border-indigo-500/20 flex flex-col items-start gap-2.5 max-w-xs">
-            <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
-              Want to create quizzes or host live games?
-            </p>
-            <Button
-              onClick={async () => {
-                try {
-                  const { switchRole } = useAuth();
-                } catch {}
-                try {
-                  await api.patch("/users/me/role", { role: "teacher" });
-                  toast.success("Switched to Teacher Mode! Loading dashboard...");
-                  window.location.reload();
-                } catch (e) {
-                  toast.error("Failed to switch role. Please try again.");
-                }
-              }}
-              className="w-full text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 shadow-md rounded-xl h-9 cursor-pointer"
-            >
-              Switch to Teacher Mode 🚀
-            </Button>
+          <div className="shrink-0 p-5 rounded-2xl bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-cyan-500/10 border border-indigo-500/20 flex flex-col items-start gap-3 max-w-xs">
+            <div>
+              <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                Have a Live Game PIN?
+              </p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                Join your instructor&apos;s live quiz arena in real-time.
+              </p>
+            </div>
+            <Link href="/join" className="w-full">
+              <Button
+                className="w-full text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 shadow-md rounded-xl h-9 cursor-pointer gap-1.5"
+              >
+                <Zap className="w-3.5 h-3.5" />
+                Join with PIN
+              </Button>
+            </Link>
           </div>
         </div>
       </motion.div>

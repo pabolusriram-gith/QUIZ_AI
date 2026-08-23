@@ -414,7 +414,7 @@ export default function LoginForm() {
                   type="button"
                   onClick={() => {
                     setOauthLoading("google");
-                    window.location.href = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1") + "/auth/google/login?role=teacher";
+                    window.location.href = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1") + "/auth/google/login?role=student";
                   }}
                   disabled={isSubmitting || oauthLoading !== null}
                   className="w-full h-11 rounded-xl border border-slate-200 dark:border-indigo-400/30 bg-slate-100/80 dark:bg-[#132356]/85 hover:bg-slate-200/70 dark:hover:bg-[#182b68] text-slate-800 dark:text-slate-200 font-medium transition-all duration-200 shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
