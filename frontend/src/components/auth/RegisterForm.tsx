@@ -119,11 +119,11 @@ export default function RegisterForm() {
     setApiSuccess(null);
     try {
       await authService.register(data.fullName, data.email, data.password, data.role);
-      setApiSuccess("Account created successfully! Redirecting to login...");
+      setApiSuccess("Account created! Redirecting to email verification...");
 
       setTimeout(() => {
-        router.replace("/login");
-      }, 2000);
+        router.replace(`/verify-email?email=${encodeURIComponent(data.email)}`);
+      }, 1200);
 
     } catch (error: unknown) {
       const errorMsg = error instanceof Error ? error.message : String(error);

@@ -40,18 +40,20 @@ class Settings(BaseSettings):
             return url
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
-    # Redis Settings
-    REDIS_HOST: str = "localhost"
-    REDIS_PORT: int = 6379
+    # Redis Settings (Optional - In-memory fallback used when not configured)
+    REDIS_HOST: Optional[str] = None
+    REDIS_PORT: Optional[int] = None
     REDIS_PASSWORD: Optional[str] = None
     REDIS_URL: Optional[str] = None
 
     @property
-    def redis_connection_url(self) -> str:
+    def redis_connection_url(self) -> Optional[str]:
         if self.REDIS_URL:
             return self.REDIS_URL
-        auth = f":{self.REDIS_PASSWORD}@" if self.REDIS_PASSWORD else ""
-        return f"redis://{auth}{self.REDIS_HOST}:{self.REDIS_PORT}/0"
+        if self.REDIS_HOST and self.REDIS_PORT:
+            auth = f":{self.REDIS_PASSWORD}@" if self.REDIS_PASSWORD else ""
+            return f"redis://{auth}{self.REDIS_HOST}:{self.REDIS_PORT}/0"
+        return None
 
     # JWT Authentication Secrets
     SECRET_KEY: str = "super_secret_jwt_key_change_in_production_32bytes_min"
@@ -86,15 +88,15 @@ class Settings(BaseSettings):
     GROQ_API_KEY: Optional[str] = None
 
     # AI Configuration Controls
-    ENABLE_MOCK_PROVIDER: bool = False
-    AUTO_PROVIDER_ORDER: Union[List[str], str] = ["groq", "gemini", "openai"]
+    ENABLE_MOCK_PROVIDER: bool = True
+    AUTO_PROVIDER_ORDER: Union[List[str], str] = ["gemini", "groq", "openai"]
     
     # RAG Settings
     RAG_BATCH_SIZE: int = 500
     ENABLE_PGVECTOR: bool = False
 
-    # Redis Pub/Sub settings for horizontal scaling
-    ENABLE_REDIS_PUBSUB: bool = True
+    # Redis Pub/Sub settings for horizontal scaling (only when Redis cluster configured)
+    ENABLE_REDIS_PUBSUB: bool = False
     REDIS_PUBSUB_CHANNEL: str = "quizverse:broadcast"
     REDIS_RECONNECT_MAX_DELAY: int = 30
 

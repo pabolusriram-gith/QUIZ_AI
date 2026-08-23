@@ -51,7 +51,7 @@ class AIRateLimitGuard:
         question_count: int = Form(5),
         existing_questions: Optional[str] = Form(None),
         custom_prompt: Optional[str] = Form(None),
-        current_user: User = Depends(check_role(["teacher", "admin"]))
+        current_user: User = Depends(get_current_user)
     ):
         # 1. Admin bypass
         if current_user and current_user.role == "admin":
@@ -320,7 +320,7 @@ async def generate_questions(
     wrap_response: bool = Form(False),
     marks_mode: str = Form("default"),
     default_marks: int = Form(1),
-    current_user: User = Depends(check_role(["teacher", "admin"])),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """
@@ -610,7 +610,7 @@ async def generate_questions(
 async def check_duplicates(
     payload: Dict[str, Any],
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(check_role(["teacher", "admin"]))
+    current_user: User = Depends(get_current_user)
 ):
     """
     Compare generated questions with the existing Question Bank (questions table) 
@@ -681,7 +681,7 @@ async def regenerate_single_question(
     uniqueness_hint: Optional[str] = Form(None, description="Millisecond timestamp or random token to guarantee a novel question on every call"),
     target_difficulty_override: Optional[str] = Form(None, description="New difficulty to use instead of the original question's difficulty"),
     target_type_override: Optional[str] = Form(None, description="New question_type to use instead of the original question's type"),
-    current_user: User = Depends(check_role(["teacher", "admin"])),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """
@@ -865,7 +865,7 @@ async def enhance_prompt(
     prompt: str = Form(...),
     provider: str = Form("auto"),
     model_name: Optional[str] = Form(None),
-    current_user: User = Depends(check_role(["teacher", "admin"]))
+    current_user: User = Depends(get_current_user)
 ) -> Any:
     """
     Enhance a simple user prompt into a structured, professional quiz-generation instruction.

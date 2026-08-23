@@ -26,6 +26,7 @@ type LoginSchemaType = z.infer<typeof loginSchema>;
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
   const [oauthLoading, setOauthLoading] = useState<"google" | "github" | null>(null);
   const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
   
@@ -124,6 +125,7 @@ export default function LoginForm() {
 
   const onSubmit = async (data: LoginSchemaType) => {
     setApiError(null);
+    setUnverifiedEmail(null);
     try {
       await login(data.email, data.password, data.rememberMe);
       router.push("/dashboard");
@@ -135,7 +137,10 @@ export default function LoginForm() {
       // Axios error checking
       if (isAxiosError(error)) {
         if (error.response) {
-          if (error.response.status === 401) {
+          if (error.response.status === 403 || error.response.headers?.["x-email-unverified"] === "true") {
+            setUnverifiedEmail(data.email);
+            setApiError("Your email has not been verified yet. Please enter the verification code sent to your inbox.");
+          } else if (error.response.status === 401) {
             setApiError("Invalid email or password");
           } else if (error.response.status === 422) {
             setApiError("Invalid inputs sent to server. Please review details.");
@@ -258,12 +263,25 @@ export default function LoginForm() {
                 <motion.div
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-300 font-medium leading-relaxed flex items-start gap-2.5"
+                  className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/25 text-xs text-rose-600 dark:text-rose-300 font-medium leading-relaxed space-y-2.5"
                 >
-                  <svg className="h-4 w-4 text-rose-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                  <span>{apiError}</span>
+                  <div className="flex items-start gap-2.5">
+                    <svg className="h-4 w-4 text-rose-500 dark:text-rose-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span>{apiError}</span>
+                  </div>
+                  {unverifiedEmail && (
+                    <div className="pt-1">
+                      <Link
+                        href={`/verify-email?email=${encodeURIComponent(unverifiedEmail)}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[11px] shadow-sm transition-colors cursor-pointer"
+                      >
+                        <span>Verify Email Now</span>
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </div>
+                  )}
                 </motion.div>
               )}
 

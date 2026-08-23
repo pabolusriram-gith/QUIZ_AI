@@ -3,19 +3,19 @@ import redis
 
 # Optional Redis connection
 _redis_client = None
-try:
-    if settings.REDIS_URL or (settings.REDIS_HOST and settings.REDIS_PORT):
+if settings.redis_connection_url:
+    try:
         client = redis.from_url(
             settings.redis_connection_url, 
             decode_responses=True,
-            socket_connect_timeout=0.1,
-            socket_timeout=0.1
+            socket_connect_timeout=0.2,
+            socket_timeout=0.2
         )
         client.ping()
         _redis_client = client
-except Exception as e:
-    _redis_client = None
-    print(f"[-] Redis blacklist initialization failed: {e}. Falling back to in-memory.")
+    except Exception as e:
+        _redis_client = None
+        print(f"[-] Redis blacklist connection skipped ({e}). Using in-memory store.")
 
 # In-memory blacklist store fallback
 _in_memory_blacklist = {}

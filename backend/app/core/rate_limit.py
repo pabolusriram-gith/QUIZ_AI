@@ -44,22 +44,22 @@ return {1, 0, 0}
 # Optional Redis connection
 _redis_client = None
 _rate_limit_lua_script = None
-try:
-    if settings.REDIS_URL or (settings.REDIS_HOST and settings.REDIS_PORT):
+if settings.redis_connection_url:
+    try:
         url = settings.redis_connection_url
         client = redis.from_url(
             url, 
             decode_responses=True,
-            socket_connect_timeout=0.1,
-            socket_timeout=0.1
+            socket_connect_timeout=0.2,
+            socket_timeout=0.2
         )
         client.ping()
         _redis_client = client
         _rate_limit_lua_script = client.register_script(LUA_RATE_LIMIT_SCRIPT)
-except Exception as e:
-    _redis_client = None
-    _rate_limit_lua_script = None
-    print(f"[-] Redis rate limiter initialization failed: {e}. Falling back to in-memory.")
+    except Exception as e:
+        _redis_client = None
+        _rate_limit_lua_script = None
+        print(f"[-] Redis rate limiter connection skipped ({e}). Using in-memory store.")
 
 # In-memory store fallback
 _in_memory_limits = {}

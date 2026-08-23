@@ -73,11 +73,31 @@ async def lifespan(app: FastAPI):
     # Check environment & modes
     db_type = "PostgreSQL" if "postgresql" in settings.async_database_url else "SQLite"
     
-    # 1. Database status
+    # 1. Database status & automatic column check
     db_status = "Disconnected"
     try:
         await verify_db_connection()
         db_status = f"Connected ({db_type})"
+        
+        # Idempotently ensure email verification columns exist in users table
+        try:
+            async with engine.begin() as conn:
+                if "postgresql" in settings.async_database_url:
+                    await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT FALSE NOT NULL;"))
+                    await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_code VARCHAR(10);"))
+                    await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_code_expires_at TIMESTAMPTZ;"))
+                else:
+                    # SQLite fallback: inspect columns
+                    table_info = await conn.execute(text("PRAGMA table_info(users);"))
+                    existing_cols = [r[1] for r in table_info.fetchall()]
+                    if "is_verified" not in existing_cols:
+                        await conn.execute(text("ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT 0 NOT NULL;"))
+                    if "verification_code" not in existing_cols:
+                        await conn.execute(text("ALTER TABLE users ADD COLUMN verification_code VARCHAR(10);"))
+                    if "verification_code_expires_at" not in existing_cols:
+                        await conn.execute(text("ALTER TABLE users ADD COLUMN verification_code_expires_at TIMESTAMP;"))
+        except Exception as col_err:
+            print(f"[*] Note on table column check: {col_err}", flush=True)
     except Exception as db_err:
         print(f"[-] Startup Database connection verification failed: {db_err}", flush=True)
 

@@ -12,6 +12,7 @@ export interface UserResponse {
   full_name?: string;
   role: string;
   is_active: boolean;
+  is_verified?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -20,6 +21,11 @@ export interface ForgotPasswordResponse {
   message: string;
   dev_reset_url?: string;
   dev_reset_token?: string;
+}
+
+export interface ResendOtpResponse {
+  message: string;
+  dev_otp?: string;
 }
 
 export const authService = {
@@ -43,6 +49,27 @@ export const authService = {
       password,
       full_name: fullName,
       role,
+    });
+    return response.data;
+  },
+
+  /**
+   * Verifies email using 6-digit OTP code and returns session tokens.
+   */
+  verifyEmail: async (email: string, otpCode: string): Promise<LoginResponse> => {
+    const response = await api.post<LoginResponse>("/auth/verify-email", {
+      email,
+      otp_code: otpCode,
+    });
+    return response.data;
+  },
+
+  /**
+   * Requests a new 6-digit OTP code to be sent to email.
+   */
+  resendVerificationOtp: async (email: string): Promise<ResendOtpResponse> => {
+    const response = await api.post<ResendOtpResponse>("/auth/resend-verification-otp", {
+      email,
     });
     return response.data;
   },

@@ -2,6 +2,7 @@ import asyncio
 import os
 import sys
 import uuid
+# pyrefly: ignore [missing-import]
 import pytest
 from httpx import AsyncClient, ASGITransport
 

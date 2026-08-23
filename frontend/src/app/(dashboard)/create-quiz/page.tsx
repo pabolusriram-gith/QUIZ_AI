@@ -561,7 +561,7 @@ function CreateQuizContent() {
       formData.append("provider", aiProvider);
       if (aiModel) formData.append("model_name", aiModel);
 
-      const response = await api.post("/ai/enhance", formData);
+      const response = await api.post("/ai/enhance", formData, { timeout: 60000 });
       const enhancedText = response.data.enhanced_prompt;
       
       setTopic(enhancedText);
@@ -728,7 +728,7 @@ function CreateQuizContent() {
       const payload = {
         questions: questionsToCheck.map(q => ({ text: q.text }))
       };
-      const response = await api.post("/ai/check-duplicate", payload);
+      const response = await api.post("/ai/check-duplicate", payload, { timeout: 30000 });
       const warningsList = response.data.warnings || [];
       const warningsMap: Record<number, { similarity: number; existing_text: string; warning: string }> = {};
       warningsList.forEach((w: { index: number; similarity: number; existing_text: string; warning: string }) => {
@@ -809,7 +809,7 @@ function CreateQuizContent() {
     }
 
     try {
-      const response = await api.post("/ai/generate", formData);
+      const response = await api.post("/ai/generate", formData, { timeout: 120000 });
       const dataPayload = response.data;
       
       let rawQuestionsList = [];
@@ -1006,7 +1006,7 @@ function CreateQuizContent() {
         : "Regenerating question via AI…";
       toast.loading(toastLabel, { id: `regen-${idx}` });
 
-      const response = await api.post("/ai/regenerate-question", formData);
+      const response = await api.post("/ai/regenerate-question", formData, { timeout: 60000 });
       const newQRaw = response.data as {
         text?: string;
         difficulty?: string;
@@ -1745,8 +1745,8 @@ function CreateQuizContent() {
     };
 
     return (
-      <div className="bg-slate-100/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-4 flex items-center justify-between select-none mb-6">
-        <div className="flex items-center w-full justify-around md:justify-center md:gap-12">
+      <div className="bg-slate-100/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-2.5 sm:p-4 flex items-center justify-between select-none mb-6 overflow-x-auto no-scrollbar">
+        <div className="flex items-center w-full justify-between sm:justify-around md:justify-center md:gap-12 min-w-max px-1">
           {steps.map((step, idx) => {
             const isActive = activeTab === step.id;
             const isCompleted = isStepCompleted(step.id);
@@ -1758,10 +1758,10 @@ function CreateQuizContent() {
                 <button
                   type="button"
                   onClick={() => setActiveTab(step.id as any)}
-                  className="flex items-center gap-2 group focus:outline-none transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 sm:gap-2 group focus:outline-none transition-colors cursor-pointer shrink-0"
                 >
                   <div
-                    className={`h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
+                    className={`h-6.5 w-6.5 sm:h-7 sm:w-7 rounded-full flex items-center justify-center text-[11px] sm:text-xs font-bold border transition-all ${
                       isActive
                         ? "bg-gradient-to-r from-indigo-600 to-cyan-600 border-indigo-500 text-white shadow-md shadow-indigo-500/25 scale-105"
                         : isCompleted
@@ -1772,20 +1772,20 @@ function CreateQuizContent() {
                     }`}
                   >
                     {isCompleted ? (
-                      <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 stroke-[3]" />
+                      <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-600 dark:text-emerald-400 stroke-[3]" />
                     ) : (
                       step.num
                     )}
                   </div>
                   <span
-                    className={`text-xs font-bold transition-colors hidden sm:inline ${
+                    className={`text-xs font-bold transition-colors ${
                       isActive
-                        ? "text-slate-900 dark:text-white"
+                        ? "text-slate-900 dark:text-white inline"
                         : isCompleted
-                        ? "text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-500"
+                        ? "text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-500 hidden sm:inline"
                         : isVisited
-                        ? "text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white"
-                        : "text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-400"
+                        ? "text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white hidden sm:inline"
+                        : "text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-400 hidden sm:inline"
                     }`}
                   >
                     {step.label}
@@ -1795,7 +1795,7 @@ function CreateQuizContent() {
                 {/* Divider Line */}
                 {idx < steps.length - 1 && (
                   <div
-                    className={`hidden md:block h-[2px] w-12 transition-colors ${
+                    className={`hidden sm:block h-[2px] w-6 md:w-12 transition-colors ${
                       isStepCompleted(steps[idx].id)
                         ? "bg-emerald-500/30"
                         : "bg-slate-200 dark:bg-slate-800"
@@ -1822,11 +1822,18 @@ function CreateQuizContent() {
   };
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto w-full pb-16">
+    <div className="space-y-6 sm:space-y-8 max-w-5xl mx-auto w-full pb-16 px-1 sm:px-0">
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes sound-wave-bar {
           0% { height: 3px; opacity: 0.35; }
           100% { height: 12px; opacity: 1; }
+        }
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
       `}} />
       
@@ -1838,9 +1845,9 @@ function CreateQuizContent() {
             title={`Quiz Editor: ${quiz.title || "Untitled Assessment"}`}
             description="Design questions, configure metadata settings, specify timing/schedule windows, and test-drive inside the simulator."
             actions={
-              <div className="flex gap-2 items-center">
-                <div className="hidden md:flex flex-col items-end mr-2 select-none">
-                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Publish Readiness</span>
+              <div className="flex flex-wrap sm:flex-nowrap gap-1.5 sm:gap-2 items-center justify-end w-full sm:w-auto">
+                <div className="hidden lg:flex flex-col items-end mr-1 select-none">
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Readiness</span>
                   <span className={`text-sm font-extrabold ${isReady ? "text-emerald-500 dark:text-emerald-400" : "text-amber-500 dark:text-amber-400"}`}>
                     {score}%
                   </span>
@@ -1848,31 +1855,31 @@ function CreateQuizContent() {
                 <Button
                   variant="outline"
                   onClick={handleExitEditor}
-                  className="rounded-xl border-slate-200 dark:border-slate-700/70 bg-slate-100/80 dark:bg-[#121c33]/80 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-[#172442] font-semibold px-4 cursor-pointer h-10 border flex items-center gap-2 transition-colors"
+                  className="rounded-xl border-slate-200 dark:border-slate-700/70 bg-slate-100/80 dark:bg-[#121c33]/80 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-[#172442] font-semibold px-2.5 sm:px-3.5 cursor-pointer h-9 sm:h-10 border flex items-center gap-1.5 text-xs transition-colors"
                 >
-                  <ArrowLeft className="h-4 w-4" />
-                  <span>Exit Editor</span>
+                  <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="hidden xs:inline sm:inline">Exit</span>
                 </Button>
                 <Button
                   disabled={isSubmitting}
                   onClick={() => handleSaveQuiz("draft")}
-                  className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-semibold px-4 cursor-pointer h-10 flex items-center gap-2 transition-colors"
+                  className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-semibold px-2.5 sm:px-3.5 cursor-pointer h-9 sm:h-10 flex items-center gap-1.5 text-xs transition-colors"
                 >
-                  <Save className="h-4 w-4" />
-                  <span>Save Draft</span>
+                  <Save className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span>Draft</span>
                 </Button>
                 <Button
                   disabled={isSubmitting || !isReady}
                   onClick={() => handleSaveQuiz("published")}
-                  className={`rounded-xl font-semibold px-5 h-10 flex items-center gap-2 border-none cursor-pointer transition-all ${
+                  className={`rounded-xl font-semibold px-3 sm:px-4.5 h-9 sm:h-10 flex items-center gap-1.5 text-xs border-none cursor-pointer transition-all ${
                     isReady 
                       ? "bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white shadow-md shadow-indigo-500/25" 
                       : "bg-slate-200/60 dark:bg-slate-800/40 border border-slate-300/40 dark:border-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-60"
                   }`}
                   title={!isReady ? "Please complete all critical details before publishing" : "Publish Quiz"}
                 >
-                  <FileCheck className="h-4.5 w-4.5" />
-                  <span>Publish Quiz</span>
+                  <FileCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span>Publish</span>
                 </Button>
               </div>
             }
@@ -1883,23 +1890,23 @@ function CreateQuizContent() {
           title="Create Quiz"
           description="Choose your preferred workflow: build custom assessments manually from scratch, or let AI assist you."
           actions={
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {view !== "choice" && (
                 <Button
                   variant="outline"
                   onClick={() => setView("choice")}
-                  className="rounded-xl border-slate-200 dark:border-slate-700/70 bg-slate-100/80 dark:bg-[#121c33]/80 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-[#172442] font-semibold px-4 cursor-pointer h-10 border flex items-center gap-2 transition-colors"
+                  className="rounded-xl border-slate-200 dark:border-slate-700/70 bg-slate-100/80 dark:bg-[#121c33]/80 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-[#172442] font-semibold px-3 sm:px-4 cursor-pointer h-9 sm:h-10 text-xs border flex items-center gap-1.5 transition-colors"
                 >
-                  <ArrowLeft className="h-4 w-4" />
+                  <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   <span>Change Workflow</span>
                 </Button>
               )}
               <Link
                 href="/dashboard"
-                className={buttonVariants({ variant: "outline", className: "rounded-xl border-slate-200 dark:border-slate-700/70 bg-slate-100/80 dark:bg-[#121c33]/80 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-[#172442] font-semibold px-4 cursor-pointer h-10 border flex items-center gap-2 transition-colors" })}
+                className={buttonVariants({ variant: "outline", className: "rounded-xl border-slate-200 dark:border-slate-700/70 bg-slate-100/80 dark:bg-[#121c33]/80 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-[#172442] font-semibold px-3 sm:px-4 cursor-pointer h-9 sm:h-10 text-xs border flex items-center gap-1.5 transition-colors" })}
               >
-                {view === "choice" && <ArrowLeft className="h-4 w-4" />}
-                <span>Back to Dashboard</span>
+                {view === "choice" && <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+                <span>Dashboard</span>
               </Link>
             </div>
           }
@@ -1960,7 +1967,7 @@ function CreateQuizContent() {
               {/* Manual Creation Card */}
               <motion.div
                 whileHover={{ y: -4 }}
-                className="group relative overflow-hidden rounded-3xl border border-indigo-500/35 bg-gradient-to-br from-slate-50 via-slate-100 to-indigo-50/50 dark:from-[#101e4a] dark:via-[#0d183f] dark:to-[#081230] p-7 md:p-8 flex flex-col justify-between min-h-[470px] shadow-[0_10px_35px_rgba(0,0,0,0.06)] dark:shadow-[0_16px_45px_rgba(6,16,51,0.7)] transition-all duration-300 hover:border-indigo-400/60 hover:shadow-[0_20px_50px_rgba(99,102,241,0.25)]"
+                className="group relative overflow-hidden rounded-3xl border border-indigo-500/35 bg-gradient-to-br from-slate-50 via-slate-100 to-indigo-50/50 dark:from-[#101e4a] dark:via-[#0d183f] dark:to-[#081230] p-5 sm:p-7 md:p-8 flex flex-col justify-between min-h-0 sm:min-h-[470px] shadow-[0_10px_35px_rgba(0,0,0,0.06)] dark:shadow-[0_16px_45px_rgba(6,16,51,0.7)] transition-all duration-300 hover:border-indigo-400/60 hover:shadow-[0_20px_50px_rgba(99,102,241,0.25)]"
               >
                 {/* Subtle abstract glow and wave background */}
                 <div className="pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full bg-gradient-to-br from-indigo-500/20 via-purple-500/15 to-transparent blur-3xl group-hover:from-indigo-500/30 transition-all duration-500" />
@@ -2062,7 +2069,7 @@ function CreateQuizContent() {
               {/* AI Assistant Card */}
               <motion.div
                 whileHover={{ y: -4 }}
-                className="group relative overflow-hidden rounded-3xl border border-cyan-500/35 bg-gradient-to-br from-slate-50 via-slate-100 to-cyan-50/50 dark:from-[#0b2447] dark:via-[#081d38] dark:to-[#051428] p-7 md:p-8 flex flex-col justify-between min-h-[470px] shadow-[0_10px_35px_rgba(0,0,0,0.06)] dark:shadow-[0_16px_45px_rgba(6,16,51,0.7)] transition-all duration-300 hover:border-cyan-400/60 hover:shadow-[0_20px_50px_rgba(6,182,212,0.25)]"
+                className="group relative overflow-hidden rounded-3xl border border-cyan-500/35 bg-gradient-to-br from-slate-50 via-slate-100 to-cyan-50/50 dark:from-[#0b2447] dark:via-[#081d38] dark:to-[#051428] p-5 sm:p-7 md:p-8 flex flex-col justify-between min-h-0 sm:min-h-[470px] shadow-[0_10px_35px_rgba(0,0,0,0.06)] dark:shadow-[0_16px_45px_rgba(6,16,51,0.7)] transition-all duration-300 hover:border-cyan-400/60 hover:shadow-[0_20px_50px_rgba(6,182,212,0.25)]"
               >
                 {/* Subtle abstract glow and wave background */}
                 <div className="pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full bg-gradient-to-br from-cyan-500/20 via-teal-500/15 to-transparent blur-3xl group-hover:from-cyan-500/30 transition-all duration-500" />
@@ -3505,6 +3512,7 @@ function CreateQuizContent() {
                                 className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                               />
                             </div>
+
                           </div>
                         </div>
                       </div>
@@ -3517,570 +3525,594 @@ function CreateQuizContent() {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="grid grid-cols-1 lg:grid-cols-4 gap-6"
+                  className="space-y-4"
                 >
-                  {/* Sidebar list */}
-                  <div className="lg:col-span-1 space-y-4">
-                    <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-4 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Questions List</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold">
-                          {quiz.questions.length} Items
-                        </span>
-                      </div>
-
-                      <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1">
-                        {quiz.questions.map((q, idx) => (
-                          <div
-                            key={q.id}
-                            onClick={() => setSelectedQuestionIndex(idx)}
-                            className={`p-3 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between group relative ${
-                              selectedQuestionIndex === idx
-                                ? "bg-indigo-500/15 dark:bg-indigo-500/20 border-indigo-500/40 text-slate-900 dark:text-white shadow-sm"
-                                : "bg-slate-100/60 dark:bg-[#10192e]/60 border-slate-200/60 dark:border-slate-800/60 text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-[#14203a] hover:text-slate-900 dark:hover:text-slate-200"
-                            }`}
-                          >
-                            {duplicateWarnings[idx] && (
-                              <div className="absolute top-1 right-1 h-2 w-2 rounded-full bg-amber-500 animate-pulse" title="Similarity warning" />
-                            )}
-                            <div className="space-y-1 truncate pr-2">
-                              <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                                Question {idx + 1} • {q.question_type.replace("_", " ")}
-                              </div>
-                              <div className="text-xs font-semibold truncate">
-                                {q.text || "Untitled blank question..."}
-                              </div>
-                            </div>
-                            {/* Reorder / Regenerate / Delete */}
-                            <div className="flex gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button
-                                type="button"
-                                disabled={idx === 0}
-                                onClick={(e) => { e.stopPropagation(); moveQuestion(idx, "up"); }}
-                                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 disabled:opacity-30 cursor-pointer"
-                                title="Move up"
-                              >
-                                <ChevronUp className="h-3 w-3" />
-                              </button>
-                              <button
-                                type="button"
-                                disabled={idx === quiz.questions.length - 1}
-                                onClick={(e) => { e.stopPropagation(); moveQuestion(idx, "down"); }}
-                                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 disabled:opacity-30 cursor-pointer"
-                                title="Move down"
-                              >
-                                <ChevronDown className="h-3 w-3" />
-                              </button>
-                              {/* Quick regenerate icon — only for AI-generated questions */}
-                              {q.generated_by_ai && (
-                                <button
-                                  type="button"
-                                  disabled={regeneratingIndex !== null}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedQuestionIndex(idx);
-                                    handleRegenerateQuestion(idx);
-                                  }}
-                                  className="p-1 rounded hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 disabled:opacity-30 cursor-pointer transition-colors"
-                                  title="Regenerate this AI question"
-                                >
-                                  {regeneratingIndex === idx
-                                    ? <Loader2 className="h-3 w-3 animate-spin" />
-                                    : <RefreshCw className="h-3 w-3" />}
-                                </button>
-                              )}
-                              <button
-                                type="button"
-                                onClick={(e) => { e.stopPropagation(); deleteQuestion(idx); }}
-                                className="p-1 rounded hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 cursor-pointer"
-                                title="Delete question"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
+                  {/* Mobile Question Selector Strip (Shown on screens < lg) */}
+                  <div className="block lg:hidden bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-3 shadow-sm space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <ListTodo className="h-3.5 w-3.5 text-indigo-500" />
+                        Questions ({quiz.questions.length})
+                      </span>
                       <Button
+                        type="button"
                         onClick={addQuestion}
-                        className="w-full h-10 border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                        className="h-7 px-2.5 text-[11px] font-bold rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20 border border-indigo-500/30 flex items-center gap-1 cursor-pointer"
                       >
-                        <Plus className="h-3.5 w-3.5" />
-                        <span>Add Question</span>
+                        <Plus className="h-3 w-3" />
+                        <span>Add Q</span>
                       </Button>
+                    </div>
+                    {/* Horizontal scrollable question pills */}
+                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+                      {quiz.questions.map((q, idx) => (
+                        <button
+                          key={q.id}
+                          type="button"
+                          onClick={() => setSelectedQuestionIndex(idx)}
+                          className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                            selectedQuestionIndex === idx
+                              ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/25 scale-105"
+                              : "bg-slate-200/70 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 border border-slate-300/60 dark:border-slate-700/60"
+                          }`}
+                        >
+                          <span>Q{idx + 1}</span>
+                          {q.generated_by_ai && <Sparkles className="h-2.5 w-2.5 text-cyan-300" />}
+                        </button>
+                      ))}
                     </div>
                   </div>
 
-                  {/* Main editing area */}
-                  <div className="lg:col-span-3 space-y-6">
-                    {quiz.questions[selectedQuestionIndex] ? (
-                      <div className="relative bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-6 space-y-6">
-
-                        {/* Targeted Regeneration Loading Overlay */}
-                        {regeneratingIndex === selectedQuestionIndex && (
-                          <div className="absolute inset-0 bg-slate-100/90 dark:bg-[#060b18]/90 backdrop-blur-[2px] rounded-2xl z-20 flex flex-col items-center justify-center space-y-3">
-                            <div className="h-10 w-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-500 dark:text-cyan-400 shadow-lg shadow-cyan-500/10">
-                              <RefreshCw className="h-5 w-5 animate-spin text-cyan-500 dark:text-cyan-400" />
-                            </div>
-                            <div className="space-y-1 text-center">
-                              <p className="text-xs font-bold text-slate-900 dark:text-white">Regenerating Question with AI</p>
-                              <p className="text-[10px] font-semibold text-cyan-600 dark:text-cyan-400/80 animate-pulse">Applying pedagogical constraints & variations...</p>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* ── Editing Panel Header: Question number + AI badge + Regenerate button ── */}
-                        <div className="flex flex-wrap items-center justify-between gap-3">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                              Question {selectedQuestionIndex + 1} of {quiz.questions.length}
-                            </span>
-                            {quiz.questions[selectedQuestionIndex].generated_by_ai && (
-                              <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 text-[10px] font-bold">
-                                <Sparkles className="h-2.5 w-2.5" />
-                                AI Generated
-                              </span>
-                            )}
-                            {quiz.questions[selectedQuestionIndex].is_user_modified && (
-                              <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-bold">
-                                Edited
-                              </span>
-                            )}
-                            {recentlyRegeneratedIndex === selectedQuestionIndex && (
-                              <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold animate-pulse">
-                                <Check className="h-2.5 w-2.5" />
-                                Replaced with New Question
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Regenerate Question button — only for AI-generated questions */}
-                          {quiz.questions[selectedQuestionIndex].generated_by_ai && (
-                            <button
-                              type="button"
-                              id={`regenerate-btn-${selectedQuestionIndex}`}
-                              disabled={regeneratingIndex !== null}
-                              onClick={() => handleRegenerateQuestion(selectedQuestionIndex)}
-                              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-sm ${
-                                regeneratingIndex === selectedQuestionIndex
-                                  ? "bg-cyan-500/20 border-cyan-500/40 text-cyan-700 dark:text-cyan-300 cursor-wait"
-                                  : regeneratingIndex !== null
-                                  ? "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 cursor-not-allowed opacity-50"
-                                  : "bg-cyan-500/10 border-cyan-500/25 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/20 hover:border-cyan-500/40 hover:text-cyan-500 dark:hover:text-cyan-300"
-                              }`}
-                              title={regeneratingIndex !== null ? "Regenerating another question…" : "Regenerate this question using AI"}
-                            >
-                              {regeneratingIndex === selectedQuestionIndex ? (
-                                <>
-                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                  <span>Regenerating…</span>
-                                </>
-                              ) : (
-                                <>
-                                  <RefreshCw className="h-3.5 w-3.5" />
-                                  <span>Regenerate Question</span>
-                                </>
-                              )}
-                            </button>
-                          )}
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    {/* Desktop Sidebar list */}
+                    <div className="hidden lg:block lg:col-span-1 space-y-4">
+                      <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Questions List</span>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold">
+                            {quiz.questions.length} Items
+                          </span>
                         </div>
-                        
-                        {/* Duplicate Warning banner if exists */}
-                        {duplicateWarnings[selectedQuestionIndex] && (
-                          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                            <div className="space-y-1">
-                              <h5 className="text-xs font-bold text-amber-500 dark:text-amber-400 flex items-center gap-1.5">
-                                <AlertCircle className="h-4 w-4" />
-                                <span>Question Overlap Warning (Similarity {Math.floor(duplicateWarnings[selectedQuestionIndex].similarity * 100)}%)</span>
-                              </h5>
-                              <p className="text-[10px] text-slate-600 dark:text-slate-400 max-w-xl leading-normal">
-                                This question overlaps closely with: &quot;{duplicateWarnings[selectedQuestionIndex].existing_text.substring(0, 120)}...&quot; in the Question Bank.
-                              </p>
-                            </div>
-                            <div className="flex gap-2">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const updated = { ...duplicateWarnings };
-                                  delete updated[selectedQuestionIndex];
-                                  setDuplicateWarnings(updated);
-                                  toast.info("Warning dismissed.");
-                                }}
-                                className="px-2.5 py-1 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 hover:bg-amber-500/35 text-[10px] font-semibold cursor-pointer border-none"
-                              >
-                                Keep
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleRegenerateQuestion(selectedQuestionIndex)}
-                                className="px-2.5 py-1 rounded bg-cyan-600 text-white hover:bg-cyan-500 text-[10px] font-semibold cursor-pointer border-none flex items-center gap-1"
-                              >
-                                <RotateCcw className="h-3 w-3" />
-                                <span>Regenerate</span>
-                              </button>
-                            </div>
-                          </div>
-                        )}
 
-                        {/* Restore AI Version Banner */}
-                        {quiz.questions[selectedQuestionIndex].is_user_modified && 
-                         quiz.questions[selectedQuestionIndex].ai_original_json && (
-                          <div className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                            <div className="space-y-1">
-                              <h5 className="text-xs font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-                                <Sparkles className="h-4 w-4" />
-                                <span>Teacher Edited Question</span>
-                              </h5>
-                              <p className="text-[10px] text-slate-600 dark:text-slate-400 max-w-xl leading-normal">
-                                This question was modified by the teacher. You can restore the original AI version to undo these changes.
-                              </p>
+                        <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
+                          {quiz.questions.map((q, idx) => (
+                            <div
+                              key={q.id}
+                              onClick={() => setSelectedQuestionIndex(idx)}
+                              className={`p-3 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between group relative ${
+                                selectedQuestionIndex === idx
+                                  ? "bg-indigo-500/15 dark:bg-indigo-500/20 border-indigo-500/40 text-slate-900 dark:text-white shadow-sm"
+                                  : "bg-slate-100/60 dark:bg-[#10192e]/60 border-slate-200/60 dark:border-slate-800/60 text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-[#14203a] hover:text-slate-900 dark:hover:text-slate-200"
+                              }`}
+                            >
+                              {duplicateWarnings[idx] && (
+                                <div className="absolute top-1 right-1 h-2 w-2 rounded-full bg-amber-500 animate-pulse" title="Similarity warning" />
+                              )}
+                              <div className="space-y-1 truncate pr-2">
+                                <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                                  Question {idx + 1} • {q.question_type.replace("_", " ")}
+                                </div>
+                                <div className="text-xs font-semibold truncate">
+                                  {q.text || "Untitled blank question..."}
+                                </div>
+                              </div>
+                              {/* Reorder / Regenerate / Delete */}
+                              <div className="flex gap-0.5 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                <button
+                                  type="button"
+                                  disabled={idx === 0}
+                                  onClick={(e) => { e.stopPropagation(); moveQuestion(idx, "up"); }}
+                                  className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 disabled:opacity-30 cursor-pointer"
+                                  title="Move up"
+                                >
+                                  <ChevronUp className="h-3 w-3" />
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={idx === quiz.questions.length - 1}
+                                  onClick={(e) => { e.stopPropagation(); moveQuestion(idx, "down"); }}
+                                  className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 disabled:opacity-30 cursor-pointer"
+                                  title="Move down"
+                                >
+                                  <ChevronDown className="h-3 w-3" />
+                                </button>
+                                {/* Quick regenerate icon — only for AI-generated questions */}
+                                {q.generated_by_ai && (
+                                  <button
+                                    type="button"
+                                    disabled={regeneratingIndex !== null}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedQuestionIndex(idx);
+                                      handleRegenerateQuestion(idx);
+                                    }}
+                                    className="p-1 rounded hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 disabled:opacity-30 cursor-pointer transition-colors"
+                                    title="Regenerate this AI question"
+                                  >
+                                    {regeneratingIndex === idx
+                                      ? <Loader2 className="h-3 w-3 animate-spin" />
+                                      : <RefreshCw className="h-3 w-3" />}
+                                  </button>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={(e) => { e.stopPropagation(); deleteQuestion(idx); }}
+                                  className="p-1 rounded hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 cursor-pointer"
+                                  title="Delete question"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </button>
+                              </div>
                             </div>
-                            <div className="flex gap-2">
+                          ))}
+                        </div>
+
+                        <Button
+                          onClick={addQuestion}
+                          className="w-full h-10 border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                          <span>Add Question</span>
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Main editing area */}
+                    <div className="lg:col-span-3 space-y-6">
+                      {quiz.questions[selectedQuestionIndex] ? (
+                        <div className="relative bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-4 sm:p-6 space-y-6">
+
+                          {/* Targeted Regeneration Loading Overlay */}
+                          {regeneratingIndex === selectedQuestionIndex && (
+                            <div className="absolute inset-0 bg-slate-100/90 dark:bg-[#060b18]/90 backdrop-blur-[2px] rounded-2xl z-20 flex flex-col items-center justify-center space-y-3">
+                              <div className="h-10 w-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-500 dark:text-cyan-400 shadow-lg shadow-cyan-500/10">
+                                <RefreshCw className="h-5 w-5 animate-spin text-cyan-500 dark:text-cyan-400" />
+                              </div>
+                              <div className="space-y-1 text-center">
+                                <p className="text-xs font-bold text-slate-900 dark:text-white">Regenerating Question with AI</p>
+                                <p className="text-[10px] font-semibold text-cyan-600 dark:text-cyan-400/80 animate-pulse">Applying pedagogical constraints & variations...</p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* ── Editing Panel Header: Question number + AI badge + Regenerate button ── */}
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                                Question {selectedQuestionIndex + 1} of {quiz.questions.length}
+                              </span>
+                              {quiz.questions[selectedQuestionIndex].generated_by_ai && (
+                                <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 text-[10px] font-bold">
+                                  <Sparkles className="h-2.5 w-2.5" />
+                                  AI Generated
+                                </span>
+                              )}
+                              {quiz.questions[selectedQuestionIndex].is_user_modified && (
+                                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-bold">
+                                  Edited
+                                </span>
+                              )}
+                              {recentlyRegeneratedIndex === selectedQuestionIndex && (
+                                <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold animate-pulse">
+                                  <Check className="h-2.5 w-2.5" />
+                                  Replaced
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Regenerate Question button — only for AI-generated questions */}
+                            {quiz.questions[selectedQuestionIndex].generated_by_ai && (
+                              <button
+                                type="button"
+                                id={`regenerate-btn-${selectedQuestionIndex}`}
+                                disabled={regeneratingIndex !== null}
+                                onClick={() => handleRegenerateQuestion(selectedQuestionIndex)}
+                                className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-sm w-full sm:w-auto ${
+                                  regeneratingIndex === selectedQuestionIndex
+                                    ? "bg-cyan-500/20 border-cyan-500/40 text-cyan-700 dark:text-cyan-300 cursor-wait"
+                                    : regeneratingIndex !== null
+                                    ? "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 cursor-not-allowed opacity-50"
+                                    : "bg-cyan-500/10 border-cyan-500/25 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/20 hover:border-cyan-500/40 hover:text-cyan-500 dark:hover:text-cyan-300"
+                                }`}
+                                title={regeneratingIndex !== null ? "Regenerating another question…" : "Regenerate this question using AI"}
+                              >
+                                {regeneratingIndex === selectedQuestionIndex ? (
+                                  <>
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                    <span>Regenerating…</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <RefreshCw className="h-3.5 w-3.5" />
+                                    <span>Regenerate Question</span>
+                                  </>
+                                )}
+                              </button>
+                            )}
+                          </div>
+                          
+                          {/* Duplicate Warning banner if exists */}
+                          {duplicateWarnings[selectedQuestionIndex] && (
+                            <div className="p-3 sm:p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                              <div className="space-y-1">
+                                <h5 className="text-xs font-bold text-amber-500 dark:text-amber-400 flex items-center gap-1.5">
+                                  <AlertCircle className="h-4 w-4 shrink-0" />
+                                  <span>Overlap Warning ({Math.floor(duplicateWarnings[selectedQuestionIndex].similarity * 100)}%)</span>
+                                </h5>
+                                <p className="text-[10px] text-slate-600 dark:text-slate-400 max-w-xl leading-normal">
+                                  This question overlaps with: &quot;{duplicateWarnings[selectedQuestionIndex].existing_text.substring(0, 100)}...&quot;
+                                </p>
+                              </div>
+                              <div className="flex gap-2 w-full sm:w-auto">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const updated = { ...duplicateWarnings };
+                                    delete updated[selectedQuestionIndex];
+                                    setDuplicateWarnings(updated);
+                                    toast.info("Warning dismissed.");
+                                  }}
+                                  className="flex-1 sm:flex-initial px-2.5 py-1 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 hover:bg-amber-500/35 text-[10px] font-semibold cursor-pointer border-none"
+                                >
+                                  Keep
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRegenerateQuestion(selectedQuestionIndex)}
+                                  className="flex-1 sm:flex-initial px-2.5 py-1 rounded bg-cyan-600 text-white hover:bg-cyan-500 text-[10px] font-semibold cursor-pointer border-none flex items-center justify-center gap-1"
+                                >
+                                  <RotateCcw className="h-3 w-3" />
+                                  <span>Regenerate</span>
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Restore AI Version Banner */}
+                          {quiz.questions[selectedQuestionIndex].is_user_modified && 
+                           quiz.questions[selectedQuestionIndex].ai_original_json && (
+                            <div className="p-3 sm:p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                              <div className="space-y-1">
+                                <h5 className="text-xs font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                                  <Sparkles className="h-4 w-4 shrink-0" />
+                                  <span>Teacher Modified Question</span>
+                                </h5>
+                                <p className="text-[10px] text-slate-600 dark:text-slate-400 max-w-xl leading-normal">
+                                  This question was edited. You can restore the original AI version to undo modifications.
+                                </p>
+                              </div>
                               <button
                                 type="button"
                                 onClick={() => handleRestoreOriginalAI(selectedQuestionIndex)}
-                                className="px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold cursor-pointer border-none flex items-center gap-1.5 transition-colors"
+                                className="w-full sm:w-auto px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold cursor-pointer border-none flex items-center justify-center gap-1.5 transition-colors"
                               >
                                 <RotateCcw className="h-3 w-3" />
                                 <span>Restore Original AI</span>
                               </button>
                             </div>
-                          </div>
-                        )}
+                          )}
 
-                        {/* Header: Type, Difficulty, Marks */}
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                          <div className="space-y-1.5 col-span-2">
-                            <label className="text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
-                              Question Type
-                              {quiz.questions[selectedQuestionIndex].generated_by_ai && regeneratingIndex === selectedQuestionIndex && (
-                                <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold animate-pulse">Regenerating…</span>
-                              )}
-                            </label>
-                            <div className="relative">
+                          {/* Header: Type, Difficulty, Marks */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Question Type</label>
                               <select
-                                id={`question-type-select-${selectedQuestionIndex}`}
                                 value={quiz.questions[selectedQuestionIndex].question_type}
-                                disabled={regeneratingIndex !== null}
-                                onChange={(e) => {
-                                  const newType = e.target.value;
-                                  if (quiz.questions[selectedQuestionIndex].generated_by_ai) {
-                                    callRegenerateAPI(selectedQuestionIndex, { question_type: newType });
-                                  } else {
-                                    updateQuestionField("question_type", newType);
-                                  }
-                                }}
-                                className="w-full bg-slate-100/80 dark:bg-[#121c33]/85 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 px-3 text-slate-800 dark:text-slate-200 font-medium text-sm focus:border-indigo-500/50 outline-none disabled:opacity-60 disabled:cursor-not-allowed"
+                                onChange={(e) => updateQuestionField("question_type", e.target.value)}
+                                className="w-full bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl px-3 h-10 text-slate-900 dark:text-white font-semibold text-xs focus:border-indigo-500/50 outline-none transition-colors"
                               >
-                                <option value="multiple_choice" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Multiple Choice (Single Correct Choice)</option>
-                                <option value="multiple_select" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Multiple Select (Multiple Correct Choices)</option>
-                                <option value="true_false" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">True / False</option>
-                                <option value="fill_in_the_blank" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Fill in the Blank</option>
-                                <option value="short_answer" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Short Answer (Manual / Keyword graded)</option>
+                                <option value="multiple_choice">Multiple Choice</option>
+                                <option value="multiple_select">Multiple Select</option>
+                                <option value="true_false">True / False</option>
+                                <option value="short_answer">Short Answer</option>
+                                <option value="fill_in_the_blank">Fill in the Blank</option>
                               </select>
                             </div>
-                          </div>
 
-                          <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
-                              Difficulty
-                              {quiz.questions[selectedQuestionIndex].generated_by_ai && regeneratingIndex === selectedQuestionIndex && (
-                                <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold animate-pulse">Regenerating…</span>
-                              )}
-                            </label>
-                            <div className="relative">
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Difficulty</label>
                               <select
-                                id={`difficulty-select-${selectedQuestionIndex}`}
                                 value={quiz.questions[selectedQuestionIndex].difficulty}
-                                disabled={regeneratingIndex !== null}
-                                onChange={(e) => {
-                                  const newDiff = e.target.value;
-                                  if (quiz.questions[selectedQuestionIndex].generated_by_ai) {
-                                    callRegenerateAPI(selectedQuestionIndex, { difficulty: newDiff });
-                                  } else {
-                                    updateQuestionField("difficulty", newDiff);
-                                  }
-                                }}
-                                className="w-full bg-slate-100/80 dark:bg-[#121c33]/85 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 px-3 text-slate-800 dark:text-slate-200 font-medium text-sm focus:border-indigo-500/50 outline-none disabled:opacity-60 disabled:cursor-not-allowed"
+                                onChange={(e) => updateQuestionField("difficulty", e.target.value)}
+                                className="w-full bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl px-3 h-10 text-slate-900 dark:text-white font-semibold text-xs focus:border-indigo-500/50 outline-none transition-colors"
                               >
-                                <option value="easy" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Easy</option>
-                                <option value="medium" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Medium</option>
-                                <option value="hard" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Hard</option>
+                                <option value="easy">Easy</option>
+                                <option value="medium">Medium</option>
+                                <option value="hard">Hard</option>
                               </select>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Points / Marks</label>
+                              <Input
+                                type="number"
+                                min={1}
+                                max={100}
+                                value={quiz.questions[selectedQuestionIndex].marks}
+                                onChange={(e) => updateQuestionField("marks", parseInt(e.target.value) || 1)}
+                                className="bg-slate-100/70 dark:bg-[#121c33]/75 border-slate-200 dark:border-slate-700/60 text-slate-900 dark:text-white font-semibold text-xs h-10 rounded-xl"
+                              />
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Negative Marks</label>
+                              <Input
+                                type="number"
+                                step="0.25"
+                                min={0}
+                                max={10}
+                                value={quiz.questions[selectedQuestionIndex].negative_marks || 0}
+                                onChange={(e) => updateQuestionField("negative_marks", parseFloat(e.target.value) || 0)}
+                                className="bg-slate-100/70 dark:bg-[#121c33]/75 border-slate-200 dark:border-slate-700/60 text-slate-900 dark:text-white font-semibold text-xs h-10 rounded-xl"
+                              />
                             </div>
                           </div>
 
-                          <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Marks / Points</label>
-                            <Input
-                              type="number"
-                              value={quiz.questions[selectedQuestionIndex].marks}
-                              onChange={(e) => updateQuestionField("marks", Number(e.target.value))}
-                              min={1}
-                              disabled={quiz.marks_mode === "auto"}
-                              className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
-                            />
-                            {quiz.marks_mode === "auto" && (
-                              <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">Auto Marks Enabled</span>
-                            )}
-                          </div>
-                        </div>
+                          {/* QUESTION CONTENT & TIMING */}
+                          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                            <div className="lg:col-span-3 space-y-1.5">
+                              <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Question Text</label>
+                              <textarea
+                                value={quiz.questions[selectedQuestionIndex].text}
+                                onChange={(e) => updateQuestionField("text", e.target.value)}
+                                placeholder="Enter your question statement or scenario..."
+                                rows={3}
+                                className="w-full bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl p-3 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50 outline-none transition-colors"
+                              />
+                            </div>
 
-                        {/* Text and Time limit */}
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                          <div className="space-y-1.5 col-span-3">
-                            <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Question Content *</label>
-                            <textarea
-                              value={quiz.questions[selectedQuestionIndex].text}
-                              onChange={(e) => updateQuestionField("text", e.target.value)}
-                              placeholder="Type the question content here..."
-                              rows={3}
-                              className="w-full bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl p-3.5 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50 outline-none transition-colors leading-relaxed"
-                            />
-                          </div>
-
-                          {/* Time Limit (Shows if Per-Question timing is active) */}
-                          <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1">
-                              <Clock className="h-3.5 w-3.5 text-indigo-500 dark:text-indigo-400" />
-                              <span>Time Limit</span>
-                            </label>
-                            {(quiz.timer_mode === "per_question" || quiz.timer_mode === "both") ? (
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Question Timer</label>
                               <div className="space-y-2">
-                                <select
-                                  value={quiz.questions[selectedQuestionIndex].time_limit_seconds || 30}
-                                  onChange={(e) => updateQuestionField("time_limit_seconds", Number(e.target.value))}
-                                  className="w-full bg-slate-100/80 dark:bg-[#121c33]/85 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 px-3 text-slate-800 dark:text-slate-200 font-medium text-sm focus:border-indigo-500/50 outline-none"
-                                >
-                                  {PREDEFINED_QUESTION_TIMERS.map(p => (
-                                    <option key={p.value} value={p.value} className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">{p.label}</option>
-                                  ))}
-                                  <option value="custom" className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">Custom seconds</option>
-                                </select>
-                                <Input
-                                  type="number"
-                                  value={quiz.questions[selectedQuestionIndex].time_limit_seconds || ""}
-                                  onChange={(e) => updateQuestionField("time_limit_seconds", e.target.value ? Number(e.target.value) : null)}
-                                  placeholder="Seconds..."
-                                  min={1}
-                                  className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-9 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50"
-                                />
+                                <div className="flex items-center gap-2">
+                                  <Clock className="h-4 w-4 text-slate-400 shrink-0" />
+                                  <Input
+                                    type="number"
+                                    min={5}
+                                    max={600}
+                                    value={quiz.questions[selectedQuestionIndex].time_limit_seconds || 60}
+                                    onChange={(e) => updateQuestionField("time_limit_seconds", parseInt(e.target.value) || 60)}
+                                    className="bg-slate-100/70 dark:bg-[#121c33]/75 border-slate-200 dark:border-slate-700/60 text-slate-900 dark:text-white font-semibold text-xs h-10 rounded-xl"
+                                  />
+                                </div>
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400 block pl-1">
+                                  Seconds per question
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* OPTIONS BUILDER */}
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                {quiz.questions[selectedQuestionIndex].question_type === "true_false"
+                                  ? "Correct Answer Selection"
+                                  : quiz.questions[selectedQuestionIndex].question_type === "fill_in_the_blank" ||
+                                    quiz.questions[selectedQuestionIndex].question_type === "short_answer"
+                                  ? "Accepted Answer Keys"
+                                  : "Answer Choices & Options"}
+                              </label>
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                                {quiz.questions[selectedQuestionIndex].question_type === "multiple_select"
+                                  ? "Check all that apply"
+                                  : quiz.questions[selectedQuestionIndex].question_type === "true_false"
+                                  ? "Select True or False"
+                                  : "Select radio to mark correct answer"}
+                              </span>
+                            </div>
+
+                            {/* True / False Layout */}
+                            {quiz.questions[selectedQuestionIndex].question_type === "true_false" ? (
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {quiz.questions[selectedQuestionIndex].options.map((opt, optIdx) => {
+                                  return (
+                                    <div
+                                      key={opt.id}
+                                      onClick={() => {
+                                        const updatedOptions = quiz.questions[selectedQuestionIndex].options.map((o, idx) => ({
+                                          ...o,
+                                          is_correct: idx === optIdx
+                                        }));
+                                        updateQuestionField("options", updatedOptions);
+                                      }}
+                                      className={`p-4 rounded-2xl border cursor-pointer flex items-center justify-between transition-all ${
+                                        opt.is_correct
+                                          ? "bg-emerald-500/10 dark:bg-emerald-950/30 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 shadow-sm"
+                                          : "bg-slate-100/70 dark:bg-[#121c33]/70 border-slate-200 dark:border-slate-700/60 hover:border-slate-300 dark:hover:border-slate-600 text-slate-700 dark:text-slate-300"
+                                      }`}
+                                    >
+                                      <div className="flex items-center gap-3">
+                                        <div className={`h-8 w-8 rounded-xl flex items-center justify-center font-bold text-xs ${
+                                          opt.is_correct
+                                            ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
+                                            : "bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700"
+                                        }`}>
+                                          {optIdx === 0 ? "T" : "F"}
+                                        </div>
+                                        <div>
+                                          <div className="text-sm font-bold text-slate-900 dark:text-white">{opt.text}</div>
+                                          <div className="text-[10px] text-slate-500 dark:text-slate-400">Click to set as correct answer</div>
+                                        </div>
+                                      </div>
+                                      <div className={`h-6 w-6 rounded-full flex items-center justify-center border ${
+                                        opt.is_correct
+                                          ? "bg-emerald-500 border-emerald-500 text-white"
+                                          : "border-slate-300 dark:border-slate-700 bg-slate-200/60 dark:bg-slate-900"
+                                      }`}>
+                                        {opt.is_correct && <Check className="h-3.5 w-3.5 stroke-[3]" />}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
                               </div>
                             ) : (
-                              <div className="p-3 text-[10px] text-slate-500 dark:text-slate-400 rounded-xl bg-slate-100/60 dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800/80 leading-normal">
-                                Disabled. Select &apos;Per-Question&apos; timer mode in Settings tab to enable timers.
+                              /* Standard Options List for MCQ / Multiple Select / Fill Blank / Short Answer */
+                              <div className="space-y-3">
+                                {quiz.questions[selectedQuestionIndex].options.map((opt, optIdx) => {
+                                  const optionLetter = String.fromCharCode(65 + (optIdx % 26));
+                                  const isMultipleChoice = quiz.questions[selectedQuestionIndex].question_type === "multiple_choice";
+                                  const isMultipleSelect = quiz.questions[selectedQuestionIndex].question_type === "multiple_select";
+                                  const isTextBased = quiz.questions[selectedQuestionIndex].question_type === "fill_in_the_blank" || 
+                                                      quiz.questions[selectedQuestionIndex].question_type === "short_answer";
+
+                                  return (
+                                    <div
+                                      key={opt.id}
+                                      className={`flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-2xl border transition-all duration-200 ${
+                                        opt.is_correct && !isTextBased
+                                          ? "bg-emerald-500/10 dark:bg-emerald-950/25 border-emerald-500/40 dark:border-emerald-500/30 shadow-sm"
+                                          : "bg-slate-100/70 dark:bg-[#121c33]/70 border-slate-200 dark:border-slate-700/60 hover:border-slate-300 dark:hover:border-slate-600"
+                                      }`}
+                                    >
+                                      {/* Option Letter Indicator */}
+                                      {!isTextBased && (
+                                        <div className={`h-7 w-7 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
+                                          opt.is_correct
+                                            ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
+                                            : "bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700"
+                                        }`}>
+                                          {optionLetter}
+                                        </div>
+                                      )}
+
+                                      {/* Correct option toggle mark */}
+                                      {isMultipleChoice && (
+                                        <input
+                                          type="radio"
+                                          name={`q-${quiz.questions[selectedQuestionIndex].id}-correct`}
+                                          checked={opt.is_correct}
+                                          onChange={() => toggleOptionCorrectness(optIdx)}
+                                          className="h-4.5 w-4.5 text-emerald-600 border-slate-300 dark:border-slate-700 focus:ring-emerald-500 cursor-pointer shrink-0"
+                                          title="Mark as correct answer"
+                                        />
+                                      )}
+                                      {isMultipleSelect && (
+                                        <input
+                                          type="checkbox"
+                                          checked={opt.is_correct}
+                                          onChange={() => toggleOptionCorrectness(optIdx)}
+                                          className="h-4.5 w-4.5 rounded border-slate-300 dark:border-slate-700 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"
+                                          title="Mark as correct answer"
+                                        />
+                                      )}
+
+                                      {/* Choice Text input */}
+                                      <div className="flex-1 min-w-0">
+                                        <Input
+                                          type="text"
+                                          value={opt.text}
+                                          onChange={(e) => updateOptionText(optIdx, e.target.value)}
+                                          placeholder={
+                                            isTextBased
+                                              ? `Acceptable answer phrase ${optIdx + 1}...`
+                                              : `Choice ${optionLetter} content...`
+                                          }
+                                          className="bg-transparent border-none text-slate-900 dark:text-white text-xs sm:text-sm font-semibold h-9 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-slate-200/40 dark:focus:bg-white/5 focus:ring-0 w-full"
+                                        />
+                                      </div>
+
+                                      {/* Delete option */}
+                                      <button
+                                        type="button"
+                                        onClick={() => removeOption(optIdx)}
+                                        className="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 shrink-0 cursor-pointer transition-colors"
+                                        title="Remove option"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </button>
+                                    </div>
+                                  );
+                                })}
+
+                                {/* Clean Dashed Add Option Button */}
+                                {(quiz.questions[selectedQuestionIndex].question_type === "multiple_choice" || 
+                                  quiz.questions[selectedQuestionIndex].question_type === "multiple_select") && (
+                                  <button
+                                    type="button"
+                                    onClick={addOption}
+                                    className="w-full py-2.5 rounded-2xl border border-dashed border-indigo-500/30 hover:border-indigo-500/50 bg-indigo-500/5 hover:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                                  >
+                                    <Plus className="h-3.5 w-3.5" />
+                                    <span>Add Option Choice</span>
+                                  </button>
+                                )}
                               </div>
                             )}
                           </div>
-                        </div>
 
-                        {/* OPTIONS BUILDER */}
-                        <div className="space-y-3 pt-4 border-t border-slate-200/80 dark:border-slate-800/80">
-                          <div className="flex items-center justify-between">
-                            <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-                              {quiz.questions[selectedQuestionIndex].question_type === "fill_in_the_blank" || 
-                               quiz.questions[selectedQuestionIndex].question_type === "short_answer"
-                                ? "Acceptable Answer Keys"
-                                : quiz.questions[selectedQuestionIndex].question_type === "true_false"
-                                ? "True / False Answers"
-                                : "Option Answers"}
-                            </h4>
+                          {/* EXPLANATION / HINTS */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-200/80 dark:border-slate-800/80">
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Correct Answer Explanation</label>
+                              <textarea
+                                value={quiz.questions[selectedQuestionIndex].explanation}
+                                onChange={(e) => updateQuestionField("explanation", e.target.value)}
+                                placeholder="Provide feedback details on why answer choice is correct..."
+                                rows={2}
+                                className="w-full bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl p-2.5 text-slate-900 dark:text-white font-medium text-xs focus:border-indigo-500/50 outline-none transition-colors"
+                              />
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Hints</label>
+                              <textarea
+                                value={quiz.questions[selectedQuestionIndex].hint}
+                                onChange={(e) => updateQuestionField("hint", e.target.value)}
+                                placeholder="Add help/hints hints for students..."
+                                rows={2}
+                                className="w-full bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl p-2.5 text-slate-900 dark:text-white font-medium text-xs focus:border-indigo-500/50 outline-none transition-colors"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Bottom Question Navigation Footer */}
+                          <div className="flex items-center justify-between pt-4 border-t border-slate-200/80 dark:border-slate-800/80">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              disabled={selectedQuestionIndex === 0}
+                              onClick={() => setSelectedQuestionIndex(prev => Math.max(0, prev - 1))}
+                              className="h-9 px-3 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 disabled:opacity-40 flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <ArrowLeft className="h-3.5 w-3.5" />
+                              <span>Previous Q</span>
+                            </Button>
                             
-                            {/* Add Option button for MCQ/MSQ */}
-                            {(quiz.questions[selectedQuestionIndex].question_type === "multiple_choice" || 
-                              quiz.questions[selectedQuestionIndex].question_type === "multiple_select") && (
-                              <button
-                                type="button"
-                                onClick={addOption}
-                                className="flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-bold cursor-pointer transition-colors"
-                              >
-                                <Plus className="h-4 w-4" />
-                                <span>Add Choice Option</span>
-                              </button>
-                            )}
+                            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                              {selectedQuestionIndex + 1} of {quiz.questions.length}
+                            </span>
 
-                            {/* Add acceptable answers for fill blank */}
-                            {(quiz.questions[selectedQuestionIndex].question_type === "fill_in_the_blank" || 
-                              quiz.questions[selectedQuestionIndex].question_type === "short_answer") && (
-                              <button
+                            {selectedQuestionIndex < quiz.questions.length - 1 ? (
+                              <Button
                                 type="button"
-                                onClick={addOption}
-                                className="flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-bold cursor-pointer transition-colors"
+                                onClick={() => setSelectedQuestionIndex(prev => Math.min(quiz.questions.length - 1, prev + 1))}
+                                className="h-9 px-3 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 border-none cursor-pointer"
                               >
-                                <Plus className="h-4 w-4" />
-                                <span>Add Alternative Phrase</span>
-                              </button>
+                                <span>Next Q</span>
+                                <ArrowRight className="h-3.5 w-3.5" />
+                              </Button>
+                            ) : (
+                              <Button
+                                type="button"
+                                onClick={addQuestion}
+                                className="h-9 px-3 text-xs font-semibold rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white flex items-center gap-1.5 border-none cursor-pointer shadow-sm"
+                              >
+                                <Plus className="h-3.5 w-3.5" />
+                                <span>Add Q</span>
+                              </Button>
                             )}
                           </div>
-
-                          {/* True / False Dedicated Layout */}
-                          {quiz.questions[selectedQuestionIndex].question_type === "true_false" ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                              {quiz.questions[selectedQuestionIndex].options.map((opt, optIdx) => {
-                                const isTrueOption = opt.text.toLowerCase().includes("true");
-                                return (
-                                  <div
-                                    key={opt.id}
-                                    onClick={() => toggleOptionCorrectness(optIdx)}
-                                    className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 flex items-center justify-between ${
-                                      opt.is_correct
-                                        ? "bg-emerald-500/15 dark:bg-emerald-950/30 border-emerald-500/50 shadow-sm shadow-emerald-500/10 text-slate-900 dark:text-white"
-                                        : "bg-slate-100/70 dark:bg-[#121c33]/70 border-slate-200 dark:border-slate-700/60 text-slate-600 dark:text-slate-400 hover:bg-slate-200/70 dark:hover:bg-[#182645] hover:text-slate-900 dark:hover:text-slate-200"
-                                    }`}
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <div className={`h-8 w-8 rounded-xl flex items-center justify-center font-bold text-sm ${
-                                        opt.is_correct
-                                          ? "bg-emerald-500 text-white"
-                                          : isTrueOption
-                                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                                          : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
-                                      }`}>
-                                        {isTrueOption ? "T" : "F"}
-                                      </div>
-                                      <div>
-                                        <div className="text-sm font-bold text-slate-900 dark:text-white">{opt.text}</div>
-                                        <div className="text-[10px] text-slate-500 dark:text-slate-400">Click to set as correct answer</div>
-                                      </div>
-                                    </div>
-                                    <div className={`h-6 w-6 rounded-full flex items-center justify-center border ${
-                                      opt.is_correct
-                                        ? "bg-emerald-500 border-emerald-500 text-white"
-                                        : "border-slate-300 dark:border-slate-700 bg-slate-200/60 dark:bg-slate-900"
-                                    }`}>
-                                      {opt.is_correct && <Check className="h-3.5 w-3.5 stroke-[3]" />}
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          ) : (
-                            /* Standard Options List for MCQ / Multiple Select / Fill Blank / Short Answer */
-                            <div className="space-y-3">
-                              {quiz.questions[selectedQuestionIndex].options.map((opt, optIdx) => {
-                                const optionLetter = String.fromCharCode(65 + (optIdx % 26));
-                                const isMultipleChoice = quiz.questions[selectedQuestionIndex].question_type === "multiple_choice";
-                                const isMultipleSelect = quiz.questions[selectedQuestionIndex].question_type === "multiple_select";
-                                const isTextBased = quiz.questions[selectedQuestionIndex].question_type === "fill_in_the_blank" || 
-                                                    quiz.questions[selectedQuestionIndex].question_type === "short_answer";
-
-                                return (
-                                  <div
-                                    key={opt.id}
-                                    className={`flex items-center gap-3 p-3 rounded-2xl border transition-all duration-200 ${
-                                      opt.is_correct && !isTextBased
-                                        ? "bg-emerald-500/10 dark:bg-emerald-950/25 border-emerald-500/40 dark:border-emerald-500/30 shadow-sm"
-                                        : "bg-slate-100/70 dark:bg-[#121c33]/70 border-slate-200 dark:border-slate-700/60 hover:border-slate-300 dark:hover:border-slate-600"
-                                    }`}
-                                  >
-                                    {/* Option Letter Indicator */}
-                                    {!isTextBased && (
-                                      <div className={`h-7 w-7 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
-                                        opt.is_correct
-                                          ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
-                                          : "bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700"
-                                      }`}>
-                                        {optionLetter}
-                                      </div>
-                                    )}
-
-                                    {/* Correct option toggle mark */}
-                                    {isMultipleChoice && (
-                                      <input
-                                        type="radio"
-                                        name={`q-${quiz.questions[selectedQuestionIndex].id}-correct`}
-                                        checked={opt.is_correct}
-                                        onChange={() => toggleOptionCorrectness(optIdx)}
-                                        className="h-4.5 w-4.5 text-emerald-600 border-slate-300 dark:border-slate-700 focus:ring-emerald-500 cursor-pointer"
-                                        title="Mark as correct answer"
-                                      />
-                                    )}
-                                    {isMultipleSelect && (
-                                      <input
-                                        type="checkbox"
-                                        checked={opt.is_correct}
-                                        onChange={() => toggleOptionCorrectness(optIdx)}
-                                        className="h-4.5 w-4.5 rounded border-slate-300 dark:border-slate-700 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
-                                        title="Mark as correct answer"
-                                      />
-                                    )}
-
-                                    {/* Choice Text input */}
-                                    <Input
-                                      type="text"
-                                      value={opt.text}
-                                      onChange={(e) => updateOptionText(optIdx, e.target.value)}
-                                      placeholder={
-                                        isTextBased
-                                          ? `Acceptable answer key phrase ${optIdx + 1} (case-insensitive grading)...`
-                                          : `Choice ${optionLetter} content...`
-                                      }
-                                      className="bg-transparent border-none text-slate-900 dark:text-white text-sm font-semibold h-9 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-slate-200/40 dark:focus:bg-white/3 focus:ring-0"
-                                    />
-
-                                    {/* Delete option */}
-                                    <button
-                                      type="button"
-                                      onClick={() => removeOption(optIdx)}
-                                      className="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 shrink-0 cursor-pointer transition-colors"
-                                      title="Remove option"
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </button>
-                                  </div>
-                                );
-                              })}
-
-                              {/* Clean Dashed Add Option Button */}
-                              {(quiz.questions[selectedQuestionIndex].question_type === "multiple_choice" || 
-                                quiz.questions[selectedQuestionIndex].question_type === "multiple_select") && (
-                                <button
-                                  type="button"
-                                  onClick={addOption}
-                                  className="w-full py-2.5 rounded-2xl border border-dashed border-indigo-500/30 hover:border-indigo-500/50 bg-indigo-500/5 hover:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                                >
-                                  <Plus className="h-3.5 w-3.5" />
-                                  <span>Add Another Option Choice</span>
-                                </button>
-                              )}
-                            </div>
-                          )}
                         </div>
-
-                        {/* EXPLANATION / HINTS */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-200/80 dark:border-slate-800/80">
-                          <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Correct Answer Explanation</label>
-                            <textarea
-                              value={quiz.questions[selectedQuestionIndex].explanation}
-                              onChange={(e) => updateQuestionField("explanation", e.target.value)}
-                              placeholder="Provide feedback details on why answer choice is correct..."
-                              rows={2}
-                              className="w-full bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl p-2.5 text-slate-900 dark:text-white font-medium text-xs focus:border-indigo-500/50 outline-none transition-colors"
-                            />
-                          </div>
-
-                          <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Hints</label>
-                            <textarea
-                              value={quiz.questions[selectedQuestionIndex].hint}
-                              onChange={(e) => updateQuestionField("hint", e.target.value)}
-                              placeholder="Add help/hints hints for students..."
-                              rows={2}
-                              className="w-full bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl p-2.5 text-slate-900 dark:text-white font-medium text-xs focus:border-indigo-500/50 outline-none transition-colors"
-                            />
-                          </div>
+                      ) : (
+                        <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-12 text-center text-slate-500">
+                          No questions in this quiz. Click &apos;Add Question&apos; to start.
                         </div>
-                      </div>
-                    ) : (
-                      <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-12 text-center text-slate-500">
-                        No questions in this quiz. Click &apos;Add Question&apos; to start.
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
-              </motion.div>
-            )}
+                </motion.div>
+              )}
 
               {/* TAB 3: STUDENT PREVIEW / SIMULATOR */}
               {activeTab === "preview" && (
@@ -4441,16 +4473,16 @@ function CreateQuizContent() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-2xl bg-slate-50 dark:bg-[#0a1124] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-6 overflow-hidden flex flex-col max-h-[85vh]"
+              className="w-[calc(100vw-2rem)] sm:max-w-2xl bg-slate-50 dark:bg-[#0a1124] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-4 sm:p-6 overflow-hidden flex flex-col max-h-[85vh]"
             >
               {/* Modal Header */}
               <div className="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80 pb-4 mb-4 select-none">
                 <div className="space-y-1">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-purple-500 dark:text-purple-400" />
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-purple-500 dark:text-purple-400 shrink-0" />
                     <span>Quiz Generation Prompt Preview</span>
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Review, edit, and fine-tune your configuration before sending it to the AI engine.</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Review and fine-tune your configuration before sending to AI.</p>
                 </div>
               </div>
 
@@ -4550,13 +4582,13 @@ function CreateQuizContent() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-md bg-slate-50 dark:bg-[#0a1124] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-6 overflow-hidden flex flex-col"
+              className="w-[calc(100vw-2rem)] sm:max-w-md bg-slate-50 dark:bg-[#0a1124] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-4 sm:p-6 overflow-hidden flex flex-col"
             >
               {/* Modal Header */}
               <div className="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80 pb-4 mb-4 select-none">
                 <div className="space-y-1">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <AlertCircle className="h-5 w-5 text-amber-500 dark:text-amber-400" />
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <AlertCircle className="h-5 w-5 text-amber-500 dark:text-amber-400 shrink-0" />
                     <span>Question Count Mismatch</span>
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">We detected a mismatch between your prompt and settings.</p>

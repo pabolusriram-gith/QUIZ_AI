@@ -524,8 +524,8 @@ class GroqProvider(BaseAIProvider):
         import time
         import socket
         
-        is_groq_model = model_name and ("llama" in model_name.lower() or "mixtral" in model_name.lower() or "gemma" in model_name.lower())
-        chosen_model = model_name if is_groq_model else "llama-3.3-70b-versatile"
+        is_groq_model = model_name and ("llama" in model_name.lower() or "mixtral" in model_name.lower() or "gemma" in model_name.lower() or "qwen" in model_name.lower() or "compound" in model_name.lower() or "gpt" in model_name.lower())
+        chosen_model = model_name if is_groq_model else "qwen/qwen3.6-27b"
         client = AsyncOpenAI(
             api_key=settings.GROQ_API_KEY,
             base_url="https://api.groq.com/openai/v1"

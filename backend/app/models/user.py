@@ -23,6 +23,9 @@ class User(Base):
     full_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     role: Mapped[str] = mapped_column(String(50), default="student", nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    is_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    verification_code: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    verification_code_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     token_version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     created_at: Mapped[datetime] = mapped_column(

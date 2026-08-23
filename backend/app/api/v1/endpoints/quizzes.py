@@ -332,7 +332,7 @@ async def update_question(
     quiz_id: uuid.UUID,
     question_id: uuid.UUID,
     question_in: QuestionUpdate,
-    current_user: User = Depends(check_role(["teacher", "admin"])),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """Update a single question (and its options) within a quiz. Teachers/admins only."""
@@ -425,7 +425,7 @@ async def update_question(
 async def delete_question(
     quiz_id: uuid.UUID,
     question_id: uuid.UUID,
-    current_user: User = Depends(check_role(["teacher", "admin"])),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ) -> None:
     """Delete a single question from a quiz. Cascades to options. Teachers/admins only."""
@@ -454,7 +454,7 @@ async def delete_question(
 @router.post("", response_model=QuizResponse, status_code=status.HTTP_201_CREATED)
 async def create_quiz(
     quiz_in: QuizCreate,
-    current_user: User = Depends(check_role(["teacher", "admin"])),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """Create a new quiz, including its questions and options. Protected for teachers and admins."""
@@ -1068,7 +1068,7 @@ async def read_quiz(
 async def update_quiz(
     id: uuid.UUID,
     quiz_in: QuizUpdate,
-    current_user: User = Depends(check_role(["teacher", "admin"])),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """
@@ -1278,7 +1278,7 @@ async def update_quiz(
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_quiz(
     id: uuid.UUID,
-    current_user: User = Depends(check_role(["teacher", "admin"])),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ) -> None:
     """Delete a quiz. Cascades to questions and options. Protected for teachers and admins."""

@@ -1,7 +1,7 @@
 import secrets
 import uuid
 import urllib.parse
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Any, Optional
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
@@ -33,6 +33,8 @@ from app.schemas.user import (
     ResetPasswordRequest,
     TokenRefreshRequest,
     GuestLoginRequest,
+    VerifyEmailRequest,
+    ResendOtpRequest,
 )
 
 router = APIRouter()
@@ -269,6 +271,85 @@ GOOGLE_CLIENT_SECRET="your_google_client_secret"
 </html>"""
 
 
+def send_verification_email(email: str, otp_code: str) -> bool:
+    """Helper to send 6-digit OTP email verification via SMTP if configured, else log to console."""
+    if not settings.SMTP_HOST or not settings.SMTP_USERNAME or not settings.SMTP_PASSWORD:
+        print(f"\n=======================================================")
+        print(f"[DEVELOPMENT MODE] Email Verification Code for {email}:")
+        print(f" >>> OTP CODE: {otp_code} <<< (Valid for 15 minutes)")
+        print(f"=======================================================\n")
+        return False
+
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+
+    try:
+        msg = MIMEMultipart("alternative")
+        msg['From'] = f"QuizVerse AI <{settings.SMTP_USERNAME}>"
+        msg['To'] = email
+        msg['Subject'] = f"QuizVerse AI - Your Verification Code is {otp_code}"
+        
+        text_body = f"""Hello,
+
+Thank you for registering on QuizVerse AI.
+Your 6-digit email verification code is: {otp_code}
+
+This code is valid for 15 minutes. Please enter it in the verification screen to activate your account.
+
+If you did not request this registration, please ignore this email.
+"""
+        html_body = f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px; }}
+        .container {{ max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 32px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }}
+        .header {{ text-align: center; margin-bottom: 24px; }}
+        .logo {{ font-size: 22px; font-weight: 800; color: #4f46e5; letter-spacing: -0.5px; }}
+        .otp-box {{ background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%); border: 2px dashed #6366f1; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0; }}
+        .otp-code {{ font-size: 32px; font-weight: 900; letter-spacing: 8px; color: #312e81; font-family: monospace; }}
+        .footer {{ font-size: 12px; color: #94a3b8; text-align: center; margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 16px; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">QuizVerse AI</div>
+            <h2 style="color: #1e293b; margin-top: 8px; font-size: 20px;">Verify Your Email Address</h2>
+        </div>
+        <p style="color: #475569; font-size: 14px; line-height: 1.6;">
+            Hello,<br><br>
+            Thank you for creating an account on <strong>QuizVerse AI</strong>. Please use the following 6-digit verification code to complete your signup:
+        </p>
+        <div class="otp-box">
+            <div class="otp-code">{otp_code}</div>
+            <div style="font-size: 12px; color: #6366f1; font-weight: 600; margin-top: 6px;">Expires in 15 minutes</div>
+        </div>
+        <p style="color: #64748b; font-size: 13px; line-height: 1.5;">
+            If you did not sign up for QuizVerse AI, you can safely ignore this email.
+        </p>
+        <div class="footer">
+            &copy; 2026 QuizVerse AI Assessments. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>"""
+        msg.attach(MIMEText(text_body, 'plain'))
+        msg.attach(MIMEText(html_body, 'html'))
+        
+        server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT or 587)
+        server.starttls()
+        server.login(settings.SMTP_USERNAME, settings.SMTP_PASSWORD)
+        server.sendmail(settings.SMTP_USERNAME, email, msg.as_string())
+        server.quit()
+        return True
+    except Exception as e:
+        print(f"[-] Failed to send verification email via SMTP: {e}")
+        return False
+
+
 def send_reset_email(email: str, reset_url: str) -> bool:
     """Helper to send password reset email via SMTP if configured, else log to console."""
     if not settings.SMTP_HOST or not settings.SMTP_USERNAME or not settings.SMTP_PASSWORD:
@@ -337,34 +418,186 @@ async def register(
     user_in: UserRegister,
     db: AsyncSession = Depends(get_db)
 ) -> Any:
-    """Register a new user, hashing their password with Argon2id and storing details in DB."""
+    """Register a new user in unverified state and issue a 6-digit OTP verification code."""
     # Apply rate limiting
     rate_limit_register(request)
 
-    # Check if user already exists
-    result = await db.execute(select(User).where(User.email == user_in.email))
-    existing_user = result.scalar_one_or_none()
-    if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
-        )
-        
+    email_clean = user_in.email.lower().strip()
+    
+    # Generate 6-digit verification code and 15-minute expiration
+    otp_code = f"{secrets.randbelow(900000) + 100000}"
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=15)
+
     from app.core.security import escape_html
-    # Create new user instance
+
+    # Check if user already exists
+    result = await db.execute(select(User).where(User.email == email_clean))
+    existing_user = result.scalar_one_or_none()
+    
+    if existing_user:
+        if existing_user.is_verified:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered and verified. Please sign in."
+            )
+        else:
+            # User registered previously but never completed email verification.
+            # Allow updating credentials & resending fresh OTP code.
+            existing_user.hashed_password = hash_password(user_in.password)
+            existing_user.full_name = escape_html(user_in.full_name)
+            existing_user.role = user_in.role.value
+            existing_user.verification_code = otp_code
+            existing_user.verification_code_expires_at = expires_at
+            existing_user.is_verified = False
+            
+            db.add(existing_user)
+            await db.commit()
+            await db.refresh(existing_user)
+            
+            # Send verification email
+            send_verification_email(email_clean, otp_code)
+            return existing_user
+
+    # Create new user instance (unverified by default)
     new_user = User(
-        email=user_in.email.lower().strip(),
+        email=email_clean,
         hashed_password=hash_password(user_in.password),
         full_name=escape_html(user_in.full_name),
         role=user_in.role.value,
         token_version=1,
-        is_active=True
+        is_active=True,
+        is_verified=False,
+        verification_code=otp_code,
+        verification_code_expires_at=expires_at
     )
     
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
+    
+    # Send verification email
+    send_verification_email(email_clean, otp_code)
     return new_user
+
+
+@router.post("/verify-email", response_model=Token)
+async def verify_email(
+    request: Request,
+    payload: VerifyEmailRequest,
+    db: AsyncSession = Depends(get_db)
+) -> Any:
+    """Verifies a user's email using the 6-digit OTP code and returns access/refresh session tokens."""
+    email_clean = payload.email.lower().strip()
+    otp_clean = payload.otp_code.strip()
+
+    result = await db.execute(select(User).where(User.email == email_clean))
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User account not found."
+        )
+
+    if user.is_verified:
+        # Already verified: generate session tokens
+        access_token = create_access_token(
+            subject=user.id,
+            role=user.role,
+            token_version=user.token_version
+        )
+        refresh_token = create_refresh_token(
+            subject=user.id,
+            token_version=user.token_version
+        )
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer"
+        }
+
+    # Verify code match
+    if not user.verification_code or user.verification_code.strip() != otp_clean:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid verification code. Please check and try again."
+        )
+
+    # Check expiration
+    now = datetime.now(timezone.utc)
+    if user.verification_code_expires_at and user.verification_code_expires_at < now:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Verification code has expired. Please click 'Resend Code'."
+        )
+
+    # Mark as verified and clear code
+    user.is_verified = True
+    user.verification_code = None
+    user.verification_code_expires_at = None
+    user.last_login_at = now
+    
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+
+    await log_login_event(db, user.id, request, "verified_login")
+
+    # Generate JWT tokens
+    access_token = create_access_token(
+        subject=user.id,
+        role=user.role,
+        token_version=user.token_version
+    )
+    refresh_token = create_refresh_token(
+        subject=user.id,
+        token_version=user.token_version
+    )
+
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer"
+    }
+
+
+@router.post("/resend-verification-otp")
+async def resend_verification_otp(
+    payload: ResendOtpRequest,
+    db: AsyncSession = Depends(get_db)
+) -> Any:
+    """Generates and resends a fresh 6-digit OTP code to the user's email."""
+    email_clean = payload.email.lower().strip()
+
+    result = await db.execute(select(User).where(User.email == email_clean))
+    user = result.scalar_one_or_none()
+
+    if not user:
+        # Avoid account enumeration: return success message
+        return {"message": "If an unverified account exists for this email, a new code has been sent."}
+
+    if user.is_verified:
+        return {"message": "Email is already verified. You can log in directly."}
+
+    # Generate fresh OTP code
+    otp_code = f"{secrets.randbelow(900000) + 100000}"
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=15)
+
+    user.verification_code = otp_code
+    user.verification_code_expires_at = expires_at
+
+    db.add(user)
+    await db.commit()
+
+    send_verification_email(email_clean, otp_code)
+    
+    response_data: dict[str, Any] = {
+        "message": "A new verification code has been sent to your email."
+    }
+    if not settings.SMTP_HOST or not settings.SMTP_USERNAME:
+        response_data["dev_otp"] = otp_code
+        
+    return response_data
 
 
 async def get_login_credentials(request: Request) -> UserLogin:
@@ -480,7 +713,23 @@ async def login(
     if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Inactive user"
+            detail="Inactive user account."
+        )
+
+    # Enforce email verification
+    if not user.is_verified:
+        # If code expired or missing, auto-generate fresh one and send
+        if not user.verification_code or not user.verification_code_expires_at or user.verification_code_expires_at < datetime.now(timezone.utc):
+            user.verification_code = f"{secrets.randbelow(900000) + 100000}"
+            user.verification_code_expires_at = datetime.now(timezone.utc) + timedelta(minutes=15)
+            db.add(user)
+            await db.commit()
+            send_verification_email(user.email, user.verification_code)
+            
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Email not verified. Please verify your email address to continue.",
+            headers={"X-Email-Unverified": "true"}
         )
 
     # Update last login timestamp
@@ -524,7 +773,8 @@ async def guest_login(
         hashed_password=hashed_pwd,
         full_name=payload.nickname,
         role="student",
-        is_active=True
+        is_active=True,
+        is_verified=True
     )
     db.add(user)
     await db.commit()
@@ -870,7 +1120,8 @@ async def google_callback(
                 hashed_password=hash_password(secrets.token_urlsafe(32)),
                 role=desired_role,
                 token_version=1,
-                is_active=True
+                is_active=True,
+                is_verified=True
             )
             db.add(user)
             await db.commit()
@@ -882,6 +1133,10 @@ async def google_callback(
                 print("[OAUTH DEBUG] Google login rejected: User account is inactive.")
                 err_msg = urllib.parse.quote("User account is inactive.")
                 return RedirectResponse(f"{settings.FRONTEND_URL.rstrip('/')}/login?error={err_msg}")
+            
+            # Ensure OAuth user is verified
+            if not user.is_verified:
+                user.is_verified = True
             
         # Update last login timestamp
         user.last_login_at = datetime.now(timezone.utc)
