@@ -73,21 +73,23 @@ body {
 
 /* Glassmorphism primitives */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.70);
+  background: rgba(255, 255, 255, 0.80);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 0, 0, 0.07);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 4px 20px -4px rgba(99, 102, 241, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
 }
 
 .dark .glass-panel {
   background: rgba(10, 20, 48, 0.50);
   border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none;
 }
 
 .glass-panel-glow {
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(79, 70, 229, 0.18);
-  box-shadow: 0 10px 40px -10px rgba(79, 70, 229, 0.10);
+  box-shadow: 0 10px 40px -10px rgba(79, 70, 229, 0.12), 0 2px 8px -2px rgba(0, 0, 0, 0.04);
 }
 
 .dark .glass-panel-glow {
@@ -101,11 +103,13 @@ body {
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 1rem;
+  box-shadow: 0 4px 20px -4px rgba(99, 102, 241, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
 }
 
 .dark .page-card {
   background: rgba(10, 18, 38, 0.80);
   border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: none;
 }
 
 .brand-text-gradient {
@@ -133,7 +137,7 @@ body {
 
 @layer base {
   :root {
-    --background: #f1f5f9; /* slate-100 — soft off-white, not pure white */
+    --background: #f8fafd; /* clean luminous off-white with subtle cool aura */
     --foreground: #0f172a; /* slate-900 */
     
     --card: #ffffff;
@@ -145,10 +149,10 @@ body {
     --primary: #4f46e5; /* Indigo 600 */
     --primary-foreground: #ffffff;
     
-    --secondary: #e2e8f0; /* Slate 200 */
-    --secondary-foreground: #0f172a;
+    --secondary: #eef2ff; /* Soft Indigo 50 / Slate 100 */
+    --secondary-foreground: #312e81;
     
-    --muted: #f8fafc; /* Slate 50 */
+    --muted: #f1f5f9; /* Slate 100 */
     --muted-foreground: #64748b; /* Slate 500 */
     
     --accent: #0891b2; /* Cyan 600 */
@@ -162,11 +166,11 @@ body {
     --ring: #4f46e5;
     --radius: 0.75rem;
     
-    --sidebar: #f8fafc; /* slightly lighter than page bg */
+    --sidebar: #ffffff; /* crisp white sidebar in light mode */
     --sidebar-foreground: #64748b;
     --sidebar-primary: #4f46e5;
     --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: rgba(0, 0, 0, 0.035);
+    --sidebar-accent: rgba(79, 70, 229, 0.05);
     --sidebar-accent-foreground: #0f172a;
     --sidebar-border: #e2e8f0;
     --sidebar-ring: #4f46e5;

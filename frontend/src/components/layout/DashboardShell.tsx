@@ -32,16 +32,17 @@ export default function DashboardShell({ children }: DashboardShellProps) {
       
       {/* ----------------- Premium Theme Background Visuals ----------------- */}
       
-      {/* Suble grid line overlay matching Login branding */}
+      {/* Subtle grid line overlay */}
       <div 
-        className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1.2px,transparent_1.2px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1.2px,transparent_1.2px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1.2px,transparent_1.2px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1.2px,transparent_1.2px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_80%,transparent_100%)] opacity-85 pointer-events-none -z-10" 
+        className="absolute inset-0 bg-[linear-gradient(to_right,rgba(99,102,241,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(99,102,241,0.035)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1.2px,transparent_1.2px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1.2px,transparent_1.2px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_40%,#000_80%,transparent_100%)] pointer-events-none -z-10" 
         aria-hidden="true"
       />
 
-      {/* Background blobs */}
+      {/* Radiant ambient glow blobs - rich luminous light theme & sleek dark theme */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden -z-20" aria-hidden="true">
-        <div className="absolute top-1/4 left-1/4 h-[600px] w-[600px] rounded-full bg-indigo-500/4 dark:bg-indigo-900/15 blur-[150px]" />
-        <div className="absolute bottom-1/4 right-1/4 h-[500px] w-[500px] rounded-full bg-cyan-500/4 dark:bg-cyan-900/15 blur-[130px]" />
+        <div className="absolute -top-20 -left-20 h-[650px] w-[650px] rounded-full bg-gradient-to-br from-indigo-500/14 via-purple-500/10 to-cyan-400/8 dark:bg-indigo-900/15 blur-[130px]" />
+        <div className="absolute top-1/3 -right-20 h-[600px] w-[600px] rounded-full bg-gradient-to-bl from-cyan-500/14 via-sky-400/10 to-indigo-500/8 dark:bg-cyan-900/15 blur-[140px]" />
+        <div className="absolute -bottom-32 left-1/3 h-[500px] w-[500px] rounded-full bg-gradient-to-tr from-violet-500/10 via-indigo-500/8 to-teal-400/8 dark:bg-transparent blur-[130px]" />
       </div>
 
       {/* ----------------- Sidebar ----------------- */}
