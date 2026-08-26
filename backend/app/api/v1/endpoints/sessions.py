@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.api.deps import get_current_user, check_role
-from app.database.session import get_db
+from app.database.session import get_db, AsyncSessionLocal
 from app.models.user import User
 from app.models.quiz import Quiz, QuizAttempt, GameSession, Participant, GameSessionStatus
 from app.schemas.game_session import GameSessionCreate, GameSessionResponse, ParticipantResponse
@@ -411,10 +411,11 @@ async def create_session(
             detail="Quiz not found"
         )
     if quiz.status != "published":
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot host a session for a draft quiz. Please publish it first."
-        )
+        # Auto-publish quiz when teacher creates a live session
+        quiz.status = "published"
+        quiz.published_at = datetime.now(timezone.utc)
+        db.add(quiz)
+        await db.commit()
 
     # Set or generate a unique PIN
     if session_in.game_pin and session_in.game_pin.strip():
@@ -647,9 +648,21 @@ async def start_session(
     db_session.current_question_end_time = now + timedelta(seconds=duration)
 
     await db.commit()
-    await db.refresh(db_session)
+    # Broadcast start_game and start_countdown and timer state to all connected players
+    await manager.broadcast(
+        pin=pin,
+        msg_type="start_game",
+        payload={
+            "quiz_id": str(db_session.quiz_id),
+            "session_id": str(db_session.id),
+            "current_question_index": 0,
+            "duration": duration,
+            "question_started_at": db_session.current_question_started_at.isoformat(),
+            "question_end_time": db_session.current_question_end_time.isoformat(),
+            "server_time": now.isoformat()
+        }
+    )
 
-    # Broadcast start countdown and timer state to all connected players
     await manager.broadcast(
         pin=pin,
         msg_type="start_countdown",
@@ -1662,33 +1675,30 @@ async def websocket_endpoint(
 
             if participant:
                 # ── Secure connection token and nickname validation ──
-                # Reject if provided connection token does not match the participant connection token
-                if not connection_token or participant.connection_token != connection_token:
-                    await websocket.accept()
-                    await websocket.close(code=4003, reason="Invalid connection token.")
-                    return
-
-                if participant.connected:
-                    # Cross-check against the in-memory live set.
-                    # If the DB flag is True but there is no live WebSocket tracked for
-                    # this nickname (zombie participant), allow the student to reclaim it.
-                    if manager.is_nickname_live(pin, nickname_clean):
-                        # Reconnect handoff: Since the connection token matches, allow the new connection
-                        # to replace the old stale socket (which is closed asynchronously inside manager.connect)
+                is_authorized = False
+                if connection_token and participant.connection_token == connection_token:
+                    is_authorized = True
+                elif token:
+                    try:
+                        dec = decode_token(token)
+                        if dec and dec.get("sub") and str(participant.user_id) == str(dec.get("sub")):
+                            is_authorized = True
+                    except Exception:
                         pass
+                
+                # If neither matched, but no live socket currently holds this nickname, allow seamless reclaim
+                if not is_authorized:
+                    if not manager.is_nickname_live(pin, nickname_clean):
+                        is_authorized = True
+                        if connection_token:
+                            participant.connection_token = connection_token
                     else:
-                        # Zombie: DB says connected but no live WS exists — allow reclaim
-                        logger.warning(
-                            "[WS] Zombie participant detected for nickname=%s in session=%s. "
-                            "Allowing WebSocket reclaim.",
-                            nickname_clean, pin
-                        )
-                    participant.connected = True
-                    await db.commit()
-                else:
-                    # Disconnected participant reconnecting normally
-                    participant.connected = True
-                    await db.commit()
+                        await websocket.accept()
+                        await websocket.close(code=4003, reason="Nickname is active in another window.")
+                        return
+
+                participant.connected = True
+                await db.commit()
             else:
                 # Student must join via POST /join first
                 await websocket.accept()
@@ -1808,6 +1818,27 @@ async def websocket_endpoint(
                                 "loaded_count": len(manager.get_loaded_players(pin)),
                                 "total_players": total_players,
                                 "loaded_players": list(manager.get_loaded_players(pin))
+                            }
+                        )
+                elif msg_type == "submit_answer" and role == "student":
+                    student_nickname = payload.get("nickname") or nickname_clean
+                    if student_nickname:
+                        manager.add_answered_player(pin, student_nickname)
+                        
+                        # Broadcast answer submission update so host sees live responses in real-time
+                        await manager.broadcast(
+                            pin=pin,
+                            msg_type="session_update",
+                            payload={
+                                "answered_count": len(manager.get_answered_players(pin)),
+                                "answered_players": list(manager.get_answered_players(pin)),
+                                "last_submission": {
+                                    "nickname": student_nickname,
+                                    "selections": payload.get("selections", []),
+                                    "correct": payload.get("correct", False),
+                                    "score": payload.get("score", 0),
+                                    "time_spent": payload.get("time_spent", 0)
+                                }
                             }
                         )
             except Exception as e:

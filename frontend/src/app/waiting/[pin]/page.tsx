@@ -144,12 +144,22 @@ function WaitingRoomContent() {
             if (payload.participants !== undefined) {
               setParticipants(payload.participants);
             }
+            if (payload.status === "active" && !isRedirecting.current) {
+              isRedirecting.current = true;
+              toast.success("The host has started the quiz!");
+              router.push(`/assessment/${session?.quiz_id || payload.quiz_id || ''}?pin=${pin}&nickname=${encodeURIComponent(nickname)}`);
+            }
           } else if (data.type === "start_game" && payload) {
-            toast.success("The host has started the quiz!");
-            router.push(`/assessment/${payload.quiz_id}?pin=${pin}&nickname=${encodeURIComponent(nickname)}`);
+            if (!isRedirecting.current) {
+              isRedirecting.current = true;
+              toast.success("The host has started the quiz!");
+              router.push(`/assessment/${payload.quiz_id}?pin=${pin}&nickname=${encodeURIComponent(nickname)}`);
+            }
           } else if (data.type === "timer_sync" && payload) {
-            isRedirecting.current = true;
-            router.push(`/assessment/${session?.quiz_id || payload.quiz_id || ''}?pin=${pin}&nickname=${encodeURIComponent(nickname)}`);
+            if (!isRedirecting.current) {
+              isRedirecting.current = true;
+              router.push(`/assessment/${session?.quiz_id || payload.quiz_id || ''}?pin=${pin}&nickname=${encodeURIComponent(nickname)}`);
+            }
           } else if (data.type === "session_state" && payload) {
             if (payload.status === "active") {
               isRedirecting.current = true;

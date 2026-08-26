@@ -277,7 +277,7 @@ def send_verification_email(email: str, otp_code: str) -> bool:
         print(f"\n=======================================================")
         print(f"[DEVELOPMENT MODE] Email Verification Code for {email}:")
         print(f" >>> OTP CODE: {otp_code} <<< (Valid for 15 minutes)")
-        print(f"=======================================================\n")
+        print(f"=======================================================\n", flush=True)
         return False
 
     import smtplib
@@ -339,21 +339,21 @@ If you did not request this registration, please ignore this email.
         msg.attach(MIMEText(text_body, 'plain'))
         msg.attach(MIMEText(html_body, 'html'))
         
-        server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT or 587)
+        server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT or 587, timeout=10)
         server.starttls()
         server.login(settings.SMTP_USERNAME, settings.SMTP_PASSWORD)
         server.sendmail(settings.SMTP_USERNAME, email, msg.as_string())
         server.quit()
         return True
     except Exception as e:
-        print(f"[-] Failed to send verification email via SMTP: {e}")
+        print(f"[-] Failed to send verification email via SMTP: {e}", flush=True)
         return False
 
 
 def send_reset_email(email: str, reset_url: str) -> bool:
     """Helper to send password reset email via SMTP if configured, else log to console."""
     if not settings.SMTP_HOST or not settings.SMTP_USERNAME or not settings.SMTP_PASSWORD:
-        print(f"\n[DEVELOPMENT MODE] Password reset URL for {email}:\n{reset_url}\n")
+        print(f"\n[DEVELOPMENT MODE] Password reset URL for {email}:\n{reset_url}\n", flush=True)
         return False
 
     import smtplib
@@ -377,14 +377,14 @@ If you did not request this, please ignore this email.
 """
         msg.attach(MIMEText(body, 'plain'))
         
-        server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT or 587)
+        server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT or 587, timeout=10)
         server.starttls()
         server.login(settings.SMTP_USERNAME, settings.SMTP_PASSWORD)
         server.sendmail(settings.SMTP_USERNAME, email, msg.as_string())
         server.quit()
         return True
     except Exception as e:
-        print(f"[-] Failed to send password reset email via SMTP: {e}")
+        print(f"[-] Failed to send password reset email via SMTP: {e}", flush=True)
         return False
 
 
@@ -455,8 +455,11 @@ async def register(
             await db.refresh(existing_user)
             
             # Send verification email
-            send_verification_email(email_clean, otp_code)
-            return existing_user
+            sent = send_verification_email(email_clean, otp_code)
+            resp = UserResponse.model_validate(existing_user)
+            if not sent or not settings.SMTP_HOST or not settings.SMTP_USERNAME:
+                resp.dev_otp = otp_code
+            return resp
 
     # Create new user instance (unverified by default)
     new_user = User(
@@ -476,8 +479,11 @@ async def register(
     await db.refresh(new_user)
     
     # Send verification email
-    send_verification_email(email_clean, otp_code)
-    return new_user
+    sent = send_verification_email(email_clean, otp_code)
+    resp = UserResponse.model_validate(new_user)
+    if not sent or not settings.SMTP_HOST or not settings.SMTP_USERNAME:
+        resp.dev_otp = otp_code
+    return resp
 
 
 @router.post("/verify-email", response_model=Token)
@@ -726,10 +732,14 @@ async def login(
             await db.commit()
             send_verification_email(user.email, user.verification_code)
             
+        unverified_headers = {"X-Email-Unverified": "true"}
+        if not settings.SMTP_HOST or not settings.SMTP_USERNAME or "your_smtp" in (settings.SMTP_HOST or ""):
+            unverified_headers["X-Dev-OTP"] = str(user.verification_code)
+            
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Email not verified. Please verify your email address to continue.",
-            headers={"X-Email-Unverified": "true"}
+            headers=unverified_headers
         )
 
     # Update last login timestamp
@@ -985,14 +995,22 @@ def is_google_configured() -> bool:
     return True
 
 
+def get_oauth_callback_url(request: Request, provider: str) -> str:
+    """Calculates canonical OAuth callback URL respecting BACKEND_URL setting and HTTPS reverse proxies."""
+    if settings.BACKEND_URL:
+        base = settings.BACKEND_URL.rstrip('/')
+    else:
+        proto = request.headers.get("x-forwarded-proto", request.url.scheme)
+        host = request.headers.get("x-forwarded-host", request.headers.get("host", str(request.base_url.netloc)))
+        base = f"{proto}://{host}".rstrip('/')
+    return f"{base}{settings.API_V1_STR}/auth/{provider}/callback"
+
+
 @router.get("/google/login")
 async def google_login(request: Request, role: Optional[str] = "student") -> Any:
     """Initiates Google OAuth redirect to Google consent screen."""
     print("[OAUTH DEBUG] /google/login endpoint called.")
-    print(f"[OAUTH DEBUG] settings.GOOGLE_CLIENT_ID loaded: {settings.GOOGLE_CLIENT_ID is not None} (Length: {len(settings.GOOGLE_CLIENT_ID) if settings.GOOGLE_CLIENT_ID else 0})")
-    if settings.GOOGLE_CLIENT_ID:
-        print(f"[OAUTH DEBUG] settings.GOOGLE_CLIENT_ID prefix: {settings.GOOGLE_CLIENT_ID[:15]}...")
-    print(f"[OAUTH DEBUG] settings.GOOGLE_CLIENT_SECRET loaded: {settings.GOOGLE_CLIENT_SECRET is not None} (Length: {len(settings.GOOGLE_CLIENT_SECRET) if settings.GOOGLE_CLIENT_SECRET else 0})")
+    print(f"[OAUTH DEBUG] settings.GOOGLE_CLIENT_ID loaded: {settings.GOOGLE_CLIENT_ID is not None}")
     print(f"[OAUTH DEBUG] settings.FRONTEND_URL: {settings.FRONTEND_URL}")
 
     if not is_google_configured():
@@ -1002,10 +1020,8 @@ async def google_login(request: Request, role: Optional[str] = "student") -> Any
             status_code=400
         )
         
-    redirect_uri = f"{str(request.base_url).rstrip('/')}{settings.API_V1_STR}/auth/google/callback"
+    redirect_uri = get_oauth_callback_url(request, "google")
     print(f"[OAUTH DEBUG] Calculated redirect_uri sent to Google: {redirect_uri}")
-    if redirect_uri != "http://localhost:8000/api/v1/auth/google/callback":
-        print(f"[OAUTH DEBUG] WARNING: Redirect URI does NOT match exact Google Console callback string: http://localhost:8000/api/v1/auth/google/callback")
         
     normalized_role = role.lower().strip() if role and role.lower().strip() in ["teacher", "student"] else "student"
     params = {
@@ -1032,7 +1048,7 @@ async def google_callback(
 ) -> Any:
     """Processes Google OAuth callback, creating user if necessary, and issuing session JWT."""
     print("[OAUTH DEBUG] /google/callback received request.")
-    print(f"[OAUTH DEBUG] Code parameter present: {code is not None} (Length: {len(code) if code else 0})")
+    print(f"[OAUTH DEBUG] Code parameter present: {code is not None}")
     print(f"[OAUTH DEBUG] Error parameter: {error}")
     
     if not is_google_configured():
@@ -1052,7 +1068,7 @@ async def google_callback(
         err_msg = urllib.parse.quote("Google authorization code was missing.")
         return RedirectResponse(f"{settings.FRONTEND_URL.rstrip('/')}/login?error={err_msg}")
 
-    redirect_uri = f"{str(request.base_url).rstrip('/')}{settings.API_V1_STR}/auth/google/callback"
+    redirect_uri = get_oauth_callback_url(request, "google")
     print(f"[OAUTH DEBUG] Redirect URI for token exchange: {redirect_uri}")
     
     try:
@@ -1194,7 +1210,7 @@ async def github_login(request: Request) -> Any:
     if not settings.GITHUB_CLIENT_ID:
         raise HTTPException(status_code=400, detail="GitHub client ID is not configured.")
         
-    redirect_uri = f"{str(request.base_url).rstrip('/')}{settings.API_V1_STR}/auth/github/callback"
+    redirect_uri = get_oauth_callback_url(request, "github")
     params = {
         "client_id": settings.GITHUB_CLIENT_ID,
         "redirect_uri": redirect_uri,
@@ -1214,7 +1230,7 @@ async def github_callback(
     if not settings.GITHUB_CLIENT_ID or not settings.GITHUB_CLIENT_SECRET:
         raise HTTPException(status_code=400, detail="GitHub client credentials are not configured.")
         
-    redirect_uri = f"{str(request.base_url).rstrip('/')}{settings.API_V1_STR}/auth/github/callback"
+    redirect_uri = get_oauth_callback_url(request, "github")
     
     async with httpx.AsyncClient() as client:
         # 1. Exchange code for access token

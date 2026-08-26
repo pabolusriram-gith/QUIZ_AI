@@ -28,6 +28,7 @@ class UserResponse(UserBase):
     is_verified: bool = False
     created_at: datetime
     updated_at: datetime
+    dev_otp: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

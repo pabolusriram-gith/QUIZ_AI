@@ -274,6 +274,21 @@ from app.api.v1.api import api_router
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 
+@app.get("/keepalive", tags=["Health"])
+@app.get("/ping", tags=["Health"])
+@app.get("/api/v1/keepalive", tags=["Health"])
+@app.get("/api/v1/ping", tags=["Health"])
+@app.get("/api/v1/health", tags=["Health"])
+async def keepalive_ping():
+    """Ultra-fast keep-alive endpoint for Render/UptimeRobot pings to prevent service sleep."""
+    return {
+        "status": "ok",
+        "alive": True,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "service": settings.PROJECT_NAME
+    }
+
+
 @app.get("/health", tags=["Health"])
 async def health_check():
     """Service Health Check Endpoint"""

@@ -849,6 +849,27 @@ function AssessmentContent() {
     answersRef.current = newAnswers;
     setAnswers(newAnswers);
     saveProgressPayload(newAnswers, flaggedRef.current);
+
+    // In Live Slido Mode: broadcast answer update immediately to Host
+    if (isLiveMode && wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      const qMeta = questionsMap[qId];
+      const correctOptionIds = qMeta?.options?.filter((o: any) => o.is_correct).map((o: any) => String(o.id)) || [];
+      const isCorrect = isMulti
+        ? updated.length === correctOptionIds.length && updated.every((v: string) => correctOptionIds.includes(v))
+        : updated.length > 0 && correctOptionIds.includes(updated[0]);
+
+      wsRef.current.send(JSON.stringify({
+        type: "submit_answer",
+        payload: {
+          nickname,
+          question_id: qId,
+          selections: updated,
+          correct: isCorrect,
+          score: isCorrect ? (qMeta?.marks || 1) : 0,
+          time_spent: analyticsTimeRef.current[qId] || 1
+        }
+      }));
+    }
   };
 
   const handleTextInput = (qId: string, text: string) => {
@@ -856,6 +877,20 @@ function AssessmentContent() {
     answersRef.current = newAnswers;
     setAnswers(newAnswers);
     saveProgressPayload(newAnswers, flaggedRef.current);
+
+    if (isLiveMode && wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        type: "submit_answer",
+        payload: {
+          nickname,
+          question_id: qId,
+          selections: [text],
+          correct: false,
+          score: 0,
+          time_spent: analyticsTimeRef.current[qId] || 1
+        }
+      }));
+    }
   };
 
   const toggleFlagged = (qId: string) => {

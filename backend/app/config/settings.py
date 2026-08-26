@@ -61,12 +61,13 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
-    # OAuth Settings
+    # OAuth & Base URL Settings
+    BACKEND_URL: Optional[str] = None
+    FRONTEND_URL: str = "http://localhost:3000"
     GOOGLE_CLIENT_ID: Optional[str] = None
     GOOGLE_CLIENT_SECRET: Optional[str] = None
     GITHUB_CLIENT_ID: Optional[str] = None
     GITHUB_CLIENT_SECRET: Optional[str] = None
-    FRONTEND_URL: str = "http://localhost:3000"
 
     @field_validator("GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GITHUB_CLIENT_ID", "GITHUB_CLIENT_SECRET", mode="before")
     @classmethod

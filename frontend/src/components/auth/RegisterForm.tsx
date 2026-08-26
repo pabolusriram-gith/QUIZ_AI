@@ -118,12 +118,13 @@ export default function RegisterForm() {
     setApiError(null);
     setApiSuccess(null);
     try {
-      await authService.register(data.fullName, data.email, data.password, data.role);
+      const res = await authService.register(data.fullName, data.email, data.password, data.role);
       setApiSuccess("Account created! Redirecting to email verification...");
 
       setTimeout(() => {
-        router.replace(`/verify-email?email=${encodeURIComponent(data.email)}`);
-      }, 1200);
+        const devOtpQuery = res?.dev_otp ? `&dev_otp=${encodeURIComponent(res.dev_otp)}` : "";
+        router.replace(`/verify-email?email=${encodeURIComponent(data.email)}${devOtpQuery}`);
+      }, 1000);
 
     } catch (error: unknown) {
       const errorMsg = error instanceof Error ? error.message : String(error);
@@ -450,13 +451,14 @@ export default function RegisterForm() {
               </form>
  
               {/* Redirect to Login */}
-              <div className="pt-2 text-center text-sm text-slate-500 dark:text-slate-400">
-                Already have an account?{" "}
+              <div className="pt-2 text-center text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5">
+                <span>Already have an account?</span>
                 <Link
                   href="/login"
-                  className="font-semibold text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 hover:underline inline-block py-1"
+                  className="font-bold text-indigo-600 dark:text-cyan-400 hover:text-indigo-500 dark:hover:text-cyan-300 hover:underline inline-flex items-center gap-0.5 py-1"
                 >
-                  Sign In
+                  <span>Sign In</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
  

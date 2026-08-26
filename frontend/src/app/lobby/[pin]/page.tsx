@@ -430,10 +430,20 @@ export default function HostLobbyPage() {
     }
     setStarting(true);
     try {
-      await api.post(`/sessions/${pin}/start-countdown`);
-      toast.success("Lobby countdown started!");
+      // 1. Broadcast countdown event to students
+      try {
+        await api.post(`/sessions/${pin}/start-countdown`);
+      } catch (countdownErr) {
+        console.warn("Countdown notify note:", countdownErr);
+      }
+      toast.success("Starting live quiz presentation...");
+
+      // 2. Start session on backend — transitions session.status to "active" and pushes Question 1
+      const res = await api.post(`/sessions/${pin}/start`);
+      setSession(res.data);
+      toast.success("Quiz is now live!");
     } catch (err: any) {
-      console.error(err);
+      console.error("Start quiz failed:", err);
       toast.error(err.response?.data?.detail || "Failed to start quiz.");
     } finally {
       setStarting(false);

@@ -13,6 +13,7 @@ export interface UserResponse {
   role: string;
   is_active: boolean;
   is_verified?: boolean;
+  dev_otp?: string;
   created_at: string;
   updated_at: string;
 }

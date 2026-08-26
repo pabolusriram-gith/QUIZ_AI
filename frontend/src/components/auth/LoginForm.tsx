@@ -139,7 +139,14 @@ export default function LoginForm() {
         if (error.response) {
           if (error.response.status === 403 || error.response.headers?.["x-email-unverified"] === "true") {
             setUnverifiedEmail(data.email);
+            const devOtpFromHeader = error.response.headers?.["x-dev-otp"];
             setApiError("Your email has not been verified yet. Please enter the verification code sent to your inbox.");
+            if (devOtpFromHeader) {
+              setToast({
+                message: `Verification code: ${devOtpFromHeader}`,
+                type: "success"
+              });
+            }
           } else if (error.response.status === 401) {
             setApiError("Invalid email or password");
           } else if (error.response.status === 422) {
@@ -436,13 +443,14 @@ export default function LoginForm() {
               </motion.div>
  
               {/* --- Sign Up Redirect --- */}
-              <div className="pt-2 text-center text-sm text-slate-500 dark:text-slate-400">
-                Don&apos;t have an account?{" "}
+              <div className="pt-2 text-center text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5">
+                <span>Don&apos;t have an account?</span>
                 <Link
                   href="/register"
-                  className="font-semibold text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 hover:underline inline-block py-1"
+                  className="font-bold text-indigo-600 dark:text-cyan-400 hover:text-indigo-500 dark:hover:text-cyan-300 hover:underline inline-flex items-center gap-0.5 py-1"
                 >
-                  Create one free
+                  <span>Sign Up</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
  
