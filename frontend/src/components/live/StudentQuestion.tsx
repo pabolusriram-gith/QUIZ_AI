@@ -1,5 +1,5 @@
 import React from "react";
-import { HelpCircle, Check, Lock, Volume2, Award, Clock } from "lucide-react";
+import { HelpCircle, Check, Lock, Volume2, Award, Clock, ArrowLeft, ArrowRight, Flag, Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -28,9 +28,15 @@ interface StudentQuestionProps {
   answeredCount: number;
   totalPlayers: number;
   isSpeaking: boolean;
+  isSoloMode?: boolean;
+  isFlagged?: boolean;
   onSelectAnswer: (optionId: string, isMulti: boolean) => void;
   onTextInput: (text: string) => void;
-  onSubmit: () => void;
+  onSubmit?: () => void;
+  onNextQuestion?: () => void;
+  onPrevQuestion?: () => void;
+  onToggleFlag?: () => void;
+  onReviewSubmit?: () => void;
   onSpeak: () => void;
 }
 
@@ -46,33 +52,58 @@ export default function StudentQuestion({
   answeredCount,
   totalPlayers,
   isSpeaking,
+  isSoloMode = false,
+  isFlagged = false,
   onSelectAnswer,
   onTextInput,
   onSubmit,
+  onNextQuestion,
+  onPrevQuestion,
+  onToggleFlag,
+  onReviewSubmit,
   onSpeak
 }: StudentQuestionProps) {
   if (!question) return null;
 
-  const isLocked = !timerStarted;
-  const isLockScreen = isLocked || isSubmitted;
+  // In solo mode, question is never locked by teacher. In live mode, locked until teacher starts timer.
+  const isLocked = !isSoloMode && !timerStarted;
 
   return (
-    <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-6 md:p-8 space-y-6 shadow-xl relative w-full max-w-2xl mx-auto animate-fade-in">
+    <div className="bg-white dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-6 md:p-8 space-y-6 shadow-xl relative w-full max-w-2xl mx-auto animate-fade-in">
+      {/* Top Question Header */}
       <div className="flex justify-between items-center border-b border-slate-200/80 dark:border-slate-800/80 pb-3">
-        <span className="text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full uppercase tracking-wider">
-          Question {currentIdx + 1} of {totalQs}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full uppercase tracking-wider">
+            Question {currentIdx + 1} of {totalQs}
+          </span>
+          {isSoloMode && onToggleFlag && (
+            <button
+              type="button"
+              onClick={onToggleFlag}
+              className={`p-1.5 px-2.5 rounded-full text-[10px] font-bold border transition-colors flex items-center gap-1 cursor-pointer ${
+                isFlagged 
+                  ? "bg-amber-500/15 border-amber-500/40 text-amber-600 dark:text-amber-400" 
+                  : "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200"
+              }`}
+              title="Flag question for review"
+            >
+              <Flag className={`h-3 w-3 ${isFlagged ? "fill-amber-500 text-amber-500" : ""}`} />
+              <span>{isFlagged ? "Flagged" : "Flag"}</span>
+            </button>
+          )}
+        </div>
         
         {/* Timer display */}
         {questionTimeLeft !== null && (
-          <span className="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 border border-cyan-500/25 px-3 py-1 rounded-xl flex items-center gap-1.5 animate-pulse">
-            <Clock className="h-3.5 w-3.5" />
-            <span>{questionTimeLeft}s Left</span>
+          <span className="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 border border-cyan-500/25 px-3 py-1 rounded-xl flex items-center gap-1.5">
+            <Clock className="h-3.5 w-3.5 animate-spin" />
+            <span>{questionTimeLeft}s</span>
           </span>
         )}
       </div>
 
       <div className="space-y-6">
+        {/* Question Text & TTS */}
         <div className="flex justify-between items-start gap-4">
           <div className="flex items-start gap-3">
             <h3 className="text-base md:text-lg font-bold text-slate-900 dark:text-white leading-relaxed">{question.text}</h3>
@@ -98,9 +129,9 @@ export default function StudentQuestion({
           </div>
         </div>
 
-        {/* Locked / Submitted States overlays */}
+        {/* Live Host Locked / Submitted States overlays */}
         {isLocked ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center space-y-4 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-100/50 dark:bg-slate-900/30">
+          <div className="flex flex-col items-center justify-center py-12 text-center space-y-4 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900/30">
             <div className="h-14 w-14 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 animate-pulse">
               <Lock className="h-6 w-6" />
             </div>
@@ -111,8 +142,8 @@ export default function StudentQuestion({
               </p>
             </div>
           </div>
-        ) : isSubmitted ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center space-y-4 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-100/50 dark:bg-slate-900/30">
+        ) : (!isSoloMode && isSubmitted) ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center space-y-4 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900/30">
             <div className="h-14 w-14 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 animate-bounce">
               <Check className="h-6 w-6" />
             </div>
@@ -127,7 +158,7 @@ export default function StudentQuestion({
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {/* Options layout */}
             {(question.question_type === "multiple_choice" || question.question_type === "true_false") && (
               <div className="grid grid-cols-1 gap-3">
@@ -139,19 +170,20 @@ export default function StudentQuestion({
                   return (
                     <button
                       key={optId}
+                      type="button"
                       onClick={() => onSelectAnswer(optId, false)}
-                      className={`w-full p-4 rounded-xl border text-left text-xs font-semibold transition-all cursor-pointer flex items-center gap-3 ${
+                      className={`w-full p-4 rounded-2xl border text-left text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-3.5 ${
                         isSelected
-                          ? "bg-indigo-500/15 dark:bg-indigo-500/20 border-indigo-500/50 text-slate-900 dark:text-white shadow-sm ring-1 ring-indigo-500/30"
-                          : "bg-slate-100/70 dark:bg-[#121c33]/70 border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 hover:bg-slate-200/70 dark:hover:bg-[#182645] hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-600"
+                          ? "bg-indigo-50/80 dark:bg-indigo-500/20 border-indigo-500/60 text-slate-900 dark:text-white shadow-sm ring-2 ring-indigo-500/30"
+                          : "bg-slate-50/90 dark:bg-[#121c33]/70 border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#182645] hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-600"
                       }`}
                     >
-                      <div className={`h-4.5 w-4.5 rounded-full border flex items-center justify-center shrink-0 ${
-                        isSelected ? "border-indigo-500 bg-indigo-500/20" : "border-slate-400 dark:border-slate-600"
+                      <div className={`h-5 w-5 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
+                        isSelected ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800"
                       }`}>
-                        {isSelected && <div className="h-2 w-2 rounded-full bg-indigo-500" />}
+                        {isSelected && <div className="h-2 w-2 rounded-full bg-white" />}
                       </div>
-                      <span>{option.text}</span>
+                      <span className="flex-1">{option.text}</span>
                     </button>
                   );
                 })}
@@ -168,19 +200,20 @@ export default function StudentQuestion({
                   return (
                     <button
                       key={optId}
+                      type="button"
                       onClick={() => onSelectAnswer(optId, true)}
-                      className={`w-full p-4 rounded-xl border text-left text-xs font-semibold transition-all cursor-pointer flex items-center gap-3 ${
+                      className={`w-full p-4 rounded-2xl border text-left text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-3.5 ${
                         isSelected
-                          ? "bg-indigo-500/15 dark:bg-indigo-500/20 border-indigo-500/50 text-slate-900 dark:text-white shadow-sm ring-1 ring-indigo-500/30"
-                          : "bg-slate-100/70 dark:bg-[#121c33]/70 border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 hover:bg-slate-200/70 dark:hover:bg-[#182645] hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-600"
+                          ? "bg-indigo-50/80 dark:bg-indigo-500/20 border-indigo-500/60 text-slate-900 dark:text-white shadow-sm ring-2 ring-indigo-500/30"
+                          : "bg-slate-50/90 dark:bg-[#121c33]/70 border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#182645] hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-600"
                       }`}
                     >
-                      <div className={`h-4.5 w-4.5 rounded border flex items-center justify-center shrink-0 ${
-                        isSelected ? "border-indigo-500 bg-indigo-500/20" : "border-slate-400 dark:border-slate-600"
+                      <div className={`h-5 w-5 rounded-lg border flex items-center justify-center shrink-0 transition-colors ${
+                        isSelected ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800"
                       }`}>
-                        {isSelected && <Check className="h-3 w-3 text-indigo-500" />}
+                        {isSelected && <Check className="h-3.5 w-3.5 text-white stroke-[3]" />}
                       </div>
-                      <span>{option.text}</span>
+                      <span className="flex-1">{option.text}</span>
                     </button>
                   );
                 })}
@@ -195,20 +228,58 @@ export default function StudentQuestion({
                   value={selectedAnswer[0] || ""}
                   onChange={(e) => onTextInput(e.target.value)}
                   placeholder="Type response text here..."
-                  className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50"
+                  className="bg-slate-50/90 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-indigo-500/50"
                 />
               </div>
             )}
 
-            {/* Submit Button */}
-            <Button
-              onClick={onSubmit}
-              disabled={selectedAnswer.length === 0 || selectedAnswer[0] === ""}
-              className="w-full h-11 bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-indigo-500/20 border-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Check className="h-4.5 w-4.5" />
-              <span>Submit Answer</span>
-            </Button>
+            {/* Navigation / Submission Footer */}
+            {isSoloMode ? (
+              <div className="flex items-center justify-between pt-4 border-t border-slate-200/80 dark:border-slate-800/80 gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={currentIdx === 0}
+                  onClick={onPrevQuestion}
+                  className="h-10 px-4 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 disabled:opacity-30 flex items-center gap-1.5 cursor-pointer"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                  <span>Previous</span>
+                </Button>
+
+                {currentIdx < totalQs - 1 ? (
+                  <Button
+                    type="button"
+                    onClick={onNextQuestion}
+                    className="h-10 px-5 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 border-none cursor-pointer shadow-md shadow-indigo-500/20"
+                  >
+                    <span>Next Question</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={onReviewSubmit}
+                    className="h-10 px-5 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white flex items-center gap-1.5 border-none cursor-pointer shadow-md shadow-emerald-500/20"
+                  >
+                    <span>Review & Submit</span>
+                    <Check className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            ) : (
+              /* Live Multi-player Submit Button */
+              onSubmit && (
+                <Button
+                  onClick={onSubmit}
+                  disabled={selectedAnswer.length === 0 || selectedAnswer[0] === ""}
+                  className="w-full h-11 bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-indigo-500/20 border-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Check className="h-4.5 w-4.5" />
+                  <span>Submit Answer</span>
+                </Button>
+              )
+            )}
           </div>
         )}
       </div>

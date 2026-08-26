@@ -659,6 +659,7 @@ function AssessmentContent() {
         setOverallTimeLeft(Math.max(0, timeLimit - elapsed));
       }
 
+      setTimerStarted(true);
       setView("playing");
       setLoading(false);
       setIsSubmittingCode(false);
@@ -1251,8 +1252,29 @@ function AssessmentContent() {
           answeredCount={answeredCount}
           totalPlayers={totalPlayers}
           isSpeaking={isSpeaking}
+          isSoloMode={!isLiveMode}
+          isFlagged={Boolean(flagged[currentQId])}
+          onToggleFlag={() => toggleFlagged(currentQId)}
           onSelectAnswer={(optId, isMulti) => selectAnswer(qData.id, optId, isMulti)}
           onTextInput={(text) => handleTextInput(qData.id, text)}
+          onNextQuestion={() => {
+            const totalQuestions = attempt?.randomized_question_ids?.length || 0;
+            if (currentIdx < totalQuestions - 1) {
+              const nextIdx = currentIdx + 1;
+              setCurrentIdx(nextIdx);
+              const nextQId = attempt?.randomized_question_ids?.[nextIdx];
+              const qMeta = questionsMap[nextQId];
+              if (qMeta && (instructions?.timer_mode === "per_question" || instructions?.timer_mode === "both")) {
+                setQuestionTimeLeft(qMeta.time_limit_seconds || 30);
+              }
+            }
+          }}
+          onPrevQuestion={() => {
+            if (currentIdx > 0) {
+              setCurrentIdx(prev => prev - 1);
+            }
+          }}
+          onReviewSubmit={() => setView("confirmation")}
           onSubmit={async () => {
             await saveProgressPayload();
             setIsSubmitted(true);
