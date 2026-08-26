@@ -3636,7 +3636,12 @@ function CreateQuizContent() {
                     {/* Horizontal scrollable question pills */}
                     <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
                       {quiz.questions.map((q, idx) => {
-                        const isUnmarked = (q.question_type === "multiple_choice" || q.question_type === "multiple_select" || q.question_type === "true_false") && !q.options.some(o => o.is_correct);
+                        const hasEnteredQ = Boolean(q.text && q.text.trim().length > 0);
+                        const hasEnteredOpts = q.options.some(o => o.text && o.text.trim().length > 0 && !/^Option\s+\d+$/i.test(o.text.trim()) && !/^Option\s+[A-Z]$/i.test(o.text.trim()));
+                        const isUnmarked = (q.question_type === "multiple_choice" || q.question_type === "multiple_select" || q.question_type === "true_false") 
+                          && hasEnteredQ 
+                          && hasEnteredOpts 
+                          && !q.options.some(o => o.is_correct);
                         return (
                           <button
                             key={q.id}
@@ -3672,7 +3677,12 @@ function CreateQuizContent() {
 
                         <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
                           {quiz.questions.map((q, idx) => {
-                            const isUnmarked = (q.question_type === "multiple_choice" || q.question_type === "multiple_select" || q.question_type === "true_false") && !q.options.some(o => o.is_correct);
+                            const hasEnteredQ = Boolean(q.text && q.text.trim().length > 0);
+                            const hasEnteredOpts = q.options.some(o => o.text && o.text.trim().length > 0 && !/^Option\s+\d+$/i.test(o.text.trim()) && !/^Option\s+[A-Z]$/i.test(o.text.trim()));
+                            const isUnmarked = (q.question_type === "multiple_choice" || q.question_type === "multiple_select" || q.question_type === "true_false") 
+                              && hasEnteredQ 
+                              && hasEnteredOpts 
+                              && !q.options.some(o => o.is_correct);
                             return (
                             <div
                               key={q.id}
@@ -4064,26 +4074,34 @@ function CreateQuizContent() {
                             </div>
 
                             {/* Unmarked Correct Answer Warning Banner */}
-                            {(quiz.questions[selectedQuestionIndex].question_type === "multiple_choice" ||
-                              quiz.questions[selectedQuestionIndex].question_type === "multiple_select" ||
-                              quiz.questions[selectedQuestionIndex].question_type === "true_false") &&
-                              !quiz.questions[selectedQuestionIndex].options.some(o => o.is_correct) && (
-                              <div className="p-3 rounded-2xl bg-amber-500/10 dark:bg-amber-950/30 border-2 border-amber-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-pulse">
-                                <div className="flex items-center gap-2">
+                            {(() => {
+                              const currQ = quiz.questions[selectedQuestionIndex];
+                              const hasEnteredCurrQ = Boolean(currQ?.text && currQ.text.trim().length > 0);
+                              const hasEnteredCurrOpts = Boolean(
+                                currQ?.options &&
+                                currQ.options.some(o => o.text && o.text.trim().length > 0 && !/^Option\s+\d+$/i.test(o.text.trim()) && !/^Option\s+[A-Z]$/i.test(o.text.trim()))
+                              );
+                              const showUnmarkedWarning = Boolean(
+                                currQ &&
+                                (currQ.question_type === "multiple_choice" ||
+                                 currQ.question_type === "multiple_select" ||
+                                 currQ.question_type === "true_false") &&
+                                hasEnteredCurrQ &&
+                                hasEnteredCurrOpts &&
+                                !currQ.options.some(o => o.is_correct)
+                              );
+
+                              if (!showUnmarkedWarning) return null;
+
+                              return (
+                                <div className="p-2.5 px-3.5 rounded-2xl bg-amber-500/10 dark:bg-amber-950/30 border border-amber-500/30 flex items-center gap-2 animate-pulse">
                                   <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
                                   <span className="text-xs font-bold text-amber-700 dark:text-amber-300">
-                                    No correct answer marked! Click the radio button or checkbox next to the correct choice.
+                                    Please mark the correct option
                                   </span>
                                 </div>
-                                <button
-                                  type="button"
-                                  onClick={() => toggleOptionCorrectness(0)}
-                                  className="px-2.5 py-1 text-[11px] font-bold rounded-xl bg-amber-500 hover:bg-amber-600 text-white cursor-pointer shrink-0 transition-colors shadow-sm"
-                                >
-                                  Mark Option A as Correct
-                                </button>
-                              </div>
-                            )}
+                              );
+                            })()}
 
                             {/* True / False Layout */}
                             {quiz.questions[selectedQuestionIndex].question_type === "true_false" ? (
@@ -4138,6 +4156,14 @@ function CreateQuizContent() {
                                   const isMultipleSelect = quiz.questions[selectedQuestionIndex].question_type === "multiple_select";
                                   const isTextBased = quiz.questions[selectedQuestionIndex].question_type === "fill_in_the_blank" || 
                                                       quiz.questions[selectedQuestionIndex].question_type === "short_answer";
+                                  const currQ = quiz.questions[selectedQuestionIndex];
+                                  const isWarningActive = Boolean(
+                                    currQ &&
+                                    (isMultipleChoice || isMultipleSelect) &&
+                                    currQ.text && currQ.text.trim().length > 0 &&
+                                    currQ.options.some(o => o.text && o.text.trim().length > 0 && !/^Option\s+\d+$/i.test(o.text.trim()) && !/^Option\s+[A-Z]$/i.test(o.text.trim())) &&
+                                    !currQ.options.some(o => o.is_correct)
+                                  );
 
                                   return (
                                     <div
@@ -4167,7 +4193,7 @@ function CreateQuizContent() {
                                           checked={opt.is_correct}
                                           onChange={() => toggleOptionCorrectness(optIdx)}
                                           className={`h-4.5 w-4.5 text-emerald-600 border-slate-300 dark:border-slate-700 focus:ring-emerald-500 cursor-pointer shrink-0 ${
-                                            !quiz.questions[selectedQuestionIndex].options.some(o => o.is_correct)
+                                            isWarningActive
                                               ? "ring-2 ring-amber-400/80 animate-pulse"
                                               : ""
                                           }`}
@@ -4180,7 +4206,7 @@ function CreateQuizContent() {
                                           checked={opt.is_correct}
                                           onChange={() => toggleOptionCorrectness(optIdx)}
                                           className={`h-4.5 w-4.5 rounded border-slate-300 dark:border-slate-700 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0 ${
-                                            !quiz.questions[selectedQuestionIndex].options.some(o => o.is_correct)
+                                            isWarningActive
                                               ? "ring-2 ring-amber-400/80 animate-pulse"
                                               : ""
                                           }`}
