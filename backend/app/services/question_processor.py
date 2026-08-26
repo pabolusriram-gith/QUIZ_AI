@@ -212,28 +212,67 @@ class QuestionProcessor:
             q["marks"] = expected_marks
             repairs_made += 1
 
-        # 6. Deterministic Option Shuffling (only shuffle multiple_choice / multiple_select)
+        # 6. Ensure 4 options and guaranteed correct answer selection
         options = q.get("options", [])
-        if len(options) > 1 and q_type in ["multiple_choice", "multiple_select"]:
-            # Copy options to avoid side-effects
-            opts_copy = [dict(opt) for opt in options]
-            
-            # Use stable shuffle_seed generated/stored on the question
-            shuffle_seed = q.get("shuffle_seed")
-            if not shuffle_seed:
-                shuffle_seed = random.randint(1, 2147483647)
-                q["shuffle_seed"] = shuffle_seed
+        if q_type in ["multiple_choice", "multiple_select"]:
+            # Ensure at least 4 options exist
+            while len(options) < 4:
+                idx = len(options)
+                opt_letter = chr(65 + (idx % 26))
+                options.append({
+                    "text": f"Option {opt_letter}",
+                    "is_correct": False,
+                    "display_order": idx
+                })
                 repairs_made += 1
-            
-            seed_val = int(shuffle_seed)
-            r = random.Random(seed_val)
-            r.shuffle(opts_copy)
-            
-            # Re-index display_order
-            for idx, opt in enumerate(opts_copy):
-                opt["display_order"] = idx
-            q["options"] = opts_copy
-            repairs_made += 1
+
+            # Ensure at least one option is marked is_correct = True
+            has_correct = any(opt.get("is_correct") is True for opt in options)
+            if not has_correct and len(options) > 0:
+                # Try matching option text to explanation if possible
+                exp_text = str(q.get("explanation", "")).lower()
+                matched = False
+                for opt in options:
+                    opt_str = str(opt.get("text", "")).strip().lower()
+                    if opt_str and opt_str in exp_text:
+                        opt["is_correct"] = True
+                        matched = True
+                        break
+                if not matched:
+                    options[0]["is_correct"] = True
+                repairs_made += 1
+
+            # Deterministic Option Shuffling (only shuffle multiple_choice / multiple_select)
+            if len(options) > 1:
+                opts_copy = [dict(opt) for opt in options]
+                shuffle_seed = q.get("shuffle_seed")
+                if not shuffle_seed:
+                    shuffle_seed = random.randint(1, 2147483647)
+                    q["shuffle_seed"] = shuffle_seed
+                    repairs_made += 1
+                
+                seed_val = int(shuffle_seed)
+                r = random.Random(seed_val)
+                r.shuffle(opts_copy)
+                
+                for idx, opt in enumerate(opts_copy):
+                    opt["display_order"] = idx
+                q["options"] = opts_copy
+                repairs_made += 1
+            else:
+                q["options"] = options
+        elif q_type == "true_false":
+            if len(options) < 2:
+                q["options"] = [
+                    {"text": "True", "is_correct": True, "display_order": 0},
+                    {"text": "False", "is_correct": False, "display_order": 1}
+                ]
+                repairs_made += 1
+            else:
+                has_correct = any(opt.get("is_correct") is True for opt in options)
+                if not has_correct:
+                    options[0]["is_correct"] = True
+                    repairs_made += 1
 
         return q, repairs_made
 

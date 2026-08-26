@@ -1189,6 +1189,8 @@ function CreateQuizContent() {
       options: [
         { id: Math.random().toString(), text: "Option 1", is_correct: false, display_order: 0 },
         { id: Math.random().toString(), text: "Option 2", is_correct: false, display_order: 1 },
+        { id: Math.random().toString(), text: "Option 3", is_correct: false, display_order: 2 },
+        { id: Math.random().toString(), text: "Option 4", is_correct: false, display_order: 3 },
       ],
     };
     setQuiz(prev => ({
@@ -1291,6 +1293,7 @@ function CreateQuizContent() {
           { id: Math.random().toString(), text: "Option 1", is_correct: true, display_order: 0 },
           { id: Math.random().toString(), text: "Option 2", is_correct: false, display_order: 1 },
           { id: Math.random().toString(), text: "Option 3", is_correct: false, display_order: 2 },
+          { id: Math.random().toString(), text: "Option 4", is_correct: false, display_order: 3 },
         ];
       }
       updatedQ.options = options;
@@ -1356,7 +1359,7 @@ function CreateQuizContent() {
     const question = quiz.questions[selectedQuestionIndex];
     const newOpt: OptionState = {
       id: Math.random().toString(),
-      text: `Option ${question.options.length + 1}`,
+      text: `Option ${String.fromCharCode(65 + (question.options.length % 26))}`,
       is_correct: false,
       display_order: question.options.length,
     };
@@ -1378,6 +1381,63 @@ function CreateQuizContent() {
     const updatedQuestions = [...quiz.questions];
     updatedQuestions[selectedQuestionIndex].options = updatedOptions;
     setQuiz(prev => ({ ...prev, questions: updatedQuestions }));
+  };
+
+  // Smart Multi-line Paste Handler for Options
+  const handlePasteOptions = (e: React.ClipboardEvent<HTMLInputElement>, startOptIdx: number) => {
+    const pastedText = e.clipboardData.getData("text");
+    if (!pastedText) return;
+
+    // Split lines by newline or carriage return
+    const rawLines = pastedText
+      .split(/\r?\n/)
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+
+    if (rawLines.length >= 2) {
+      e.preventDefault();
+      // Clean leading bullet marks, indices and lettering: A), A., 1., 1), -, *, •
+      const cleanedLines = rawLines.map(line => {
+        return line.replace(/^([a-zA-Z0-9]+[\.\)\:\-]\s*|[\-\*\•]\s*)/, "").trim();
+      }).filter(line => line.length > 0);
+
+      if (cleanedLines.length === 0) return;
+
+      const updatedQuestions = [...quiz.questions];
+      const currentQ = updatedQuestions[selectedQuestionIndex];
+      const currentOptions = [...currentQ.options];
+
+      // Determine new option list size (at least 4 for MCQ/MSQ)
+      const totalCount = Math.max(4, currentOptions.length, startOptIdx + cleanedLines.length);
+      const newOptions: OptionState[] = [];
+
+      for (let i = 0; i < totalCount; i++) {
+        if (i >= startOptIdx && i < startOptIdx + cleanedLines.length) {
+          const content = cleanedLines[i - startOptIdx];
+          const existing = currentOptions[i];
+          newOptions.push({
+            id: existing?.id || Math.random().toString(),
+            text: content,
+            is_correct: existing ? existing.is_correct : (i === 0),
+            display_order: i
+          });
+        } else if (i < currentOptions.length) {
+          newOptions.push(currentOptions[i]);
+        } else {
+          newOptions.push({
+            id: Math.random().toString(),
+            text: `Option ${String.fromCharCode(65 + i)}`,
+            is_correct: false,
+            display_order: i
+          });
+        }
+      }
+
+      currentQ.options = newOptions;
+      currentQ.is_user_modified = true;
+      setQuiz(prev => ({ ...prev, questions: updatedQuestions }));
+      toast.success(`Pasted ${cleanedLines.length} options across separate boxes!`);
+    }
   };
 
   // Timer mode configuration
@@ -1422,6 +1482,8 @@ function CreateQuizContent() {
     for (let i = 0; i < quiz.questions.length; i++) {
       const q = quiz.questions[i];
       if (!q.text.trim()) {
+        setSelectedQuestionIndex(i);
+        setActiveTab("questions");
         toast.error(`Question ${i + 1} text is empty.`);
         return;
       }
@@ -1430,11 +1492,15 @@ function CreateQuizContent() {
       if (q.question_type === "multiple_choice" || q.question_type === "multiple_select" || q.question_type === "true_false") {
         const correctCount = q.options.filter(o => o.is_correct).length;
         if (correctCount === 0) {
-          toast.error(`Question ${i + 1} has no correct answer selected.`);
+          setSelectedQuestionIndex(i);
+          setActiveTab("questions");
+          toast.error(`Question ${i + 1} has no correct answer selected. Please choose the correct option.`);
           return;
         }
         for (let j = 0; j < q.options.length; j++) {
           if (!q.options[j].text.trim()) {
+            setSelectedQuestionIndex(i);
+            setActiveTab("questions");
             toast.error(`Question ${i + 1}, Option ${j + 1} text is empty.`);
             return;
           }
@@ -1445,6 +1511,8 @@ function CreateQuizContent() {
       if (q.question_type === "fill_in_the_blank" || q.question_type === "short_answer") {
         const filledAnswers = q.options.filter(o => o.text.trim() !== "");
         if (filledAnswers.length === 0) {
+          setSelectedQuestionIndex(i);
+          setActiveTab("questions");
           toast.error(`Question ${i + 1} requires at least one acceptable correct answer string.`);
           return;
         }
@@ -3290,10 +3358,20 @@ function CreateQuizContent() {
                   <div className="md:col-span-2 space-y-6">
                     {/* TIMING CONFIGURATION */}
                     <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-6 space-y-4">
-                      <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        <Clock className="h-4.5 w-4.5 text-indigo-500 dark:text-indigo-400" />
-                        <span>Flexible Timer Configuration</span>
-                      </h3>
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                          <Clock className="h-4.5 w-4.5 text-indigo-500 dark:text-indigo-400" />
+                          <span>Flexible Timer Configuration</span>
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("questions")}
+                          className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20 border border-indigo-500/30 flex items-center gap-1.5 cursor-pointer transition-colors"
+                        >
+                          <ArrowLeft className="h-3.5 w-3.5" />
+                          <span>Back to Questions Canvas</span>
+                        </button>
+                      </div>
 
                       <div className="space-y-4">
                         {/* Mode Select */}
@@ -3307,10 +3385,13 @@ function CreateQuizContent() {
                             <button
                               key={mode.id}
                               type="button"
-                              onClick={() => handleTimerModeChange(mode.id as any)}
+                              onClick={() => {
+                                handleTimerModeChange(mode.id as any);
+                                toast.success(`Timer mode set to: ${mode.label}`);
+                              }}
                               className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
                                 quiz.timer_mode === mode.id
-                                  ? "bg-indigo-500/10 dark:bg-indigo-500/15 border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.1)] text-indigo-700 dark:text-indigo-300 font-bold"
+                                  ? "bg-indigo-500/10 dark:bg-indigo-500/15 border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.1)] text-indigo-700 dark:text-indigo-300 font-bold ring-1 ring-indigo-500/30"
                                   : "bg-slate-100/70 dark:bg-[#121c33]/70 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200/70 dark:hover:bg-[#182645] hover:text-slate-900 dark:hover:text-slate-200"
                               }`}
                             >
@@ -3375,14 +3456,23 @@ function CreateQuizContent() {
 
                         {/* Per Question info */}
                         {(quiz.timer_mode === "per_question" || quiz.timer_mode === "both") && (
-                          <div className="p-4 rounded-xl bg-cyan-500/10 dark:bg-cyan-950/20 border border-cyan-500/25 flex items-start gap-3">
-                            <AlertCircle className="h-5 w-5 text-cyan-600 dark:text-cyan-400 shrink-0 mt-0.5" />
-                            <div className="space-y-1">
-                              <h4 className="text-xs font-bold text-cyan-700 dark:text-cyan-300">Per-Question timing enabled!</h4>
-                              <p className="text-[10px] text-slate-600 dark:text-slate-400 leading-normal">
-                                Instructors can define specific timers for each question inside the Canvas. Once time runs out on a question, the client automatically forwards the student to the next question.
-                              </p>
+                          <div className="p-4 rounded-xl bg-cyan-500/10 dark:bg-cyan-950/20 border border-cyan-500/25 flex items-start justify-between gap-3">
+                            <div className="flex items-start gap-3">
+                              <AlertCircle className="h-5 w-5 text-cyan-600 dark:text-cyan-400 shrink-0 mt-0.5" />
+                              <div className="space-y-1">
+                                <h4 className="text-xs font-bold text-cyan-700 dark:text-cyan-300">Per-Question timing enabled!</h4>
+                                <p className="text-[10px] text-slate-600 dark:text-slate-400 leading-normal">
+                                  Instructors can define specific timers for each question inside the Canvas. Once time runs out on a question, the client automatically forwards the student to the next question.
+                                </p>
+                              </div>
                             </div>
+                            <button
+                              type="button"
+                              onClick={() => setActiveTab("questions")}
+                              className="px-3 py-1.5 text-xs font-bold rounded-xl bg-cyan-500 hover:bg-cyan-600 text-white cursor-pointer shrink-0 transition-colors"
+                            >
+                              Go to Questions →
+                            </button>
                           </div>
                         )}
                       </div>
@@ -3545,21 +3635,27 @@ function CreateQuizContent() {
                     </div>
                     {/* Horizontal scrollable question pills */}
                     <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-                      {quiz.questions.map((q, idx) => (
-                        <button
-                          key={q.id}
-                          type="button"
-                          onClick={() => setSelectedQuestionIndex(idx)}
-                          className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                            selectedQuestionIndex === idx
-                              ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/25 scale-105"
-                              : "bg-slate-200/70 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 border border-slate-300/60 dark:border-slate-700/60"
-                          }`}
-                        >
-                          <span>Q{idx + 1}</span>
-                          {q.generated_by_ai && <Sparkles className="h-2.5 w-2.5 text-cyan-300" />}
-                        </button>
-                      ))}
+                      {quiz.questions.map((q, idx) => {
+                        const isUnmarked = (q.question_type === "multiple_choice" || q.question_type === "multiple_select" || q.question_type === "true_false") && !q.options.some(o => o.is_correct);
+                        return (
+                          <button
+                            key={q.id}
+                            type="button"
+                            onClick={() => setSelectedQuestionIndex(idx)}
+                            className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                              selectedQuestionIndex === idx
+                                ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/25 scale-105"
+                                : "bg-slate-200/70 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 border border-slate-300/60 dark:border-slate-700/60"
+                            }`}
+                          >
+                            <span>Q{idx + 1}</span>
+                            {q.generated_by_ai && <Sparkles className="h-2.5 w-2.5 text-cyan-300" />}
+                            {isUnmarked && (
+                              <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" title="Missing correct answer" />
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -3575,7 +3671,9 @@ function CreateQuizContent() {
                         </div>
 
                         <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
-                          {quiz.questions.map((q, idx) => (
+                          {quiz.questions.map((q, idx) => {
+                            const isUnmarked = (q.question_type === "multiple_choice" || q.question_type === "multiple_select" || q.question_type === "true_false") && !q.options.some(o => o.is_correct);
+                            return (
                             <div
                               key={q.id}
                               onClick={() => setSelectedQuestionIndex(idx)}
@@ -3589,8 +3687,13 @@ function CreateQuizContent() {
                                 <div className="absolute top-1 right-1 h-2 w-2 rounded-full bg-amber-500 animate-pulse" title="Similarity warning" />
                               )}
                               <div className="space-y-1 truncate pr-2">
-                                <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                                  Question {idx + 1} • {q.question_type.replace("_", " ")}
+                                <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                                  <span>Question {idx + 1} • {q.question_type.replace("_", " ")}</span>
+                                  {isUnmarked && (
+                                    <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/15 px-1 py-0.2 rounded border border-amber-500/30 animate-pulse">
+                                      ! No Answer
+                                    </span>
+                                  )}
                                 </div>
                                 <div className="text-xs font-semibold truncate">
                                   {q.text || "Untitled blank question..."}
@@ -3644,7 +3747,8 @@ function CreateQuizContent() {
                                 </button>
                               </div>
                             </div>
-                          ))}
+                            );
+                          })}
                         </div>
 
                         <Button
@@ -3862,23 +3966,80 @@ function CreateQuizContent() {
                             </div>
 
                             <div className="space-y-1.5">
-                              <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Question Timer</label>
-                              <div className="space-y-2">
-                                <div className="flex items-center gap-2">
-                                  <Clock className="h-4 w-4 text-slate-400 shrink-0" />
-                                  <Input
-                                    type="number"
-                                    min={5}
-                                    max={600}
-                                    value={quiz.questions[selectedQuestionIndex].time_limit_seconds || 60}
-                                    onChange={(e) => updateQuestionField("time_limit_seconds", parseInt(e.target.value) || 60)}
-                                    className="bg-slate-100/70 dark:bg-[#121c33]/75 border-slate-200 dark:border-slate-700/60 text-slate-900 dark:text-white font-semibold text-xs h-10 rounded-xl"
-                                  />
-                                </div>
-                                <span className="text-[10px] text-slate-500 dark:text-slate-400 block pl-1">
-                                  Seconds per question
-                                </span>
+                              <div className="flex items-center justify-between">
+                                <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Timer Mode</label>
+                                <button
+                                  type="button"
+                                  onClick={() => setActiveTab("schedule")}
+                                  className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer flex items-center gap-0.5"
+                                >
+                                  <span>Change Mode</span>
+                                  <ArrowRight className="h-2.5 w-2.5" />
+                                </button>
                               </div>
+
+                              {(quiz.timer_mode === "per_question" || quiz.timer_mode === "both") ? (
+                                <div className="space-y-2 p-2.5 rounded-xl bg-slate-100/70 dark:bg-[#121c33]/75 border border-cyan-500/30">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-1.5">
+                                      <Clock className="h-4 w-4 text-cyan-500 shrink-0" />
+                                      <Input
+                                        type="number"
+                                        min={5}
+                                        max={600}
+                                        value={quiz.questions[selectedQuestionIndex].time_limit_seconds || 30}
+                                        onChange={(e) => updateQuestionField("time_limit_seconds", parseInt(e.target.value) || 30)}
+                                        className="bg-transparent border-none text-slate-900 dark:text-white font-bold text-sm h-7 p-0 focus:ring-0 w-16"
+                                      />
+                                      <span className="text-[11px] font-bold text-slate-500">sec</span>
+                                    </div>
+                                    <span className="text-[9px] font-bold uppercase text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded">Per-Q</span>
+                                  </div>
+                                  <div className="flex gap-1 pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60">
+                                    {[15, 30, 45, 60, 120].map(sec => (
+                                      <button
+                                        key={sec}
+                                        type="button"
+                                        onClick={() => updateQuestionField("time_limit_seconds", sec)}
+                                        className={`flex-1 py-0.5 text-[9px] font-bold rounded cursor-pointer transition-colors ${
+                                          (quiz.questions[selectedQuestionIndex].time_limit_seconds || 30) === sec
+                                            ? "bg-cyan-500 text-white shadow-sm"
+                                            : "bg-slate-200/60 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-300 dark:hover:bg-slate-700"
+                                        }`}
+                                      >
+                                        {sec}s
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                              ) : quiz.timer_mode === "overall" ? (
+                                <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 space-y-1">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+                                      <Clock className="h-3.5 w-3.5" />
+                                      Overall Timer
+                                    </span>
+                                    <span className="text-[9px] font-bold text-indigo-500 uppercase bg-indigo-500/10 px-1.5 py-0.5 rounded">
+                                      {Math.floor((quiz.overall_time_limit_seconds || 600) / 60)}m Total
+                                    </span>
+                                  </div>
+                                  <p className="text-[10px] text-slate-600 dark:text-slate-400 leading-tight">
+                                    Global timer countdown applies to all questions.
+                                  </p>
+                                </div>
+                              ) : (
+                                <div className="p-3 rounded-xl bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 space-y-1">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                                      <Clock className="h-3.5 w-3.5 text-slate-400" />
+                                      Untimed Quiz
+                                    </span>
+                                  </div>
+                                  <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">
+                                    No time limits. Students answer at their own pace.
+                                  </p>
+                                </div>
+                              )}
                             </div>
                           </div>
 
@@ -3895,12 +4056,34 @@ function CreateQuizContent() {
                               </label>
                               <span className="text-[10px] text-slate-500 dark:text-slate-400">
                                 {quiz.questions[selectedQuestionIndex].question_type === "multiple_select"
-                                  ? "Check all that apply"
+                                  ? "Check all that apply • Paste 4 options to auto-fill"
                                   : quiz.questions[selectedQuestionIndex].question_type === "true_false"
                                   ? "Select True or False"
-                                  : "Select radio to mark correct answer"}
+                                  : "Select radio to mark correct answer • Paste multiple options to auto-fill"}
                               </span>
                             </div>
+
+                            {/* Unmarked Correct Answer Warning Banner */}
+                            {(quiz.questions[selectedQuestionIndex].question_type === "multiple_choice" ||
+                              quiz.questions[selectedQuestionIndex].question_type === "multiple_select" ||
+                              quiz.questions[selectedQuestionIndex].question_type === "true_false") &&
+                              !quiz.questions[selectedQuestionIndex].options.some(o => o.is_correct) && (
+                              <div className="p-3 rounded-2xl bg-amber-500/10 dark:bg-amber-950/30 border-2 border-amber-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-pulse">
+                                <div className="flex items-center gap-2">
+                                  <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
+                                  <span className="text-xs font-bold text-amber-700 dark:text-amber-300">
+                                    No correct answer marked! Click the radio button or checkbox next to the correct choice.
+                                  </span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => toggleOptionCorrectness(0)}
+                                  className="px-2.5 py-1 text-[11px] font-bold rounded-xl bg-amber-500 hover:bg-amber-600 text-white cursor-pointer shrink-0 transition-colors shadow-sm"
+                                >
+                                  Mark Option A as Correct
+                                </button>
+                              </div>
+                            )}
 
                             {/* True / False Layout */}
                             {quiz.questions[selectedQuestionIndex].question_type === "true_false" ? (
@@ -3983,7 +4166,11 @@ function CreateQuizContent() {
                                           name={`q-${quiz.questions[selectedQuestionIndex].id}-correct`}
                                           checked={opt.is_correct}
                                           onChange={() => toggleOptionCorrectness(optIdx)}
-                                          className="h-4.5 w-4.5 text-emerald-600 border-slate-300 dark:border-slate-700 focus:ring-emerald-500 cursor-pointer shrink-0"
+                                          className={`h-4.5 w-4.5 text-emerald-600 border-slate-300 dark:border-slate-700 focus:ring-emerald-500 cursor-pointer shrink-0 ${
+                                            !quiz.questions[selectedQuestionIndex].options.some(o => o.is_correct)
+                                              ? "ring-2 ring-amber-400/80 animate-pulse"
+                                              : ""
+                                          }`}
                                           title="Mark as correct answer"
                                         />
                                       )}
@@ -3992,7 +4179,11 @@ function CreateQuizContent() {
                                           type="checkbox"
                                           checked={opt.is_correct}
                                           onChange={() => toggleOptionCorrectness(optIdx)}
-                                          className="h-4.5 w-4.5 rounded border-slate-300 dark:border-slate-700 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"
+                                          className={`h-4.5 w-4.5 rounded border-slate-300 dark:border-slate-700 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0 ${
+                                            !quiz.questions[selectedQuestionIndex].options.some(o => o.is_correct)
+                                              ? "ring-2 ring-amber-400/80 animate-pulse"
+                                              : ""
+                                          }`}
                                           title="Mark as correct answer"
                                         />
                                       )}
@@ -4003,10 +4194,11 @@ function CreateQuizContent() {
                                           type="text"
                                           value={opt.text}
                                           onChange={(e) => updateOptionText(optIdx, e.target.value)}
+                                          onPaste={(e) => handlePasteOptions(e, optIdx)}
                                           placeholder={
                                             isTextBased
                                               ? `Acceptable answer phrase ${optIdx + 1}...`
-                                              : `Choice ${optionLetter} content...`
+                                              : `Choice ${optionLetter} (paste multiple options here to auto-fill)...`
                                           }
                                           className="bg-transparent border-none text-slate-900 dark:text-white text-xs sm:text-sm font-semibold h-9 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-slate-200/40 dark:focus:bg-white/5 focus:ring-0 w-full"
                                         />
