@@ -27,7 +27,6 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
-  const [oauthLoading, setOauthLoading] = useState<"google" | "github" | null>(null);
   const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
   
   const { login, isAuthenticated, loading } = useAuth();
@@ -60,20 +59,6 @@ export default function LoginForm() {
       }
     }
   }, []);
-
-  // Timeout protection to reset loading state if redirection hangs
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    if (oauthLoading) {
-      timeoutId = setTimeout(() => {
-        setOauthLoading(null);
-        showToast("Sign-In request timed out. Please check your connection and try again.", "error");
-      }, 10000);
-    }
-    return () => {
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, [oauthLoading]);
 
   // Redirect already authenticated users away from the login page
   useEffect(() => {
@@ -305,7 +290,7 @@ export default function LoginForm() {
                     <Input
                       id="email"
                       type="email"
-                      disabled={isSubmitting || oauthLoading !== null}
+                      disabled={isSubmitting}
                       placeholder="name@example.com"
                       {...register("email")}
                       className={`pl-11 pr-4 h-11 w-full bg-slate-100/70 dark:bg-[#132356]/85 border border-slate-200 dark:border-indigo-400/30 rounded-xl hover:border-slate-300 dark:hover:border-indigo-400/50 focus:border-indigo-500 dark:focus:border-cyan-400 focus:bg-white dark:focus:bg-[#182b68] focus:ring-4 focus:ring-indigo-500/10 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-all duration-200 ${errors.email ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
@@ -336,7 +321,7 @@ export default function LoginForm() {
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      disabled={isSubmitting || oauthLoading !== null}
+                      disabled={isSubmitting}
                       placeholder="••••••••"
                       {...register("password")}
                       className={`pl-11 pr-11 h-11 w-full bg-slate-100/70 dark:bg-[#132356]/85 border border-slate-200 dark:border-indigo-400/30 rounded-xl hover:border-slate-300 dark:hover:border-indigo-400/50 focus:border-indigo-500 dark:focus:border-cyan-400 focus:bg-white dark:focus:bg-[#182b68] focus:ring-4 focus:ring-indigo-500/10 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-all duration-200 ${errors.password ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10' : ''}`}
@@ -363,7 +348,7 @@ export default function LoginForm() {
                     <div className="relative flex items-center justify-center h-4.5 w-4.5 rounded-md border border-slate-300 dark:border-indigo-400/30 bg-slate-100 dark:bg-[#132356] transition-all group-hover:border-indigo-500 group-hover:shadow-[0_0_0_3px_rgba(99,102,241,0.15)] has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-600">
                       <input 
                         type="checkbox" 
-                        disabled={isSubmitting || oauthLoading !== null}
+                        disabled={isSubmitting}
                         className="peer sr-only" 
                         {...register("rememberMe")}
                       />
@@ -377,13 +362,13 @@ export default function LoginForm() {
  
                 {/* Submit Button */}
                 <motion.div
-                  whileHover={!(isSubmitting || oauthLoading !== null) ? { scale: 1.01 } : {}}
-                  whileTap={!(isSubmitting || oauthLoading !== null) ? { scale: 0.99 } : {}}
+                  whileHover={!isSubmitting ? { scale: 1.01 } : {}}
+                  whileTap={!isSubmitting ? { scale: 0.99 } : {}}
                   className="pt-2"
                 >
                   <Button
                     type="submit"
-                    disabled={isSubmitting || oauthLoading !== null}
+                    disabled={isSubmitting}
                     className="w-full h-11 font-semibold text-white bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-600 hover:from-indigo-500 hover:via-indigo-400 hover:to-cyan-500 rounded-xl shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 cursor-pointer border-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {isSubmitting ? (
@@ -403,44 +388,6 @@ export default function LoginForm() {
                   </Button>
                 </motion.div>
               </form>
- 
-              {/* --- Divider --- */}
-              <div className="relative flex items-center justify-center">
-                <div className="border-t border-slate-200 dark:border-indigo-400/25 w-full" />
-                <span className="bg-slate-50 dark:bg-[#101e4a] px-3 text-[11px] font-semibold tracking-wider text-slate-400 dark:text-slate-400 uppercase">
-                  Or continue with
-                </span>
-                <div className="border-t border-slate-200 dark:border-indigo-400/25 w-full" />
-              </div>
- 
-              {/* --- Google OAuth Button --- */}
-              <motion.div
-                whileHover={!(isSubmitting || oauthLoading !== null) ? { scale: 1.01 } : {}}
-                whileTap={!(isSubmitting || oauthLoading !== null) ? { scale: 0.99 } : {}}
-              >
-                <Button
-                  variant="outline"
-                  type="button"
-                  onClick={() => {
-                    setOauthLoading("google");
-                    window.location.href = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1") + "/auth/google/login?role=student";
-                  }}
-                  disabled={isSubmitting || oauthLoading !== null}
-                  className="w-full h-11 rounded-xl border border-slate-200 dark:border-indigo-400/30 bg-slate-100/80 dark:bg-[#132356]/85 hover:bg-slate-200/70 dark:hover:bg-[#182b68] text-slate-800 dark:text-slate-200 font-medium transition-all duration-200 shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                >
-                  {oauthLoading === "google" ? (
-                    <svg className="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                  ) : (
-                    <svg className="h-5 w-5 shrink-0" aria-hidden="true" viewBox="0 0 488 512">
-                      <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path>
-                    </svg>
-                  )}
-                  <span>{oauthLoading === "google" ? "Connecting to Google..." : "Continue with Google"}</span>
-                </Button>
-              </motion.div>
  
               {/* --- Sign Up Redirect --- */}
               <div className="pt-2 text-center text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5">

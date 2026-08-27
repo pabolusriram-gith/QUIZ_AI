@@ -77,11 +77,18 @@ class Settings(BaseSettings):
             return re.sub(r'\s+', '', v)
         return v
 
-    # SMTP Settings (For Password Recovery Emails)
+    # SMTP Settings (For Password Recovery Emails & OTP)
     SMTP_HOST: Optional[str] = None
     SMTP_PORT: Optional[int] = 587
     SMTP_USERNAME: Optional[str] = None
     SMTP_PASSWORD: Optional[str] = None
+
+    @field_validator("SMTP_HOST", "SMTP_USERNAME", "SMTP_PASSWORD", mode="before")
+    @classmethod
+    def strip_smtp_fields(cls, v):
+        if isinstance(v, str):
+            return v.strip().replace(" ", "")
+        return v
 
     # AI API Keys
     GEMINI_API_KEY: Optional[str] = None
