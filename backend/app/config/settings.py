@@ -96,8 +96,9 @@ class Settings(BaseSettings):
     GROQ_API_KEY: Optional[str] = None
 
     # AI Configuration Controls
-    ENABLE_MOCK_PROVIDER: bool = True
-    AUTO_PROVIDER_ORDER: Union[List[str], str] = ["gemini", "groq", "openai"]
+    ENABLE_MOCK_PROVIDER: bool = False
+    ENABLE_OPENAI_PROVIDER: bool = False
+    AUTO_PROVIDER_ORDER: Union[List[str], str] = ["groq", "gemini"]
     
     # RAG Settings
     RAG_BATCH_SIZE: int = 500
@@ -120,11 +121,11 @@ class Settings(BaseSettings):
     AI_ENHANCE_PER_MINUTE: int = 20
 
     # AI Resilience Settings
-    GEMINI_TIMEOUT_SECONDS: int = 45
-    GROQ_TIMEOUT_SECONDS: int = 30
-    OPENAI_TIMEOUT_SECONDS: int = 45
+    GEMINI_TIMEOUT_SECONDS: int = 25
+    GROQ_TIMEOUT_SECONDS: int = 20
+    OPENAI_TIMEOUT_SECONDS: int = 20
 
-    AI_MAX_RETRIES: int = 2
+    AI_MAX_RETRIES: int = 1
     AI_RETRY_BASE_DELAY_SECONDS: int = 1
     AI_CIRCUIT_FAILURE_THRESHOLD: int = 5
     AI_CIRCUIT_COOLDOWN_SECONDS: int = 60

@@ -76,33 +76,43 @@ except ImportError:
     google_exceptions = None
 
 def is_transient_failure(e: Exception) -> bool:
-    # 1. Timeout / socket / connection reset exceptions
+    # 1. Quota exhaustion / hard limit is NOT transient (fail fast)
+    msg = str(e).lower()
+    if "insufficient_quota" in msg or "insufficient credits" in msg or "billing" in msg:
+        return False
+    if "api key" in msg or "auth" in msg or "unauthorized" in msg or "forbidden" in msg:
+        return False
+    if "model_not_found" in msg or "does not exist" in msg or "no longer available" in msg:
+        return False
+    if "json_validate_failed" in msg or "bad request" in msg:
+        return False
+
+    # 2. Timeout / socket / connection reset exceptions
     if isinstance(e, (asyncio.TimeoutError, socket.timeout, ConnectionRefusedError, ConnectionResetError)):
         return True
-    # 2. HTTPX exceptions
+    # 3. HTTPX exceptions
     if isinstance(e, (httpx.TimeoutException, httpx.NetworkError)):
         return True
-    # 3. OpenAI / Groq exceptions
+    # 4. OpenAI / Groq exceptions
     if isinstance(e, OpenAI_APIError):
         if isinstance(e, (OpenAI_RateLimitError, OpenAI_InternalServerError, OpenAI_APITimeoutError, OpenAI_APIConnectionError)):
             return True
         status_code = getattr(e, "status_code", None)
-        if status_code in [429, 500, 502, 503, 504]:
-            return True
-        if isinstance(e, (OpenAI_AuthenticationError, OpenAI_PermissionDeniedError, OpenAI_NotFoundError, OpenAI_BadRequestError)):
-            return False
-    # 4. Google exceptions
-    if google_exceptions and isinstance(e, google_exceptions.GoogleAPICallError):
-        status_code = getattr(e, "code", None)
-        if status_code in [429, 500, 502, 503, 504]:
+        if status_code in [500, 502, 503, 504]:
             return True
         if status_code in [400, 401, 403, 404]:
             return False
-    # 5. Check string representations if generic
-    msg = str(e).lower()
-    if "timeout" in msg or "timed out" in msg or "connection" in msg or "rate limit" in msg or "429" in msg or "503" in msg:
-        if "api key" in msg or "auth" in msg or "unauthorized" in msg or "bad request" in msg:
+        if isinstance(e, (OpenAI_AuthenticationError, OpenAI_PermissionDeniedError, OpenAI_NotFoundError, OpenAI_BadRequestError)):
             return False
+    # 5. Google exceptions
+    if google_exceptions and isinstance(e, google_exceptions.GoogleAPICallError):
+        status_code = getattr(e, "code", None)
+        if status_code in [500, 502, 503, 504]:
+            return True
+        if status_code in [400, 401, 403, 404]:
+            return False
+    # 6. Check string representations if generic
+    if "timeout" in msg or "timed out" in msg or "connection" in msg or "503" in msg or "502" in msg:
         return True
     return False
 
@@ -407,7 +417,10 @@ class GeminiProvider(BaseAIProvider):
         }
         
         is_gemini_model = model_name and ("gemini" in model_name.lower())
-        chosen_model = model_name if is_gemini_model else "gemini-3.5-flash"
+        if is_gemini_model and model_name not in ["gemini-1.5-flash", "gemini-2.5-flash", "gemini-2.5-pro"]:
+            chosen_model = model_name
+        else:
+            chosen_model = "gemini-3.6-flash"
         model = genai.GenerativeModel(
             model_name=chosen_model,
             generation_config=generation_config,
@@ -524,8 +537,11 @@ class GroqProvider(BaseAIProvider):
         import time
         import socket
         
-        is_groq_model = model_name and ("llama" in model_name.lower() or "mixtral" in model_name.lower() or "gemma" in model_name.lower() or "qwen" in model_name.lower() or "compound" in model_name.lower() or "gpt" in model_name.lower())
-        chosen_model = model_name if is_groq_model else "qwen/qwen3.6-27b"
+        is_groq_model = model_name and ("qwen" in model_name.lower() or "compound" in model_name.lower() or "gpt" in model_name.lower() or "allam" in model_name.lower() or "orpheus" in model_name.lower())
+        if is_groq_model and model_name not in ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]:
+            chosen_model = model_name
+        else:
+            chosen_model = "openai/gpt-oss-120b"
         client = AsyncOpenAI(
             api_key=settings.GROQ_API_KEY,
             base_url="https://api.groq.com/openai/v1"
@@ -539,8 +555,7 @@ class GroqProvider(BaseAIProvider):
                     {"role": "system", "content": system_instruction},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=temperature,
-                response_format={"type": "json_object"}
+                temperature=temperature
             )
             gen_time = int((time.time() - start_time) * 1000)
             ai_metrics_service.increment_success("groq")
@@ -676,6 +691,8 @@ def is_groq_configured() -> bool:
     return bool(settings.GROQ_API_KEY and settings.GROQ_API_KEY.strip() and not settings.GROQ_API_KEY.startswith("your_"))
 
 def is_openai_configured() -> bool:
+    if not getattr(settings, "ENABLE_OPENAI_PROVIDER", True):
+        return False
     return bool(settings.OPENAI_API_KEY and settings.OPENAI_API_KEY.strip() and not settings.OPENAI_API_KEY.startswith("your_"))
 
 
@@ -686,7 +703,7 @@ def resolve_provider(provider_name: str) -> str:
     # 1. Handle Explicit Mock Provider
     if name == "mock":
         if not settings.ENABLE_MOCK_PROVIDER:
-            raise AIProviderConfigurationError("Mock provider is disabled (ENABLE_MOCK_PROVIDER is false).")
+            raise AIProviderConfigurationError("Mock provider is disabled in production (ENABLE_MOCK_PROVIDER is false).")
         return "mock"
         
     # 2. Handle Auto Mode
@@ -708,17 +725,19 @@ def resolve_provider(provider_name: str) -> str:
             raise AIProviderConfigurationError("All AI providers are currently unavailable. Please try again later.")
             
     # 3. Handle Explicit Providers
+    if name == "groq":
+        if not is_groq_configured():
+            raise AIProviderConfigurationError("Groq provider disabled (API key not configured).")
+        return "groq"
+
     if name == "gemini":
         if not is_gemini_configured():
             raise AIProviderConfigurationError("Gemini provider disabled (API key not configured).")
         return "gemini"
         
-    if name == "groq":
-        if not is_groq_configured():
-            raise AIProviderConfigurationError("Groq provider disabled (API key not configured).")
-        return "groq"
-        
     if name == "openai":
+        if not getattr(settings, "ENABLE_OPENAI_PROVIDER", True):
+            raise AIProviderConfigurationError("OpenAI provider is temporarily disabled in production due to account quota limits.")
         if not is_openai_configured():
             raise AIProviderConfigurationError("OpenAI provider disabled (API key not configured).")
         return "openai"

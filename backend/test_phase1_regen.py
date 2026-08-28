@@ -20,7 +20,12 @@ import json
 import os
 import re
 import sys
-import pytest
+try:
+    import pytest
+except ImportError:
+    class _MockPytest:
+        mark = type("mark", (), {"asyncio": lambda f: f})
+    pytest = _MockPytest()
 
 # -- ensure backend package is importable --------------------------------------
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
@@ -367,4 +372,21 @@ async def test_regeneration_topic_contamination():
         assert is_related_wrong is False, f"Question about '{test_topic}' should not match unrelated topic '{wrong_topic}'"
         
         print(f"\n[PASS] test_regeneration_topic_contamination for topic={test_topic}")
+
+
+if __name__ == "__main__":
+    async def run_all():
+        print("Running test_difficulty_change_regenerates...")
+        await test_difficulty_change_regenerates()
+        print("Running test_type_change_to_true_false_regenerates...")
+        await test_type_change_to_true_false_regenerates()
+        print("Running test_manual_regenerate_produces_different_question...")
+        await test_manual_regenerate_produces_different_question()
+        print("Running test_question_count_generation...")
+        await test_question_count_generation()
+        print("Running test_regeneration_topic_contamination...")
+        await test_regeneration_topic_contamination()
+        print("\nALL PHASE 1 REGENERATION TESTS PASSED (100%)!")
+
+    asyncio.run(run_all())
 

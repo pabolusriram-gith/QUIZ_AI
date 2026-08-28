@@ -620,9 +620,9 @@ class PipelineCoordinator:
     """Coordinates generation blueprints, hybrid validation checks, and guided iterative regeneration."""
     
     # Configurable similarity thresholds
-    SIM_THRESHOLD_STEM = 0.35
-    SIM_THRESHOLD_OBJ = 0.40
-    SIM_THRESHOLD_ORIGINAL = 0.30
+    SIM_THRESHOLD_STEM = 0.65
+    SIM_THRESHOLD_OBJ = 0.60
+    SIM_THRESHOLD_ORIGINAL = 0.55
 
     @classmethod
     async def generate_quiz(
@@ -776,29 +776,33 @@ class PipelineCoordinator:
 
             system_instruction = style_prompt_block + "\n\n"
             system_instruction += "Your primary objective is to produce high-quality, professional educational assessments that test deep conceptual understanding and problem-solving rather than simple memorization.\n"
-            system_instruction += "You MUST return ONLY a valid JSON array of questions matching the requested slots. Do NOT wrap inside markdown block wrappers or code fences.\n"
+            system_instruction += "You MUST return a valid JSON object with a 'questions' key containing an array of question objects matching the requested slots (e.g. {\"questions\": [...]}). Do NOT wrap inside markdown block wrappers or code fences.\n"
             
             system_instruction += "\nCRITICAL RESPONSE FORMAT & QUALITY RULES:\n"
-            system_instruction += "1. Output ONLY the raw valid JSON array. Absolutely NO leading/trailing text, explanations, or notes outside the JSON.\n"
-            system_instruction += "2. Do NOT wrap the JSON in markdown code blocks like ```json ... ```. Output raw JSON text directly.\n"
+            system_instruction += "1. Output ONLY the raw valid JSON object with key 'questions'. Absolutely NO leading/trailing text, explanations, or notes outside the JSON.\n"
+            system_instruction += "2. Do NOT wrap the JSON in markdown code blocks. Output raw JSON text directly.\n"
             system_instruction += "3. The text of the question stems, options, and explanations must NEVER contain fragments of these prompt instructions, template variables, system prompt, or blueprint slot guidelines (such as 'Generate 10 questions', 'Blueprint Slot', etc.). Stems must be clean and ready for exams.\n"
             system_instruction += "4. Do NOT output any internal reasoning, draft texts, or conversational wrappers.\n\n"
             
-            system_instruction += "Each question object in the array must strictly match this schema:\n"
+            system_instruction += "The JSON response must match this schema:\n"
             system_instruction += """{
-  "text": "Question text containing context/scenarios. For code, use clean markdown blocks.",
-  "difficulty": "easy / medium / hard",
-  "topic": "topic name",
-  "marks": 1,
-  "explanation": "Detailed explanation containing: **Core Concept**, **Incorrect Option Analysis**, and **Learner Takeaway**.",
-  "question_type": "multiple_choice / multiple_select / true_false / fill_in_the_blank / short_answer",
-  "bloom_level": "bloom taxonomy level",
-  "learning_objective": "specific detailed concept tested",
-  "options": [
+  "questions": [
     {
-      "text": "option text",
-      "is_correct": true,
-      "display_order": 0
+      "text": "Question text containing context/scenarios. For code, use clean markdown blocks.",
+      "difficulty": "easy / medium / hard",
+      "topic": "topic name",
+      "marks": 1,
+      "explanation": "Detailed explanation containing: **Core Concept**, **Incorrect Option Analysis**, and **Learner Takeaway**.",
+      "question_type": "multiple_choice / multiple_select / true_false / fill_in_the_blank / short_answer",
+      "bloom_level": "bloom taxonomy level",
+      "learning_objective": "specific detailed concept tested",
+      "options": [
+        {
+          "text": "option text",
+          "is_correct": true,
+          "display_order": 0
+        }
+      ]
     }
   ]
 }
@@ -821,7 +825,7 @@ Core Pedagogical Quality Rules:
             if has_document_context:
                 system_instruction += "\nCRITICAL INSTRUCTION: You are generating questions based ONLY on the provided Context Content (from the uploaded document). The style-specific example is provided ONLY to demonstrate structural/JSON format and question style, not the topic. You MUST NOT generate questions about the topic of the example (such as databases, coding, or Python) unless the Context Content is explicitly about those topics. All questions MUST be derived directly from the Context Content. If the Context Content does not contain enough information to generate the requested number of questions, generate ONLY as many high-quality questions as the Context Content actually supports. Do NOT invent facts or use external knowledge. If the content is insufficient to generate even a single question, return an empty JSON array.\n"
 
-            prompt = f"Generate exactly {oversample_count} questions based on this exact blueprint:\n"
+            prompt = f"Generate exactly {oversample_count} questions in valid JSON format matching the schema {{\"questions\": [...]}} based on this exact blueprint:\n"
             for slot in blueprint:
                 prompt += f"- Slot {slot.order_index}: Difficulty={slot.difficulty}, Bloom Level={slot.bloom_level}, Type={slot.question_type}, Target Objective='{slot.learning_objective}'\n"
             
@@ -1095,7 +1099,7 @@ Core Pedagogical Quality Rules:
                     guided_prompt += f"- Target Bloom level: {slot.bloom_level}\n"
                     guided_prompt += f"- Question Type: {slot.question_type}\n"
                     guided_prompt += f"- Target Learning Objective: '{slot.learning_objective}'\n"
-                    guided_prompt += f"\nCRITICAL FORMAT RULE: Output ONLY a valid JSON array containing exactly 1 question matching the requested slot. Do NOT wrap inside markdown block wrappers or code fences. Absolutely NO text outside the JSON. The question stem must NEVER contain prompt words or instructions.\n"
+                    guided_prompt += f"\nCRITICAL FORMAT RULE: Output ONLY a valid JSON object with key 'questions' containing an array with exactly 1 question matching the requested slot (e.g. {{\"questions\": [...]}}). Do NOT wrap inside markdown block wrappers or code fences. Absolutely NO text outside the JSON. The question stem must NEVER contain prompt words or instructions.\n"
                     guided_prompt += f"\nCRITICAL CORRECTIVE FEEDBACK: Please address this issue specifically by writing a premium quality question. Ensure options are distinct, distractors are plausible, and explanations follow the Core Concept, Incorrect Option Analysis, and Learner Takeaway format.\n"
                     guided_prompt += f"\nSUBJECT-SPECIFIC GUIDELINES:\n{subject_guidelines}\n"
                     guided_prompt += f"\nContext Content:\n{final_context[:20000]}\n"
@@ -1622,7 +1626,7 @@ Generated on: {datetime.now(timezone.utc).isoformat()}
                 f"\nSUBJECT-SPECIFIC GUIDELINES:\n{subject_guidelines}\n"
                 f"\nEXPLANATION FORMAT REQUIREMENTS:\n"
                 f"Every candidate explanation MUST contain the structured sections: 'Core Concept', 'Incorrect Option Analysis', and 'Learner Takeaway'.\n"
-                f"Return a valid JSON array of {candidates_count} candidate questions."
+                f"Return a valid JSON object with key 'questions' containing the {candidates_count} candidate questions array (e.g. {{\"questions\": [...]}})."
             )
 
             prompt = (
@@ -1633,7 +1637,7 @@ Generated on: {datetime.now(timezone.utc).isoformat()}
                 f"  Objective: '{original_question.get('learning_objective', '')}' \n"
                 f"\nGenerate exactly {candidates_count} candidate replacement questions "
                 f"with difficulty={target_difficulty}, question_type={target_type}. "
-                f"Return ONLY a valid JSON array. No markdown, no preamble."
+                f"Return ONLY a valid JSON object with key 'questions' containing the candidate array (e.g. {{\"questions\": [...]}}). No markdown, no preamble."
             )
 
             candidates = []

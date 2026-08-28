@@ -229,9 +229,8 @@ function CreateQuizContent() {
   const [aiProvider, setAiProvider] = useState<string>("auto");
   const [providers, setProviders] = useState<{ id: string; name: string; recommended?: boolean }[]>([
     { id: "auto", name: "Auto", recommended: true },
-    { id: "gemini", name: "Gemini" },
     { id: "groq", name: "Groq" },
-    { id: "openai", name: "OpenAI" }
+    { id: "gemini", name: "Gemini" }
   ]);
   const [aiModel, setAiModel] = useState<string>("");
   const [sourceType, setSourceType] = useState<"topic" | "text" | "file">("topic");
@@ -248,9 +247,10 @@ function CreateQuizContent() {
   const [customPrompt, setCustomPrompt] = useState<string>("");
   const [questionDistribution, setQuestionDistribution] = useState<string>("");
 
-  // AI Generated Results / Warnings / Loading
+  // AI Generated Results / Warnings / Loading / Error
   const [duplicateWarnings, setDuplicateWarnings] = useState<Record<number, { similarity: number; existing_text: string; warning: string }>>({});
   const [aiLoading, setAiLoading] = useState<boolean>(false);
+  const [generationError, setGenerationError] = useState<string | null>(null);
   const [mismatchData, setMismatchData] = useState<{ parsedCount: number; currentCount: number } | null>(null);
 
   // Per-question regeneration loading state — null means no regeneration in progress
@@ -778,7 +778,9 @@ function CreateQuizContent() {
   };
 
   const executeGenerateAI = async (targetCount: number) => {
+    if (aiLoading) return;
     setAiLoading(true);
+    setGenerationError(null);
     setView("loading");
 
     const formData = new FormData();
@@ -830,7 +832,9 @@ function CreateQuizContent() {
       }
       
       if (!rawQuestionsList || rawQuestionsList.length === 0) {
-        toast.error("AI returned 0 valid questions. Try a different topic or provider.");
+        const errorMsg = "AI returned 0 valid questions. Please try a different topic, style, or provider.";
+        setGenerationError(errorMsg);
+        toast.error(errorMsg);
         setAiLoading(false);
         setView("ai-generator");
         return;
@@ -896,6 +900,7 @@ function CreateQuizContent() {
       setQuiz(newQuiz);
       setSelectedQuestionIndex(0);
       setAiLoading(false);
+      setGenerationError(null);
       setView("editor");
       setActiveTab("questions");
       setVisitedTabs(new Set(["questions"]));
@@ -911,14 +916,21 @@ function CreateQuizContent() {
       await checkDuplicates(questions);
 
     } catch (err: unknown) {
-      const error = err as { response?: { status?: number, data?: { detail?: string } } };
+      const error = err as { message?: string; code?: string; response?: { status?: number; data?: { detail?: string } } };
       setAiLoading(false);
       setView("ai-generator");
+      let errMsg = "AI question generation failed.";
       if (error.response?.status === 429) {
-        toast.error("You're generating questions too quickly. Please wait a moment and try again.");
-      } else {
-        toast.error(error.response?.data?.detail || "AI question generation failed.");
+        errMsg = "You are generating questions too quickly or the provider quota is exhausted. Please try again in a moment or select a different provider.";
+      } else if (error.code === "ECONNABORTED" || error.message?.toLowerCase().includes("timeout")) {
+        errMsg = "Generation request timed out after 120 seconds. Please select a faster provider or reduce question count.";
+      } else if (error.response?.data?.detail) {
+        errMsg = error.response.data.detail;
+      } else if (error.message) {
+        errMsg = error.message;
       }
+      setGenerationError(errMsg);
+      toast.error(errMsg);
     }
   };
 
@@ -2298,8 +2310,28 @@ function CreateQuizContent() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
             transition={{ duration: 0.35 }}
-            className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+            className="space-y-6"
           >
+            {generationError && (
+              <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/25 text-rose-700 dark:text-rose-300 flex items-start justify-between gap-3 shadow-lg shadow-rose-500/5">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="h-5 w-5 text-rose-500 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-bold text-rose-900 dark:text-rose-200">Question Generation Notice</h4>
+                    <p className="text-xs text-rose-700 dark:text-rose-300/90 leading-relaxed">{generationError}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setGenerationError(null)}
+                  className="px-3 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-700 dark:text-rose-300 text-xs font-bold transition-colors cursor-pointer shrink-0"
+                >
+                  Dismiss
+                </button>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column: AI Parameters */}
             <div className="lg:col-span-1 space-y-6">
               <div className="bg-slate-50/80 dark:bg-[#0c1427]/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(2,6,17,0.4)] rounded-2xl p-6 space-y-4">
@@ -2324,14 +2356,10 @@ function CreateQuizContent() {
                         let label = p.name;
                         if (p.id === "auto") {
                           label = "🤖 Auto (Recommended)";
-                        } else if (p.id === "gemini") {
-                          label = "💎 Gemini";
                         } else if (p.id === "groq") {
                           label = "⚡ Groq";
-                        } else if (p.id === "openai") {
-                          label = "🧠 OpenAI";
-                        } else if (p.id === "mock") {
-                          label = "🛠️ Mock Engine";
+                        } else if (p.id === "gemini") {
+                          label = "💎 Gemini";
                         }
                         return (
                           <option key={p.id} value={p.id} className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">
@@ -2343,26 +2371,22 @@ function CreateQuizContent() {
                   </div>
 
                   {/* Model input (optional override) */}
-                  {aiProvider !== "mock" && (
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Specific Model Override (Optional)</label>
-                      <Input
-                        type="text"
-                        value={aiModel}
-                        onChange={(e) => setAiModel(e.target.value)}
-                        placeholder={
-                          aiProvider === "gemini" 
-                            ? "e.g. gemini-1.5-flash" 
-                            : aiProvider === "groq"
-                            ? "e.g. llama-3.3-70b-versatile"
-                            : aiProvider === "openai" 
-                            ? "e.g. gpt-4o-mini" 
-                            : "Leave blank for default"
-                        }
-                        className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-cyan-500/50"
-                      />
-                    </div>
-                  )}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Specific Model Override (Optional)</label>
+                    <Input
+                      type="text"
+                      value={aiModel}
+                      onChange={(e) => setAiModel(e.target.value)}
+                      placeholder={
+                        aiProvider === "groq" 
+                          ? "e.g. openai/gpt-oss-120b" 
+                          : aiProvider === "gemini"
+                          ? "e.g. gemini-3.6-flash" 
+                          : "Leave blank for default"
+                      }
+                      className="bg-slate-100/70 dark:bg-[#121c33]/75 border border-slate-200 dark:border-slate-700/60 rounded-xl h-11 text-slate-900 dark:text-white font-medium text-sm focus:border-cyan-500/50"
+                    />
+                  </div>
 
                   {/* Question Count */}
                   <div className="space-y-1.5">
@@ -2985,6 +3009,7 @@ function CreateQuizContent() {
                 </div>
               </div>
             </div>
+          </div>
           </motion.div>
         )}
 
