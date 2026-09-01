@@ -595,12 +595,12 @@ async def resend_verification_otp(
     db.add(user)
     await db.commit()
 
-    send_verification_email(email_clean, otp_code)
+    sent = send_verification_email(email_clean, otp_code)
     
     response_data: dict[str, Any] = {
         "message": "A new verification code has been sent to your email."
     }
-    if not settings.SMTP_HOST or not settings.SMTP_USERNAME:
+    if not sent or not settings.SMTP_HOST or not settings.SMTP_USERNAME:
         response_data["dev_otp"] = otp_code
         
     return response_data
