@@ -923,7 +923,9 @@ function CreateQuizContent() {
       if (error.response?.status === 429) {
         errMsg = "You are generating questions too quickly or the provider quota is exhausted. Please try again in a moment or select a different provider.";
       } else if (error.code === "ECONNABORTED" || error.message?.toLowerCase().includes("timeout")) {
-        errMsg = "Generation request timed out after 120 seconds. Please select a faster provider or reduce question count.";
+        errMsg = "Generation request timed out. Please select a faster provider or reduce question count.";
+      } else if (error.response?.status === 503) {
+        errMsg = "All available AI providers are currently experiencing issues or failed. Please check your provider settings or try again later.";
       } else if (error.response?.data?.detail) {
         errMsg = error.response.data.detail;
       } else if (error.message) {

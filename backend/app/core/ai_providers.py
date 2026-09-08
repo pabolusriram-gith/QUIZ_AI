@@ -225,7 +225,13 @@ async def execute_resilient_raw_call(provider_name: str, func, *args, **kwargs):
             )
             
             if not is_trans:
-                # Non-transient failure. Do NOT retry, propagate immediately.
+                # Non-transient failure. Do NOT retry.
+                # Open circuit breaker for hard failures (auth, quota, forbidden) so AutoProvider skips it
+                msg = str(e).lower()
+                if "api key" in msg or "auth" in msg or "unauthorized" in msg or "forbidden" in msg or "insufficient_quota" in msg or "billing" in msg or "insufficient credits" in msg:
+                    ai_health_service.force_open_circuit(provider_name, reason=f"Hard authentication or quota failure: {e}")
+                
+                # Propagate immediately.
                 raise e
                 
             attempt += 1
@@ -610,10 +616,9 @@ class AutoProvider(BaseAIProvider):
             elif p_name == "mock" and settings.ENABLE_MOCK_PROVIDER:
                 order.append("mock")
         
-        # If mock is explicitly enabled and not in list, we append it as absolute last fallback in dev mode only
-        if settings.ENABLE_MOCK_PROVIDER and "mock" not in order:
-            order.append("mock")
-            
+        # Mock should only be used if explicitly in AUTO_PROVIDER_ORDER
+        # Removed the automatic appending of 'mock' as per production reliability rules.
+        
         for prov in order:
             if prov != "mock":
                 state = ai_health_service.check_and_update_circuit(prov)

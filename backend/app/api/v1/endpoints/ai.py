@@ -905,8 +905,6 @@ async def enhance_prompt(
                 providers_to_try.append("openai")
             elif prov == "mock" and settings.ENABLE_MOCK_PROVIDER:
                 providers_to_try.append("mock")
-        if settings.ENABLE_MOCK_PROVIDER and "mock" not in providers_to_try:
-            providers_to_try.append("mock")
     else:
         providers_to_try = [resolved_name]
         
