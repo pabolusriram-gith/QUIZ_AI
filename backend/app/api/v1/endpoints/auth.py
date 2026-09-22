@@ -272,33 +272,28 @@ GOOGLE_CLIENT_SECRET="your_google_client_secret"
 
 
 def send_verification_email(email: str, otp_code: str) -> bool:
-    """Helper to send 6-digit OTP email verification via SMTP if configured, else log to console."""
-    if not settings.SMTP_HOST or not settings.SMTP_USERNAME or not settings.SMTP_PASSWORD:
+    """Helper to send 6-digit OTP email verification via Brevo API if configured, else log to console."""
+    import os
+    import httpx
+    
+    brevo_api_key = os.getenv("BREVO_API_KEY")
+    if not brevo_api_key:
         print(f"\n=======================================================")
         print(f"[DEVELOPMENT MODE] Email Verification Code for {email}:")
         print(f" >>> OTP CODE: {otp_code} <<< (Valid for 15 minutes)")
         print(f"=======================================================\n", flush=True)
         return False
 
-    import smtplib
-    from email.mime.text import MIMEText
-    from email.mime.multipart import MIMEMultipart
-
     try:
-        msg = MIMEMultipart("alternative")
-        msg['From'] = f"QuizVerse AI <{settings.SMTP_USERNAME}>"
-        msg['To'] = email
-        msg['Subject'] = f"QuizVerse AI - Your Verification Code is {otp_code}"
+        url = "https://api.brevo.com/v3/smtp/email"
+        headers = {
+            "accept": "application/json",
+            "api-key": brevo_api_key,
+            "content-type": "application/json"
+        }
         
-        text_body = f"""Hello,
-
-Thank you for registering on QuizVerse AI.
-Your 6-digit email verification code is: {otp_code}
-
-This code is valid for 15 minutes. Please enter it in the verification screen to activate your account.
-
-If you did not request this registration, please ignore this email.
-"""
+        text_body = f"Hello,\n\nThank you for registering on QuizVerse AI.\nYour 6-digit email verification code is: {otp_code}\n\nThis code is valid for 15 minutes. Please enter it in the verification screen to activate your account.\n\nIf you did not request this registration, please ignore this email.\n"
+        
         html_body = f"""<!DOCTYPE html>
 <html>
 <head>
@@ -336,17 +331,25 @@ If you did not request this registration, please ignore this email.
     </div>
 </body>
 </html>"""
-        msg.attach(MIMEText(text_body, 'plain'))
-        msg.attach(MIMEText(html_body, 'html'))
+
+        payload = {
+            "sender": {
+                "name": "QuizVerse AI",
+                "email": settings.SMTP_FROM_EMAIL or "pabolusriram@gmail.com"
+            },
+            "to": [{"email": email}],
+            "subject": f"QuizVerse AI - Your Verification Code is {otp_code}",
+            "htmlContent": html_body,
+            "textContent": text_body
+        }
         
-        server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT or 587, timeout=10, source_address=('0.0.0.0', 0))
-        server.starttls()
-        server.login(settings.SMTP_USERNAME, settings.SMTP_PASSWORD)
-        server.sendmail(settings.SMTP_USERNAME, email, msg.as_string())
-        server.quit()
+        with httpx.Client() as client:
+            response = client.post(url, headers=headers, json=payload, timeout=10.0)
+            response.raise_for_status()
+            
         return True
     except Exception as e:
-        print(f"[-] Failed to send verification email via SMTP: {e}", flush=True)
+        print(f"[-] Failed to send verification email via Brevo API: {e}", flush=True)
         return False
 
 
