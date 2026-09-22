@@ -335,7 +335,7 @@ def send_verification_email(email: str, otp_code: str) -> bool:
         payload = {
             "sender": {
                 "name": "QuizVerse AI",
-                "email": settings.SMTP_FROM_EMAIL or "pabolusriram@gmail.com"
+                "email": getattr(settings, 'SMTP_FROM_EMAIL', None) or "pabolusriram@gmail.com"
             },
             "to": [{"email": email}],
             "subject": f"QuizVerse AI - Your Verification Code is {otp_code}",
