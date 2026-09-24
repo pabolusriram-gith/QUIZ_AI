@@ -605,6 +605,11 @@ async def read_quizzes(
     if current_user.role == "student":
         # Students should only see published, non-archived quizzes
         filters.append(Quiz.status == "published")
+    elif current_user.role == "teacher":
+        # Teachers should only see their own quizzes on their dashboard
+        filters.append(Quiz.created_by_id == current_user.id)
+        if status:
+            filters.append(Quiz.status == status)
     elif status:
         filters.append(Quiz.status == status)
 
