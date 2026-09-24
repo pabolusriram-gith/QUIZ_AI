@@ -767,9 +767,9 @@ function CreateQuizContent() {
       const parsedCount = parseInt(countMatch[1], 10);
       if (!isNaN(parsedCount)) {
         const clampedParsed = Math.max(1, Math.min(30, parsedCount));
-        if (Math.abs(clampedParsed - questionCount) >= 3) {
-          setMismatchData({ parsedCount: clampedParsed, currentCount: questionCount });
-          return;
+        // Automatically sync the UI slider to the prompt's count if a count is specified
+        if (clampedParsed !== questionCount) {
+          setQuestionCount(clampedParsed);
         }
       }
     }
@@ -818,15 +818,16 @@ function CreateQuizContent() {
       if (dataPayload && dataPayload.questions) {
         rawQuestionsList = dataPayload.questions;
         const suggestedMetadata = dataPayload.metadata;
-        if (suggestedMetadata) {
-          setQuiz(prev => ({
-            ...prev,
-            title: prev.title || suggestedMetadata.title || "",
-            subject: prev.subject || suggestedMetadata.subject || "",
-            department: prev.department || suggestedMetadata.department || "",
-            description: prev.description || suggestedMetadata.description || ""
-          }));
-        }
+        // User requested that quiz details be manually entered instead of auto-filled
+        // if (suggestedMetadata) {
+        //   setQuiz(prev => ({
+        //     ...prev,
+        //     title: prev.title || suggestedMetadata.title || "",
+        //     subject: prev.subject || suggestedMetadata.subject || "",
+        //     department: prev.department || suggestedMetadata.department || "",
+        //     description: prev.description || suggestedMetadata.description || ""
+        //   }));
+        // }
       } else if (Array.isArray(dataPayload)) {
         rawQuestionsList = dataPayload;
       }
