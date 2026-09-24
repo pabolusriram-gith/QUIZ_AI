@@ -781,7 +781,7 @@ class PipelineCoordinator:
             system_instruction += "\nCRITICAL RESPONSE FORMAT & QUALITY RULES:\n"
             system_instruction += "1. Output ONLY the raw valid JSON object with key 'questions'. Absolutely NO leading/trailing text, explanations, or notes outside the JSON.\n"
             system_instruction += "2. Do NOT wrap the JSON in markdown code blocks. Output raw JSON text directly.\n"
-            system_instruction += "3. The text of the question stems, options, and explanations must NEVER contain fragments of these prompt instructions, template variables, system prompt, or blueprint slot guidelines (such as 'Generate 10 questions', 'Blueprint Slot', etc.). Stems must be clean and ready for exams.\n"
+            system_instruction += "3. The text of the question stems, options, and explanations must NEVER contain meta-instructions, prompt fragments, system guidelines, or internal variables. Stems must be clean, self-contained, and ready for exams without referencing how they were generated.\n"
             system_instruction += "4. Do NOT output any internal reasoning, draft texts, or conversational wrappers.\n\n"
             
             system_instruction += "The JSON response must match this schema:\n"
