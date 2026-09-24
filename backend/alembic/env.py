@@ -48,32 +48,34 @@ def do_run_migrations(connection: Connection) -> None:
     from sqlalchemy import text
     
     # Check if auth schema exists. If not, setup local compatibility structures.
-    res = connection.execute(text("SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'auth';"))
-    if not res.scalar():
-        connection.execute(text("CREATE SCHEMA IF NOT EXISTS auth;"))
-        connection.execute(text("""
-            CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid AS $$
-                SELECT coalesce(
-                    nullif(current_setting('request.jwt.claim.sub', true), ''),
-                    nullif(current_setting('request.jwt.claims', true)::json->>'sub', '')
-                )::uuid;
-            $$ LANGUAGE sql STABLE;
-        """))
-        connection.execute(text("""
-            DO $$
-            BEGIN
-                IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'anon') THEN
-                    CREATE ROLE anon;
-                END IF;
-                IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'authenticated') THEN
-                    CREATE ROLE authenticated;
-                END IF;
-                IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'service_role') THEN
-                    CREATE ROLE service_role;
-                END IF;
-            END
-            $$;
-        """))
+    # Only run this on Postgres, not SQLite
+    if "sqlite" not in str(connection.engine.url):
+        res = connection.execute(text("SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'auth';"))
+        if not res.scalar():
+            connection.execute(text("CREATE SCHEMA IF NOT EXISTS auth;"))
+            connection.execute(text("""
+                CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid AS $$
+                    SELECT coalesce(
+                        nullif(current_setting('request.jwt.claim.sub', true), ''),
+                        nullif(current_setting('request.jwt.claims', true)::json->>'sub', '')
+                    )::uuid;
+                $$ LANGUAGE sql STABLE;
+            """))
+            connection.execute(text("""
+                DO $$
+                BEGIN
+                    IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'anon') THEN
+                        CREATE ROLE anon;
+                    END IF;
+                    IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'authenticated') THEN
+                        CREATE ROLE authenticated;
+                    END IF;
+                    IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'service_role') THEN
+                        CREATE ROLE service_role;
+                    END IF;
+                END
+                $$;
+            """))
 
     context.configure(connection=connection, target_metadata=target_metadata)
 

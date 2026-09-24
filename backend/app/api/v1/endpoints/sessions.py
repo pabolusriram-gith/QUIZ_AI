@@ -392,13 +392,20 @@ async def create_session(
     existing_session = existing_res.scalar_one_or_none()
     
     if existing_session:
-        # Load the quiz to enrich title
-        quiz_res = await db.execute(select(Quiz).where(Quiz.id == existing_session.quiz_id))
-        quiz = quiz_res.scalar_one_or_none()
-        
-        # Attach dynamic property
-        existing_session.quiz_title = quiz.title if quiz else None
-        return existing_session
+        now = datetime.now(timezone.utc)
+        if (now - existing_session.created_at).total_seconds() > 24 * 3600:
+            existing_session.status = GameSessionStatus.FINISHED.value
+            existing_session.ended_at = now
+            await db.commit()
+            existing_session = None
+        else:
+            # Load the quiz to enrich title
+            quiz_res = await db.execute(select(Quiz).where(Quiz.id == existing_session.quiz_id))
+            quiz = quiz_res.scalar_one_or_none()
+            
+            # Attach dynamic property
+            existing_session.quiz_title = quiz.title if quiz else None
+            return existing_session
 
     # Verify quiz exists and is published
     quiz_res = await db.execute(
@@ -410,10 +417,29 @@ async def create_session(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Quiz not found"
         )
+        
+    now = datetime.now(timezone.utc)
+    
+    if quiz.available_from:
+        from_time = quiz.available_from.replace(tzinfo=timezone.utc) if not quiz.available_from.tzinfo else quiz.available_from
+        if now < from_time:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"This quiz cannot be hosted yet. It becomes available on {from_time.strftime('%Y-%m-%d %H:%M:%S')} UTC."
+            )
+            
+    if quiz.available_until:
+        until_time = quiz.available_until.replace(tzinfo=timezone.utc) if not quiz.available_until.tzinfo else quiz.available_until
+        if now > until_time:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"This quiz has expired. It was only available until {until_time.strftime('%Y-%m-%d %H:%M:%S')} UTC."
+            )
+
     if quiz.status != "published":
         # Auto-publish quiz when teacher creates a live session
         quiz.status = "published"
-        quiz.published_at = datetime.now(timezone.utc)
+        quiz.published_at = now
         db.add(quiz)
         await db.commit()
 
@@ -622,6 +648,24 @@ async def start_session(
         select(Quiz).where(Quiz.id == db_session.quiz_id).options(selectinload(Quiz.questions))
     )
     quiz = quiz_res.scalar_one_or_none()
+    
+    if quiz:
+        now_utc = datetime.now(timezone.utc)
+        if quiz.available_from:
+            from_time = quiz.available_from.replace(tzinfo=timezone.utc) if not quiz.available_from.tzinfo else quiz.available_from
+            if now_utc < from_time:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"This quiz cannot be started yet. It becomes available on {from_time.strftime('%Y-%m-%d %H:%M:%S')} UTC."
+                )
+        if quiz.available_until:
+            until_time = quiz.available_until.replace(tzinfo=timezone.utc) if not quiz.available_until.tzinfo else quiz.available_until
+            if now_utc > until_time:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"This quiz has expired. It was only available until {until_time.strftime('%Y-%m-%d %H:%M:%S')} UTC."
+                )
+                
     questions = list(quiz.questions) if quiz else []
 
     if not db_session.randomized_question_ids:

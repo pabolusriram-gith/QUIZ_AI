@@ -18,7 +18,7 @@ bcrypt.hashpw = patched_hashpw
 from passlib.context import CryptContext
 from app.config.settings import settings
 
-pwd_context = CryptContext(schemes=["argon2", "bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt", "argon2"], deprecated="auto")
 
 
 def hash_password(password: str) -> str:

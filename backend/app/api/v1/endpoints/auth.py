@@ -22,6 +22,7 @@ from app.core.security import (
 from app.core.rate_limit import rate_limit_login, rate_limit_register, rate_limit_forgot_password
 from app.core.blacklist import blacklist_token, is_token_blacklisted
 from app.api.deps import get_db, get_current_user
+from fastapi.concurrency import run_in_threadpool
 from app.models.user import User
 from app.models.login_history import LoginHistory
 from app.schemas.user import (
@@ -709,7 +710,11 @@ async def login(
     result = await db.execute(select(User).where(User.email == credentials.email.lower().strip()))
     user = result.scalar_one_or_none()
 
-    if not user or not verify_password(credentials.password, user.hashed_password):
+    is_valid = False
+    if user:
+        is_valid = await run_in_threadpool(verify_password, credentials.password, user.hashed_password)
+
+    if not user or not is_valid:
         # Log failure if user exists
         if user:
             await log_login_event(db, user.id, request, "failed")
@@ -718,6 +723,11 @@ async def login(
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"}
         )
+        
+    # Rehash if needed
+    from app.core.security import pwd_context
+    if pwd_context.needs_update(user.hashed_password):
+        user.hashed_password = await run_in_threadpool(hash_password, credentials.password)
         
     if not user.is_active:
         raise HTTPException(
