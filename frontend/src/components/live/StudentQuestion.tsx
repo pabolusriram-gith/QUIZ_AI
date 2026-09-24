@@ -65,6 +65,12 @@ export default function StudentQuestion({
 }: StudentQuestionProps) {
   if (!question) return null;
 
+  // Local state for slido-style waiting in solo mode with individual timers
+  const [localSubmitted, setLocalSubmitted] = React.useState(false);
+  React.useEffect(() => {
+    setLocalSubmitted(false);
+  }, [currentIdx]);
+
   // In solo mode, question is never locked by teacher. In live mode, locked until teacher starts timer.
   const isLocked = !isSoloMode && !timerStarted;
 
@@ -142,7 +148,7 @@ export default function StudentQuestion({
               </p>
             </div>
           </div>
-        ) : (!isSoloMode && isSubmitted) ? (
+        ) : (!isSoloMode && isSubmitted) || (isSoloMode && questionTimeLeft !== null && localSubmitted) ? (
           <div className="flex flex-col items-center justify-center py-12 text-center space-y-4 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900/30">
             <div className="h-14 w-14 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 animate-bounce">
               <Check className="h-6 w-6" />
@@ -150,11 +156,15 @@ export default function StudentQuestion({
             <div className="space-y-1">
               <h3 className="text-base font-bold text-slate-900 dark:text-white">Answer Submitted</h3>
               <p className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold">
-                Waiting for the teacher to advance to the next question...
+                {!isSoloMode 
+                  ? "Waiting for the teacher to advance to the next question..."
+                  : "Waiting for the question timer to expire..."}
               </p>
-              <div className="text-[9px] text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full inline-block mt-3 animate-pulse">
-                {answeredCount} / {totalPlayers} Students Answered
-              </div>
+              {!isSoloMode && (
+                <div className="text-[9px] text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full inline-block mt-3 animate-pulse">
+                  {answeredCount} / {totalPlayers} Students Answered
+                </div>
+              )}
             </div>
           </div>
         ) : (
@@ -235,38 +245,49 @@ export default function StudentQuestion({
 
             {/* Navigation / Submission Footer */}
             {isSoloMode ? (
-              <div className="flex items-center justify-between pt-4 border-t border-slate-200/80 dark:border-slate-800/80 gap-3">
+              questionTimeLeft !== null ? (
                 <Button
-                  type="button"
-                  variant="outline"
-                  disabled={currentIdx === 0}
-                  onClick={onPrevQuestion}
-                  className="h-10 px-4 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 disabled:opacity-30 flex items-center gap-1.5 cursor-pointer"
+                  onClick={() => setLocalSubmitted(true)}
+                  disabled={selectedAnswer.length === 0 || (selectedAnswer[0] === "" && question.question_type !== "multiple_choice") || localSubmitted}
+                  className="w-full h-11 bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-indigo-500/20 border-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <ArrowLeft className="h-3.5 w-3.5" />
-                  <span>Previous</span>
+                  <Check className="h-4.5 w-4.5" />
+                  <span>Submit Answer</span>
                 </Button>
+              ) : (
+                <div className="flex items-center justify-between pt-4 border-t border-slate-200/80 dark:border-slate-800/80 gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={currentIdx === 0}
+                    onClick={onPrevQuestion}
+                    className="h-10 px-4 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 disabled:opacity-30 flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    <span>Previous</span>
+                  </Button>
 
-                {currentIdx < totalQs - 1 ? (
-                  <Button
-                    type="button"
-                    onClick={onNextQuestion}
-                    className="h-10 px-5 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 border-none cursor-pointer shadow-md shadow-indigo-500/20"
-                  >
-                    <span>Next Question</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Button>
-                ) : (
-                  <Button
-                    type="button"
-                    onClick={onReviewSubmit}
-                    className="h-10 px-5 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white flex items-center gap-1.5 border-none cursor-pointer shadow-md shadow-emerald-500/20"
-                  >
-                    <span>Review & Submit</span>
-                    <Check className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
+                  {currentIdx < totalQs - 1 ? (
+                    <Button
+                      type="button"
+                      onClick={onNextQuestion}
+                      className="h-10 px-5 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 border-none cursor-pointer shadow-md shadow-indigo-500/20"
+                    >
+                      <span>Next Question</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      onClick={onReviewSubmit}
+                      className="h-10 px-5 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white flex items-center gap-1.5 border-none cursor-pointer shadow-md shadow-emerald-500/20"
+                    >
+                      <span>Review & Submit</span>
+                      <Check className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              )
             ) : (
               /* Live Multi-player Submit Button */
               onSubmit && (
